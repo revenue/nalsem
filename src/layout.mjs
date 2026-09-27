@@ -1,6 +1,6 @@
 // 페이지 셸. 모든 페이지가 같은 헤더·검색·푸터를 공유한다.
 export const V = Date.now().toString(36); // 자산 캐시 무효화
-export const SITE = { name: "날셈", url: "https://nalsem.app", tagline: "나이·날짜·음력 생활계산기" };
+export const SITE = { name: "날셈", url: "https://nalsem.unitblack.kr", tagline: "나이·날짜·음력 생활계산기" };
 
 // 아이콘: Iconify Solar 세트만 사용
 const ICON = {
@@ -9,7 +9,7 @@ const ICON = {
 };
 export const ARROW = '<span class="ico" aria-hidden="true"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>';
 
-export const BUILD_DATE = new Date().toISOString().slice(0, 10);
+export const BUILD_DATE = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST 기준
 export function shell({ title, description, path, body, script = "", nav = "", jsonld = null, keywords = [] }) {
   const fullTitle = path === "/" ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
   const ld = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];

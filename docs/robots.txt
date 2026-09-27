@@ -31,4 +31,4 @@ Allow: /
 User-agent: Daum
 Allow: /
 
-Sitemap: https://nalsem.app/sitemap.xml
+Sitemap: https://nalsem.unitblack.kr/sitemap.xml

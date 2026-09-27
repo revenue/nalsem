@@ -44,6 +44,13 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 - Supanova 원본은 Tailwind CDN + 단일 HTML 을 전제하지만, 31페이지 정적 사이트라 같은 규칙을 `site.css` 토큰으로 옮겨 적용했다
 - 페이지: 좌 도구 / 우 설명(7:5), 모바일은 세로 스택. 결과는 입력 즉시 갱신, URL 쿼리로 공유·북마크
 
+## 배포
+
+- 도메인: **https://nalsem.unitblack.kr** (`docs/CNAME`). `src/layout.mjs` 의 `SITE.url` 이 canonical·OG·sitemap·llms.txt 전부의 기준
+- 호스팅: GitHub Pages, `main` 브랜치 `/docs` 폴더
+- DNS: `unitblack.kr` 존에 `nalsem CNAME revenue.github.io.` 추가 (회사 DNS 담당자). 반영 후 Pages 설정에서 "Enforce HTTPS" 켜기
+- 배포 = `npm run build` 후 `docs/` 커밋·푸시. 별도 CI 없음
+
 ## 라이선스
 
 MIT. 띠궁합·삼재·손없는 날은 민속 참고 자료이며 법률·행정 판단의 근거가 아닙니다.
