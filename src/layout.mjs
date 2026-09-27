@@ -24,10 +24,10 @@ export function shell({ title, description, path, body, script = "", nav = "", j
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${SITE.url}${path}">
 <meta property="og:site_name" content="${SITE.name}">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#e6f0fb">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css?v=${V}">
-<script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.dataset.theme="light";}catch(e){}</script>
+<script>try{var t=localStorage.getItem("theme");if(t==="dark")document.documentElement.dataset.theme="dark";}catch(e){}</script>
 <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 </head>

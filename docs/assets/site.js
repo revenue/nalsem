@@ -3,11 +3,11 @@
   "use strict";
   const root = document.documentElement;
   const tBtn = document.getElementById("toggle-theme");
-  const syncIcon = () => { const i = document.getElementById("theme-icon"); if (i) i.setAttribute("icon", root.dataset.theme === "light" ? "solar:moon-linear" : "solar:sun-linear"); };
+  const syncIcon = () => { const i = document.getElementById("theme-icon"); if (i) i.setAttribute("icon", root.dataset.theme === "dark" ? "solar:sun-linear" : "solar:moon-linear"); };
   syncIcon();
   tBtn && tBtn.addEventListener("click", () => {
-    if (root.dataset.theme === "light") delete root.dataset.theme; else root.dataset.theme = "light";
-    try { localStorage.setItem("theme", root.dataset.theme || "dark"); } catch (e) {}
+    if (root.dataset.theme === "dark") delete root.dataset.theme; else root.dataset.theme = "dark";
+    try { localStorage.setItem("theme", root.dataset.theme || "light"); } catch (e) {}
     syncIcon();
   });
 

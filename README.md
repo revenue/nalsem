@@ -36,7 +36,7 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 
 ## 디자인 (Supanova Design Skill 적용)
 
-- Vibe: Vantablack Luxe(다크 기본 `#0a0a0a`) / 라이트 토글은 Clean Structural. OS 설정과 무관하게 다크가 기본, 토글은 localStorage 저장
+- 배경: 라이트 블루(`#e6f0fb`) 기본 / 토글 시 네이비 다크(`#0a0f18`). OS 설정과 무관, 토글은 localStorage 저장
 - 폰트 Pretendard Variable(jsdelivr) · 강조색 1개 Warm Amber(`--accent`, 채도 <80%) · 아이콘 Iconify Solar
 - 컴포넌트: Double-Bezel 카드(`.bz`, 바깥 링 + 안쪽 코어) · pill CTA + 원형 화살표 · 플로팅 글래스 내비(z 40) · 노이즈 오버레이(z 60) · 메시 그라디언트 오브
 - 모션: 모든 전환 `0.5s cubic-bezier(.16,1,.3,1)` · 스크롤 진입 fadeInUp(blur) + 80ms 스태거(IntersectionObserver) · transform/opacity 만 · reduced-motion 시 정지
