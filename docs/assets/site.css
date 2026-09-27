@@ -148,8 +148,8 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px v
 @media (min-width: 640px) { .form-row.cols-2 { grid-template-columns: 1fr 1fr; } }
 
 /* 버튼: pill + 원형 화살표 */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 52px; padding: 0 12px 0 24px; border-radius: var(--r-pill); border: 1px solid transparent; font-weight: 600; font-size: 16px; cursor: pointer; white-space: nowrap; transition: var(--t); }
-.btn .ico { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; background: rgba(0, 0, 0, .1); transition: var(--t); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 48px; padding: 0 10px 0 22px; border-radius: var(--r-pill); border: 1px solid transparent; font-weight: 600; font-size: 16px; cursor: pointer; white-space: nowrap; transition: var(--t); }
+.btn .ico { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; background: rgba(0, 0, 0, .1); transition: var(--t); }
 .btn:hover { transform: scale(1.02); }
 .btn:hover .ico { transform: translateX(3px); }
 .btn:active { transform: scale(.98); }
@@ -158,7 +158,7 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px v
 .btn-primary:hover { background: var(--accent-hover); box-shadow: var(--glow); }
 .btn-ghost { background: var(--surface-2); border-color: var(--line); color: var(--text); padding: 0 20px; }
 .btn-ghost:hover { border-color: var(--line-strong); background: var(--surface); }
-.btn-sm { min-height: 44px; padding: 0 18px; font-size: 14px; }
+.btn-sm { height: 48px; padding: 0 20px; font-size: 15px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { height: 40px; padding: 0 16px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface-2); font-size: 14px; cursor: pointer; color: var(--muted); transition: var(--t); }
 .chip:hover { color: var(--text); border-color: var(--line-strong); transform: scale(1.02); }
@@ -179,6 +179,8 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px v
 .page-grid { display: grid; gap: 28px; margin-top: 36px; }
 @media (min-width: 1024px) { .page-grid { grid-template-columns: 7fr 5fr; gap: 40px; align-items: start; } .aside { position: sticky; top: 96px; } }
 .tool { display: grid; gap: 22px; }
+.tool form { display: grid; gap: 20px; }
+.actions { padding-top: 4px; }
 .tool h2 { font-size: 15px; font-weight: 600; color: var(--muted); }
 
 /* 결과 */
