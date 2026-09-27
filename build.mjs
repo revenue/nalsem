@@ -44,7 +44,7 @@ writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\
 // 검색·생성형 AI 크롤러 모두 허용 (GEO)
 writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\n${["GPTBot", "ChatGPT-User", "OAI-SearchBot", "ClaudeBot", "anthropic-ai", "PerplexityBot", "Google-Extended", "Bingbot", "Yeti", "Daum"].map((b) => `User-agent: ${b}\nAllow: /`).join("\n\n")}\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
 // llms.txt: 생성형 엔진이 사이트 구조를 한 번에 읽는 안내 파일
-writeFileSync(join(OUT, "llms.txt"), `# ${SITE.name}\n\n> ${SITE.tagline}. 서버 없이 브라우저에서 계산하는 무료 정적 사이트. 음력은 한국천문연구원 기준(korean-lunar-calendar), 공휴일은 관공서의 공휴일에 관한 규정과 대체공휴일 규칙으로 계산.\n\n${Object.entries(CATS).map(([k, v]) => `## ${v.name}\n\n${all.filter((c) => c.cat === k).map((c) => `- [${c.title}](${SITE.url}/${c.slug}/): ${c.description}`).join("\n")}`).join("\n\n")}\n\n## 참고\n\n- 소스: https://github.com/revenue/nalsem (MIT)\n- 띠궁합·삼재·손없는 날은 민속 참고 자료이며 법률·행정 판단의 근거가 아님\n`);
+writeFileSync(join(OUT, "llms.txt"), `# ${SITE.name}\n\n> ${SITE.tagline}. 서버 없이 브라우저에서 계산하는 무료 정적 사이트. 음력은 한국천문연구원 기준(korean-lunar-calendar), 공휴일은 관공서의 공휴일에 관한 규정과 대체공휴일 규칙으로 계산.\n\n${Object.entries(CATS).map(([k, v]) => `## ${v.name}\n\n${all.filter((c) => c.cat === k).map((c) => `- [${c.title}](${SITE.url}/${c.slug}/): ${c.description}`).join("\n")}`).join("\n\n")}\n\n## 사이트 정보\n\n${pages.map((p) => `- [${p.title}](${SITE.url}/${p.slug}/): ${p.description}`).join("\n")}\n\n## 참고\n\n- 소스: https://github.com/revenue/nalsem (MIT)\n- 띠궁합·삼재·손없는 날은 민속 참고 자료이며 법률·행정 판단의 근거가 아님\n`);
 // 404
 writeFileSync(join(OUT, "404.html"), shell({ title: "페이지를 찾을 수 없습니다", description: "요청한 페이지가 없습니다.", path: "/404.html", body: `<div class="page wrap"><h1>페이지를 찾을 수 없습니다</h1><p class="lede">주소가 바뀌었거나 없는 페이지입니다. 홈에서 계산기를 찾아 주세요.</p><p style="margin-top:24px"><a class="btn btn-primary" href="/">홈으로</a></p></div>`, script: indexScript }).replace('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">', '<meta name="robots" content="noindex">'));
 writeFileSync(join(OUT, ".nojekyll"), "");
@@ -58,3 +58,4 @@ if (/[—–]/.test(home(all))) bad.push("home");
 for (const p of pages) if (/[—–]/.test(p.body)) bad.push(p.slug);
 if (bad.length) { console.error("em-dash 발견:", bad.join(", ")); process.exit(1); }
 console.log(`built ${all.length + 1 + pages.length} pages → ${OUT}/`);
+await import("./test/site.audit.mjs"); // 배포 전 전수 점검 (실패 시 종료 코드 1)

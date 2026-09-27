@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node build.mjs",
     "serve": "node build.mjs && python3 -m http.server 4173 --directory docs",
-    "test": "node build.mjs && node test/engine.test.mjs"
+    "test": "node build.mjs && node test/engine.test.mjs && node test/site.audit.mjs"
   },
   "license": "MIT"
 }

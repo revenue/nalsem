@@ -36,6 +36,12 @@
 - [손없는 날](https://nalsem.suik.me/son-eomneun-nal/): 손없는 날 달력. 이사·개업·혼례 날짜로 찾는 손없는 날(음력 9·10·19·20·29·30일)을 월별로 요일과 함께 확인하세요.
 - [아기 100일 계산기](https://nalsem.suik.me/baby-100/): 아기 백일 계산기. 생년월일로 백일(100일), 첫돌, 두돌 날짜와 생후 일수·개월수·주수를 확인하세요.
 
+## 사이트 정보
+
+- [개인정보처리방침](https://nalsem.suik.me/privacy/): 날셈의 개인정보처리방침. 입력값은 서버로 전송되지 않으며, 광고(Google AdSense)와 브라우저 저장소 사용 내용을 안내합니다.
+- [사이트 소개](https://nalsem.suik.me/about/): 날셈은 만나이, 디데이, 양력 음력 변환, 공휴일, 띠 등 생활 속 날짜와 나이 계산을 한곳에 모은 무료 계산기 사이트입니다.
+- [문의](https://nalsem.suik.me/contact/): 날셈 이용 문의, 계산 오류 제보, 기능 제안 방법을 안내합니다.
+
 ## 참고
 
 - 소스: https://github.com/revenue/nalsem (MIT)
