@@ -1,6 +1,6 @@
 // 페이지 셸. 모든 페이지가 같은 헤더·검색·푸터를 공유한다.
 export const V = Date.now().toString(36); // 자산 캐시 무효화
-export const SITE = { name: "날셈", url: "https://nalsem.unitblack.kr", tagline: "나이·날짜·음력 생활계산기" };
+export const SITE = { name: "날셈", url: "https://nalsem.suik.me", tagline: "나이·날짜·음력 생활계산기" };
 
 // 아이콘: Iconify Solar 세트만 사용
 const ICON = {

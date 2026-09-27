@@ -46,9 +46,9 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 
 ## 배포
 
-- 도메인: **https://nalsem.unitblack.kr** (`docs/CNAME`). `src/layout.mjs` 의 `SITE.url` 이 canonical·OG·sitemap·llms.txt 전부의 기준
+- 도메인: **https://nalsem.suik.me** (`docs/CNAME`). 이전 도메인 nalsem.unitblack.kr 은 2026-09-28 이전 완료 후 사용 중지. `src/layout.mjs` 의 `SITE.url` 이 canonical·OG·sitemap·llms.txt 전부의 기준
 - 호스팅: GitHub Pages, `main` 브랜치 `/docs` 폴더
-- DNS: `unitblack.kr` 존에 `nalsem CNAME revenue.github.io.` 추가 (회사 DNS 담당자). 반영 후 Pages 설정에서 "Enforce HTTPS" 켜기
+- DNS: `suik.me` (가비아 DNS) 에 `nalsem CNAME revenue.github.io.` 추가. 반영 후 Pages 설정에서 "Enforce HTTPS" 켜기
 - 배포 = `npm run build` 후 `docs/` 커밋·푸시. 별도 CI 없음
 
 ## 라이선스
