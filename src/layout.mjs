@@ -23,6 +23,7 @@ export function shell({ title, description, path, body, script = "", nav = "", j
 ${keywords.length ? `<meta name="keywords" content="${esc(keywords.join(", "))}">` : ""}
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta name="author" content="${SITE.name}">
+<meta name="google-site-verification" content="4xD7Nv4vd_ABr-AbzHS7bG4BPbM-FVy0nVW8v0wqTwU">
 <meta name="google-site-verification" content="PO4IBHGRHsJC8ucC1dzmMBEXnc1pYPSAKte26dSNnec">
 <meta name="google-adsense-account" content="ca-pub-2298882938781262">
 <link rel="canonical" href="${SITE.url}${path}">
