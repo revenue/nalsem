@@ -43,6 +43,7 @@ ${keywords.length ? `<meta name="keywords" content="${esc(keywords.join(", "))}"
 <meta name="theme-color" content="#e6f0fb">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://code.iconify.design" crossorigin>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2298882938781262" crossorigin="anonymous"></script>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css?v=${V}">
 <script>try{var t=localStorage.getItem("theme");if(t==="dark")document.documentElement.dataset.theme="dark";}catch(e){}</script>
