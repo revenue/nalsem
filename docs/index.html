@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>날셈: 나이·날짜·음력 생활계산기</title>
+<meta name="description" content="나이·날짜·음력 생활계산기. 만나이·세는나이, 디데이, 양력 음력 변환, 날짜 계산, 띠와 삼재, 공휴일까지 30가지 생활 계산을 한곳에서.">
+<link rel="canonical" href="https://nalsem.app/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="날셈: 나이·날짜·음력 생활계산기">
+<meta property="og:description" content="나이·날짜·음력 생활계산기. 만나이·세는나이, 디데이, 양력 음력 변환, 날짜 계산, 띠와 삼재, 공휴일까지 30가지 생활 계산을 한곳에서.">
+<meta property="og:url" content="https://nalsem.app/">
+<meta property="og:site_name" content="날셈">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0f11" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"날셈","url":"https://nalsem.app"}</script>
+</head>
+<body>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="날셈 홈"><span class="brand-mark" aria-hidden="true">날</span>날셈</a>
+    <nav class="nav" aria-label="카테고리">
+      <a href="/#age" >나이·띠</a>
+      <a href="/#date" >날짜·음력</a>
+      <a href="/#stats" >통계</a>
+    </nav>
+    <div class="hdr-right">
+      <button class="icon-btn" id="open-search" type="button" aria-label="계산기 검색 (/)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="toggle-theme" type="button" aria-label="다크 모드 전환"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 13.4 3.1C13 3 12.5 3 12 3z"/></svg></button>
+    </div>
+  </div>
+</header>
+<dialog class="search-dlg" id="search">
+  <form class="search-box" method="dialog">
+    <input id="search-input" type="search" placeholder="계산기 이름으로 찾기" autocomplete="off" aria-label="계산기 검색">
+    <div class="search-list" id="search-list"></div>
+  </form>
+</dialog>
+<main>
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <h1 class="rise">나이도 날짜도 음력도<br>한 번에 <em>셈하기</em></h1>
+      <p class="lede rise d1">만나이부터 디데이, 양력 음력 변환까지. 생년월일 하나로 오늘 필요한 숫자를 바로 봅니다.</p>
+      <form class="quick rise d2" id="quick" autocomplete="off">
+        <div class="field" id="qb">
+  <label for="qb-y">생년월일</label>
+  <div class="ymd">
+    <div class="unit" data-unit="년"><input id="qb-y" type="text" inputmode="numeric" pattern="\d*" maxlength="4" data-len="4" placeholder="1990" value="" autocomplete="off"></div>
+    <div class="unit" data-unit="월"><input id="qb-m" type="text" inputmode="numeric" pattern="\d*" maxlength="2" data-len="2" placeholder="5" value="" autocomplete="off" aria-label="생년월일 월"></div>
+    <div class="unit" data-unit="일"><input id="qb-d" type="text" inputmode="numeric" pattern="\d*" maxlength="2" data-len="2" placeholder="3" value="" autocomplete="off" aria-label="생년월일 일"></div>
+  </div>
+  <p class="help">숫자만 입력하면 바로 계산됩니다</p>
+  <p class="err" role="alert"></p>
+</div>
+        <div class="result" id="quick-result" hidden></div>
+      </form>
+    </div>
+    <div class="today-panel rise d3" aria-label="오늘">
+      <p class="lbl">오늘</p>
+      <p class="big" id="t-solar"></p>
+      <div class="row"><span>음력</span><b id="t-lunar"></b></div>
+      <div class="row"><span>간지</span><b id="t-ganji"></b></div>
+      <div class="row"><span>올해</span><b id="t-doy"></b></div>
+      <div class="row"><span>다음 공휴일</span><b id="t-hol"></b></div>
+      <div class="row"><span>손없는 날</span><b id="t-son"></b></div>
+    </div>
+  </div>
+</section>
+
+<section class="section wrap" id="age">
+  <div class="section-head"><h2>나이·띠·사람</h2><span class="count">16개</span></div>
+  <div class="tiles">
+    <a class="tile wide featured" href="/age/"><div class="t">나이 계산기</div><p class="sub">만나이·세는나이·연나이를 한 번에</p><div class="live" id="l-age">&nbsp;</div></a>
+    <a class="tile accent" href="/zodiac-age/"><div class="t">띠별 나이</div><p class="sub">띠를 고르면 출생연도와 올해 나이</p><div class="live" id="l-zodiac">&nbsp;</div></a>
+    <a class="tile " href="/man-age/"><div class="t">만나이 계산기</div><p class="sub">법정 나이, 생일 지났는지까지</p></a>
+    <a class="tile " href="/zodiac-match/"><div class="t">띠궁합</div><p class="sub">삼합·육합·충·원진으로 보는 궁합</p></a>
+    <a class="tile soft" href="/samjae/"><div class="t">삼재</div><p class="sub">내 띠의 삼재 해와 들·눌·날삼재</p><div class="live" id="l-samjae">&nbsp;</div></a>
+    <a class="tile half" href="/age-table/"><div class="t">올해 나이표</div><p class="sub">출생연도별 만나이·세는나이·띠 한 표로</p></a>
+    <a class="tile half" href="/age-terms/"><div class="t">나이별 용어와 출생연도</div><p class="sub">환갑·고희·희수·미수는 몇 살, 몇 년생</p></a>
+    <a class="tile " href="/birthyear-zodiac/"><div class="t">출생년도별 띠</div><p class="sub">몇 년생이 무슨 띠인지</p></a>
+    <a class="tile " href="/birthyear-age/"><div class="t">출생년도별 나이 일람표</div><p class="sub">이 사람은 몇 년도에 몇 살이었나</p></a>
+    <a class="tile " href="/zodiac-gap/"><div class="t">띠동갑 계산기</div><p class="sub">나와 띠동갑인 연도 찾기</p></a>
+    <a class="tile " href="/adult/"><div class="t">성년·미성년 나이 계산기</div><p class="sub">언제 성인이 되는지, 법별 기준 날짜</p></a>
+    <a class="tile " href="/school/"><div class="t">학교 입학·졸업 년도 계산기</div><p class="sub">초·중·고·대학 입학과 졸업 연도</p></a>
+    <a class="tile " href="/student-age/"><div class="t">학생 나이 정보</div><p class="sub">올해 학년별 출생연도와 나이</p></a>
+    <a class="tile " href="/today/"><div class="t">오늘 날짜 정보</div><p class="sub">요일·음력·간지·올해 며칠째</p></a>
+    <a class="tile " href="/indian-name/"><div class="t">인디언식 이름 짓기</div><p class="sub">생년월일로 만드는 그 이름</p></a>
+    <a class="tile " href="/joseon-name/"><div class="t">조선식 이름 짓기</div><p class="sub">내 성에 옛날 이름 붙여 보기</p></a>
+  </div>
+</section>
+
+<section class="section wrap" id="date">
+  <div class="section-head"><h2>날짜·음력</h2><span class="count">12개</span></div>
+  <div class="rows">
+    <a href="/d-day/"><div><div class="t">디데이 계산기</div><p class="sub">오늘부터 그날까지 며칠</p></div></a>
+    <a href="/solar-to-lunar/"><div><div class="t">양력을 음력으로 변환</div><p class="sub">양력 생일의 음력 날짜와 간지</p></div><span class="live" id="l-lunar"></span></a>
+    <a href="/suneung/"><div><div class="t">수능 디데이</div><p class="sub">2027학년도 수능까지 남은 날</p></div><span class="live" id="l-suneung"></span></a>
+    <a href="/holidays/"><div><div class="t">우리나라 공휴일</div><p class="sub">올해·내년 공휴일과 대체공휴일, 연휴</p></div><span class="live" id="l-hol"></span></a>
+    <a href="/lunar-to-solar/"><div><div class="t">음력을 양력으로 변환</div><p class="sub">음력 날짜가 올해 양력으로 며칠</p></div></a>
+    <a href="/lunar-yearly/"><div><div class="t">음력을 연도별 양력으로 변환</div><p class="sub">음력 생일·제삿날이 해마다 양력 며칠인지</p></div></a>
+    <a href="/today-lunar/"><div><div class="t">오늘 날짜 음력 변환</div><p class="sub">오늘 음력 며칠, 이번 달 음력 달력</p></div></a>
+    <a href="/anniversary/"><div><div class="t">기념일 계산기</div><p class="sub">100일·200일·1주년이 언제인지</p></div></a>
+    <a href="/date-add/"><div><div class="t">날짜 더하기·빼기 계산기</div><p class="sub">며칠 뒤, 몇 주 전이 무슨 요일</p></div></a>
+    <a href="/date-diff/"><div><div class="t">날짜 차이 계산기</div><p class="sub">두 날짜 사이 며칠, 몇 주, 몇 개월</p></div></a>
+    <a href="/son-eomneun-nal/"><div><div class="t">손없는 날</div><p class="sub">이사·개업하기 좋은 날 달력</p></div></a>
+    <a href="/baby-100/"><div><div class="t">아기 100일 계산기</div><p class="sub">백일·돌·생후 개월 수</p></div></a>
+  </div>
+</section>
+
+<section class="section wrap" id="stats">
+  <div class="section-head"><h2>통계</h2><span class="count">2개</span></div>
+  <div class="duo">
+    <a class="tile " href="/population/"><div class="t">대한민국 인구통계</div><p class="sub">주민등록 인구, 세대수, 남녀 비율</p><div class="live" id="l-pop">&nbsp;</div></a>
+    <a class="tile " href="/average-age/"><div class="t">대한민국 평균연령</div><p class="sub">전국·시도별 평균연령, 남녀 차이</p><div class="live" id="l-avg">&nbsp;</div></a>
+  </div>
+</section>
+</main>
+<footer class="ftr">
+  <div class="wrap">
+    <p>음력 변환은 한국천문연구원 음양력 자료를 따르는 <a href="https://github.com/usingsky/korean_lunar_calendar_js" rel="noopener">korean-lunar-calendar</a>(MIT)를 사용합니다. 띠궁합·삼재·손없는 날은 민속 참고 자료이며, 법률·행정 판단은 관련 기관에서 확인하세요.</p>
+    <p>© 2026 날셈. 모든 계산은 브라우저 안에서 처리되며 입력값은 서버로 전송되지 않습니다.</p>
+  </div>
+</footer>
+<script src="/assets/vendor/korean-lunar-calendar.min.js"></script>
+<script src="/assets/calc.js"></script>
+<script src="/assets/site.js"></script>
+<script>(function(){"use strict";
+window.NALSEM_INDEX=[{"slug":"age","title":"나이 계산기","cat":"나이·띠·사람","keys":["만나이","한국나이","세는나이","연나이","나이계산"]},{"slug":"man-age","title":"만나이 계산기","cat":"나이·띠·사람","keys":["만나이","만나이통일","법정나이"]},{"slug":"zodiac-age","title":"띠별 나이","cat":"나이·띠·사람","keys":["띠별나이","띠나이","몇년생"]},{"slug":"birthyear-zodiac","title":"출생년도별 띠","cat":"나이·띠·사람","keys":["띠","간지","육십갑자","무슨띠"]},{"slug":"age-table","title":"올해 나이표","cat":"나이·띠·사람","keys":["나이표","나이일람표","연도별나이"]},{"slug":"age-terms","title":"나이별 용어와 출생연도","cat":"나이·띠·사람","keys":["환갑","고희","희수","미수","백수","칠순","팔순","나이용어"]},{"slug":"birthyear-age","title":"출생년도별 나이 일람표","cat":"나이·띠·사람","keys":["연도별나이","나이일람","환갑년도"]},{"slug":"zodiac-match","title":"띠궁합","cat":"나이·띠·사람","keys":["띠궁합","궁합","삼합","육합","원진"]},{"slug":"zodiac-gap","title":"띠동갑 계산기","cat":"나이·띠·사람","keys":["띠동갑","12살차이"]},{"slug":"adult","title":"성년·미성년 나이 계산기","cat":"나이·띠·사람","keys":["성년","성인","미성년자","만19세","청소년"]},{"slug":"samjae","title":"삼재","cat":"나이·띠·사람","keys":["삼재","들삼재","날삼재","눌삼재"]},{"slug":"school","title":"학교 입학·졸업 년도 계산기","cat":"나이·띠·사람","keys":["입학년도","졸업년도","학번","취학"]},{"slug":"student-age","title":"학생 나이 정보","cat":"나이·띠·사람","keys":["학년별나이","초등학생나이","고등학생나이","몇학년"]},{"slug":"today","title":"오늘 날짜 정보","cat":"나이·띠·사람","keys":["오늘날짜","오늘음력","며칠째","주차","간지"]},{"slug":"indian-name","title":"인디언식 이름 짓기","cat":"나이·띠·사람","keys":["인디언식이름","인디언이름","이름짓기"]},{"slug":"joseon-name","title":"조선식 이름 짓기","cat":"나이·띠·사람","keys":["조선식이름","옛날이름","이름짓기"]},{"slug":"d-day","title":"디데이 계산기","cat":"날짜·음력","keys":["디데이","dday","d-day","남은날"]},{"slug":"solar-to-lunar","title":"양력을 음력으로 변환","cat":"날짜·음력","keys":["양력음력변환","음력변환","양력을음력으로","음력생일"]},{"slug":"lunar-to-solar","title":"음력을 양력으로 변환","cat":"날짜·음력","keys":["음력양력변환","음력을양력으로","제사날짜","음력생일"]},{"slug":"lunar-yearly","title":"음력을 연도별 양력으로 변환","cat":"날짜·음력","keys":["음력생일양력","제사날짜","연도별음력","음력달력"]},{"slug":"today-lunar","title":"오늘 날짜 음력 변환","cat":"날짜·음력","keys":["오늘음력","음력달력","오늘음력며칠"]},{"slug":"anniversary","title":"기념일 계산기","cat":"날짜·음력","keys":["기념일","100일","1000일","커플","결혼기념일","주년"]},{"slug":"date-add","title":"날짜 더하기·빼기 계산기","cat":"날짜·음력","keys":["날짜더하기","날짜계산","며칠후","몇주후","몇개월후"]},{"slug":"date-diff","title":"날짜 차이 계산기","cat":"날짜·음력","keys":["날짜차이","일수계산","며칠차이","재직기간","근무일수"]},{"slug":"suneung","title":"수능 디데이","cat":"날짜·음력","keys":["수능디데이","수능","수능날짜","수능까지"]},{"slug":"holidays","title":"우리나라 공휴일","cat":"날짜·음력","keys":["공휴일","대체공휴일","연휴","빨간날","쉬는날"]},{"slug":"son-eomneun-nal","title":"손없는 날","cat":"날짜·음력","keys":["손없는날","이사날짜","이사하기좋은날","개업"]},{"slug":"baby-100","title":"아기 100일 계산기","cat":"날짜·음력","keys":["백일","100일","돌","첫돌","생후개월","아기"]},{"slug":"population","title":"대한민국 인구통계","cat":"통계","keys":["인구","인구통계","대한민국인구","시도별인구","남녀비율"]},{"slug":"average-age","title":"대한민국 평균연령","cat":"통계","keys":["평균연령","평균나이","시도별평균연령","고령화"]}];
+const t = N.today(), y = N.Y(t);
+const L = N.toLunar(t);
+const $ = (id) => document.getElementById(id);
+$("t-solar").textContent = N.fmt(t);
+$("t-lunar").textContent = L ? `${L.year}년 ${L.leap ? "윤" : ""}${L.month}월 ${L.day}일` : "범위 밖";
+$("t-ganji").textContent = L ? `${L.gapja.year} ${L.gapja.month} ${L.gapja.day}` : "";
+const doy = N.dayOfYear(t), total = N.isLeap(y) ? 366 : 365;
+$("t-doy").textContent = `${doy}일째, ${total - doy}일 남음`;
+const next = N.holidays(y).concat(N.holidays(y + 1)).find((h) => h.date > t);
+$("t-hol").textContent = next ? `${N.fmtShort(next.date)} ${next.name}` : "";
+$("t-son").textContent = L ? (N.isSonEomneun(L.day) ? "오늘이 손없는 날" : "아님") : "";
+const gj = N.ganjiOf(y);
+$("l-age").textContent = `${y}년생은 0세, 세는나이 1살`;
+$("l-zodiac").textContent = `${y}년은 ${gj.color} ${gj.animal}띠 해`;
+const sj = N.samjae(0, y); // 대표: 신자진 그룹 표시 대신 올해 삼재 띠 안내
+const groups = [[8,0,4],[5,9,1],[2,6,10],[11,3,7]].find((g) => N.samjae(g[0], y).active);
+$("l-samjae").textContent = groups ? `올해 삼재: ${groups.map((j) => N.ZODIAC_BY_JIJI[j]).join("·")}띠` : "";
+$("l-lunar").textContent = L ? `오늘 음력 ${L.month}.${L.day}` : "";
+const su = N.suneung(y + 1);
+const sd = N.diffDays(t, su.date);
+$("l-suneung").textContent = sd >= 0 ? `D-${sd}` : "";
+$("l-hol").textContent = next ? `다음 ${N.fmtShort(next.date)}` : "";
+$("l-pop").textContent = "5,108만 명";
+$("l-avg").textContent = "46.2세";
+
+// 즉석 나이 계산
+const q = $("qb"), get = N.ymdInputs(q), out = $("quick-result");
+function run() {
+  const b = get();
+  if (!b) { out.hidden = true; return; }
+  if (b > t) { N.showErr(q, "오늘 이전 날짜를 입력해 주세요"); out.hidden = true; return; }
+  N.showErr(q, "");
+  const a = N.ages(b, t), nb = N.nextBirthday(b, t), z = N.ganjiOf(N.Y(b));
+  out.innerHTML = `<div class="stats cols-3">
+    <div class="stat"><div class="k">만나이</div><div class="v">${a.man}<small>세</small></div></div>
+    <div class="stat"><div class="k">세는나이</div><div class="v">${a.korean}<small>살</small></div></div>
+    <div class="stat"><div class="k">띠</div><div class="v">${z.animal}</div></div>
+  </div>
+  <p class="note">다음 생일 ${N.fmtShort(nb.date)}까지 <b>${nb.days}일</b>, 살아온 날 <b>${N.comma(a.full.days)}일</b>. <a href="/age/?d=${N.iso(b)}" style="text-decoration:underline;text-underline-offset:3px">자세히 보기</a></p>`;
+  N.bump(out);
+}
+q.addEventListener("input", run);
+document.getElementById("quick").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+
+})();</script>
+</body>
+</html>
