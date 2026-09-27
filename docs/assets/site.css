@@ -281,3 +281,24 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
 .rise.d1 { animation-delay: .08s; } .rise.d2 { animation-delay: .16s; } .rise.d3 { animation-delay: .24s; }
 .result.bump { animation: bump .5s var(--ease); }
 @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; } .rv.in, .rise, .result.bump, .orb { animation: none; } * { transition: none !important; } }
+
+/* 홈: 생년월일 연동 카드 (균일 3열, 제목 + 결과 한 줄 + 보조) */
+.sub-head { font-size: 15px; font-weight: 600; color: var(--muted); margin: 8px 0 14px; display: flex; gap: 10px; align-items: baseline; }
+.sub-head .who { color: var(--accent); font-weight: 600; }
+.lks + .sub-head { margin-top: 48px; }
+.lks { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .lks { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .lks { grid-template-columns: repeat(3, 1fr); } }
+.lk { display: grid; gap: 6px; align-content: start; padding: 20px 22px; min-height: 124px; transition: var(--t); }
+a.lk:hover { transform: translateY(-3px) scale(1.01); }
+.lk .k { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--muted); font-weight: 500; }
+.lk .k iconify-icon { color: var(--faint); transition: var(--t); }
+a.lk:hover .k iconify-icon { transform: translateX(3px); color: var(--accent); }
+.lk .v { font-size: 20px; font-weight: 700; letter-spacing: -.02em; line-height: 1.3; color: var(--faint); }
+.lk.on .v { color: var(--text); }
+.lk .s { font-size: 13px; color: var(--muted); min-height: 1.3em; }
+.lk-form .ymd { margin: 4px 0 6px; }
+.lk-form input { height: 44px; font-size: 16px; }
+.rows-3 a { padding: 14px 4px; }
+@media (min-width: 1024px) { .rows.rows-3 { grid-template-columns: repeat(3, 1fr); column-gap: 40px; } .rows-3 a:nth-child(3) { border-top: 0; } }
+@media (min-width: 640px) { .lk-form { grid-column: 1 / -1; grid-template-columns: 160px 220px 1fr; grid-template-areas: "k in v" "k in s"; align-items: center; column-gap: 20px; row-gap: 2px; min-height: 0; } .lk-form .k { grid-area: k; } .lk-form .ymd { grid-area: in; margin: 0; } .lk-form .v { grid-area: v; } .lk-form .s { grid-area: s; } }

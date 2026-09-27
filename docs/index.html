@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="날셈">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/site.css?v=mujnc02i">
+<link rel="stylesheet" href="/assets/site.css?v=mujo7w3t">
 <script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.dataset.theme="light";}catch(e){}</script>
 <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"날셈","url":"https://nalsem.app"}</script>
@@ -56,7 +56,7 @@
     <div class="unit" data-unit="월"><input id="qb-m" type="text" inputmode="numeric" pattern="\d*" maxlength="2" data-len="2" placeholder="5" value="" autocomplete="off" aria-label="생년월일 월"></div>
     <div class="unit" data-unit="일"><input id="qb-d" type="text" inputmode="numeric" pattern="\d*" maxlength="2" data-len="2" placeholder="3" value="" autocomplete="off" aria-label="생년월일 일"></div>
   </div>
-  <p class="help">숫자만 입력하면 바로 계산됩니다</p>
+  <p class="help">입력하면 아래 나이·띠·사람 항목 전부가 함께 계산됩니다</p>
   <p class="err" role="alert"></p>
 </div>
         <div class="result" id="quick-result" hidden></div>
@@ -76,23 +76,33 @@
 
 <section class="section wrap" id="age">
   <div class="section-head rv"><h2>나이·띠·사람</h2><span class="count">16개</span></div>
-  <div class="tiles">
-    <a class="tile bz rv wide featured" href="/age/"><div class="t">나이 계산기</div><p class="sub">만나이·세는나이·연나이를 한 번에</p><div class="live" id="l-age">&nbsp;</div></a>
-    <a class="tile bz rv accent" href="/zodiac-age/"><div class="t">띠별 나이</div><p class="sub">띠를 고르면 출생연도와 올해 나이</p><div class="live" id="l-zodiac">&nbsp;</div></a>
-    <a class="tile bz rv " href="/man-age/"><div class="t">만나이 계산기</div><p class="sub">법정 나이, 생일 지났는지까지</p></a>
-    <a class="tile bz rv " href="/zodiac-match/"><div class="t">띠궁합</div><p class="sub">삼합·육합·충·원진으로 보는 궁합</p></a>
-    <a class="tile bz rv soft" href="/samjae/"><div class="t">삼재</div><p class="sub">내 띠의 삼재 해와 들·눌·날삼재</p><div class="live" id="l-samjae">&nbsp;</div></a>
-    <a class="tile bz rv half" href="/age-table/"><div class="t">올해 나이표</div><p class="sub">출생연도별 만나이·세는나이·띠 한 표로</p></a>
-    <a class="tile bz rv half" href="/age-terms/"><div class="t">나이별 용어와 출생연도</div><p class="sub">환갑·고희·희수·미수는 몇 살, 몇 년생</p></a>
-    <a class="tile bz rv " href="/birthyear-zodiac/"><div class="t">출생년도별 띠</div><p class="sub">몇 년생이 무슨 띠인지</p></a>
-    <a class="tile bz rv " href="/birthyear-age/"><div class="t">출생년도별 나이 일람표</div><p class="sub">이 사람은 몇 년도에 몇 살이었나</p></a>
-    <a class="tile bz rv " href="/zodiac-gap/"><div class="t">띠동갑 계산기</div><p class="sub">나와 띠동갑인 연도 찾기</p></a>
-    <a class="tile bz rv " href="/adult/"><div class="t">성년·미성년 나이 계산기</div><p class="sub">언제 성인이 되는지, 법별 기준 날짜</p></a>
-    <a class="tile bz rv " href="/school/"><div class="t">학교 입학·졸업 년도 계산기</div><p class="sub">초·중·고·대학 입학과 졸업 연도</p></a>
-    <a class="tile bz rv " href="/student-age/"><div class="t">학생 나이 정보</div><p class="sub">올해 학년별 출생연도와 나이</p></a>
-    <a class="tile bz rv " href="/today/"><div class="t">오늘 날짜 정보</div><p class="sub">요일·음력·간지·올해 며칠째</p></a>
-    <a class="tile bz rv " href="/indian-name/"><div class="t">인디언식 이름 짓기</div><p class="sub">생년월일로 만드는 그 이름</p></a>
-    <a class="tile bz rv " href="/joseon-name/"><div class="t">조선식 이름 짓기</div><p class="sub">내 성에 옛날 이름 붙여 보기</p></a>
+
+  <h3 class="sub-head rv">내 생년월일로 보기 <span class="who" id="who"></span></h3>
+  <div class="lks">
+    <a class="lk bz rv" href="/age/" data-slug="age"><div class="k">나이 계산기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="age">생년월일을 입력하면 표시</div><div class="s" data-s="age"></div></a>
+    <a class="lk bz rv" href="/man-age/" data-slug="man-age"><div class="k">만나이 계산기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="man-age">생년월일을 입력하면 표시</div><div class="s" data-s="man-age"></div></a>
+    <a class="lk bz rv" href="/birthyear-zodiac/" data-slug="birthyear-zodiac"><div class="k">출생년도별 띠<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="birthyear-zodiac">생년월일을 입력하면 표시</div><div class="s" data-s="birthyear-zodiac"></div></a>
+    <a class="lk bz rv" href="/zodiac-gap/" data-slug="zodiac-gap"><div class="k">띠동갑 계산기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="zodiac-gap">생년월일을 입력하면 표시</div><div class="s" data-s="zodiac-gap"></div></a>
+    <a class="lk bz rv" href="/adult/" data-slug="adult"><div class="k">성년·미성년 나이 계산기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="adult">생년월일을 입력하면 표시</div><div class="s" data-s="adult"></div></a>
+    <a class="lk bz rv" href="/school/" data-slug="school"><div class="k">학교 입학·졸업 년도 계산기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="school">생년월일을 입력하면 표시</div><div class="s" data-s="school"></div></a>
+    <a class="lk bz rv" href="/samjae/" data-slug="samjae"><div class="k">삼재<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="samjae">생년월일을 입력하면 표시</div><div class="s" data-s="samjae"></div></a>
+    <a class="lk bz rv" href="/indian-name/" data-slug="indian-name"><div class="k">인디언식 이름 짓기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="indian-name">생년월일을 입력하면 표시</div><div class="s" data-s="indian-name"></div></a>
+    <a class="lk bz rv" href="/joseon-name/" data-slug="joseon-name"><div class="k">조선식 이름 짓기<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div><div class="v" data-v="joseon-name">생년월일을 입력하면 표시</div><div class="s" data-s="joseon-name"></div></a>
+    <div class="lk bz rv lk-form" data-slug="zodiac-match">
+      <div class="k"><a href="/zodiac-match/">띠궁합<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a></div>
+      <div class="ymd" style="grid-template-columns:1fr"><div class="unit" data-unit="년"><input id="zm-y" type="text" inputmode="numeric" maxlength="4" placeholder="상대 출생연도" autocomplete="off" aria-label="상대 출생연도"></div></div>
+      <div class="v" data-v="zodiac-match">상대 출생연도를 입력하면 표시</div><div class="s" data-s="zodiac-match"></div>
+    </div>
+  </div>
+
+  <h3 class="sub-head rv">표로 보기</h3>
+  <div class="rows rows-3">
+    <a class="rv" href="/age-table/"><div><div class="t">올해 나이표</div><p class="sub">출생연도별 만나이·세는나이·띠 한 표로</p></div></a>
+    <a class="rv" href="/age-terms/"><div><div class="t">나이별 용어와 출생연도</div><p class="sub">환갑·고희·희수·미수는 몇 살, 몇 년생</p></div></a>
+    <a class="rv" href="/zodiac-age/"><div><div class="t">띠별 나이</div><p class="sub">띠를 고르면 출생연도와 올해 나이</p></div></a>
+    <a class="rv" href="/birthyear-age/"><div><div class="t">출생년도별 나이 일람표</div><p class="sub">이 사람은 몇 년도에 몇 살이었나</p></div></a>
+    <a class="rv" href="/student-age/"><div><div class="t">학생 나이 정보</div><p class="sub">올해 학년별 출생연도와 나이</p></div></a>
+    <a class="rv" href="/today/"><div><div class="t">오늘 날짜 정보</div><p class="sub">요일·음력·간지·올해 며칠째</p></div></a>
   </div>
 </section>
 
@@ -129,8 +139,8 @@
   </div>
 </footer>
 <script src="/assets/vendor/korean-lunar-calendar.min.js"></script>
-<script src="/assets/calc.js?v=mujnc02i"></script>
-<script src="/assets/site.js?v=mujnc02i"></script>
+<script src="/assets/calc.js?v=mujo7w3t"></script>
+<script src="/assets/site.js?v=mujo7w3t"></script>
 <script>(function(){"use strict";
 window.NALSEM_INDEX=[{"slug":"age","title":"나이 계산기","cat":"나이·띠·사람","keys":["만나이","한국나이","세는나이","연나이","나이계산"]},{"slug":"man-age","title":"만나이 계산기","cat":"나이·띠·사람","keys":["만나이","만나이통일","법정나이"]},{"slug":"zodiac-age","title":"띠별 나이","cat":"나이·띠·사람","keys":["띠별나이","띠나이","몇년생"]},{"slug":"birthyear-zodiac","title":"출생년도별 띠","cat":"나이·띠·사람","keys":["띠","간지","육십갑자","무슨띠"]},{"slug":"age-table","title":"올해 나이표","cat":"나이·띠·사람","keys":["나이표","나이일람표","연도별나이"]},{"slug":"age-terms","title":"나이별 용어와 출생연도","cat":"나이·띠·사람","keys":["환갑","고희","희수","미수","백수","칠순","팔순","나이용어"]},{"slug":"birthyear-age","title":"출생년도별 나이 일람표","cat":"나이·띠·사람","keys":["연도별나이","나이일람","환갑년도"]},{"slug":"zodiac-match","title":"띠궁합","cat":"나이·띠·사람","keys":["띠궁합","궁합","삼합","육합","원진"]},{"slug":"zodiac-gap","title":"띠동갑 계산기","cat":"나이·띠·사람","keys":["띠동갑","12살차이"]},{"slug":"adult","title":"성년·미성년 나이 계산기","cat":"나이·띠·사람","keys":["성년","성인","미성년자","만19세","청소년"]},{"slug":"samjae","title":"삼재","cat":"나이·띠·사람","keys":["삼재","들삼재","날삼재","눌삼재"]},{"slug":"school","title":"학교 입학·졸업 년도 계산기","cat":"나이·띠·사람","keys":["입학년도","졸업년도","학번","취학"]},{"slug":"student-age","title":"학생 나이 정보","cat":"나이·띠·사람","keys":["학년별나이","초등학생나이","고등학생나이","몇학년"]},{"slug":"today","title":"오늘 날짜 정보","cat":"나이·띠·사람","keys":["오늘날짜","오늘음력","며칠째","주차","간지"]},{"slug":"indian-name","title":"인디언식 이름 짓기","cat":"나이·띠·사람","keys":["인디언식이름","인디언이름","이름짓기"]},{"slug":"joseon-name","title":"조선식 이름 짓기","cat":"나이·띠·사람","keys":["조선식이름","옛날이름","이름짓기"]},{"slug":"d-day","title":"디데이 계산기","cat":"날짜·음력","keys":["디데이","dday","d-day","남은날"]},{"slug":"solar-to-lunar","title":"양력을 음력으로 변환","cat":"날짜·음력","keys":["양력음력변환","음력변환","양력을음력으로","음력생일"]},{"slug":"lunar-to-solar","title":"음력을 양력으로 변환","cat":"날짜·음력","keys":["음력양력변환","음력을양력으로","제사날짜","음력생일"]},{"slug":"lunar-yearly","title":"음력을 연도별 양력으로 변환","cat":"날짜·음력","keys":["음력생일양력","제사날짜","연도별음력","음력달력"]},{"slug":"today-lunar","title":"오늘 날짜 음력 변환","cat":"날짜·음력","keys":["오늘음력","음력달력","오늘음력며칠"]},{"slug":"anniversary","title":"기념일 계산기","cat":"날짜·음력","keys":["기념일","100일","1000일","커플","결혼기념일","주년"]},{"slug":"date-add","title":"날짜 더하기·빼기 계산기","cat":"날짜·음력","keys":["날짜더하기","날짜계산","며칠후","몇주후","몇개월후"]},{"slug":"date-diff","title":"날짜 차이 계산기","cat":"날짜·음력","keys":["날짜차이","일수계산","며칠차이","재직기간","근무일수"]},{"slug":"suneung","title":"수능 디데이","cat":"날짜·음력","keys":["수능디데이","수능","수능날짜","수능까지"]},{"slug":"holidays","title":"우리나라 공휴일","cat":"날짜·음력","keys":["공휴일","대체공휴일","연휴","빨간날","쉬는날"]},{"slug":"son-eomneun-nal","title":"손없는 날","cat":"날짜·음력","keys":["손없는날","이사날짜","이사하기좋은날","개업"]},{"slug":"baby-100","title":"아기 100일 계산기","cat":"날짜·음력","keys":["백일","100일","돌","첫돌","생후개월","아기"]},{"slug":"population","title":"대한민국 인구통계","cat":"통계","keys":["인구","인구통계","대한민국인구","시도별인구","남녀비율"]},{"slug":"average-age","title":"대한민국 평균연령","cat":"통계","keys":["평균연령","평균나이","시도별평균연령","고령화"]}];
 const t = N.today(), y = N.Y(t);
@@ -144,38 +154,53 @@ $("t-doy").textContent = `${doy}일째, ${total - doy}일 남음`;
 const next = N.holidays(y).concat(N.holidays(y + 1)).find((h) => h.date > t);
 $("t-hol").textContent = next ? `${N.fmtShort(next.date)} ${next.name}` : "";
 $("t-son").textContent = L ? (N.isSonEomneun(L.day) ? "오늘이 손없는 날" : "아님") : "";
-const gj = N.ganjiOf(y);
-$("l-age").textContent = `${y}년생은 0세, 세는나이 1살`;
-$("l-zodiac").textContent = `${y}년은 ${gj.color} ${gj.animal}띠 해`;
-const sj = N.samjae(0, y); // 대표: 신자진 그룹 표시 대신 올해 삼재 띠 안내
-const groups = [[8,0,4],[5,9,1],[2,6,10],[11,3,7]].find((g) => N.samjae(g[0], y).active);
-$("l-samjae").textContent = groups ? `올해 삼재: ${groups.map((j) => N.ZODIAC_BY_JIJI[j]).join("·")}띠` : "";
 $("l-lunar").textContent = L ? `오늘 음력 ${L.month}.${L.day}` : "";
-const su = N.suneung(y + 1);
-const sd = N.diffDays(t, su.date);
+const sd = N.diffDays(t, N.suneung(y + 1).date);
 $("l-suneung").textContent = sd >= 0 ? `D-${sd}` : "";
 $("l-hol").textContent = next ? `다음 ${N.fmtShort(next.date)}` : "";
 $("l-pop").textContent = "5,108만 명";
 $("l-avg").textContent = "46.2세";
 
-// 즉석 나이 계산
-const q = $("qb"), get = N.ymdInputs(q), out = $("quick-result");
+// 생년월일 연동: 아래 카드 전부 갱신
+const q = $("qb"), get = N.ymdInputs(q), out = $("quick-result"), zm = $("zm-y");
+const V = (s, v, sub) => { const a = document.querySelector('[data-v="' + s + '"]'), b = document.querySelector('[data-s="' + s + '"]'); a.textContent = v; b.textContent = sub || ""; a.parentElement.classList.toggle("on", !!v && !/입력하면/.test(v)); };
+const at = (b, n) => { const yy = N.Y(b) + n; return (N.M(b) === 2 && N.D(b) === 29 && !N.isLeap(yy)) ? N.mk(yy, 3, 1) : N.mk(yy, N.M(b), N.D(b)); };
+const dd = (d) => { const n = N.diffDays(t, d); return n === 0 ? "오늘" : n > 0 ? "D-" + n : "지남"; };
+let cur = null;
+function match() {
+  const yb = parseInt(zm.value, 10);
+  if (!cur || !(yb > 0)) { V("zodiac-match", cur ? "상대 출생연도를 입력하면 표시" : "생년월일을 먼저 입력해 주세요"); return; }
+  const ja = N.jijiIndexOf(N.Y(cur)), jb = N.jijiIndexOf(yb), m = N.zodiacMatch(ja, jb), gb = N.ganjiOf(yb);
+  V("zodiac-match", m.label + " · " + m.grade, N.ganjiOf(N.Y(cur)).animal + "띠와 " + gb.animal + "띠(" + yb + "년생), " + Math.abs(N.Y(cur) - yb) + "살 차이");
+  document.querySelector('[data-slug="zodiac-match"] a').href = "/zodiac-match/?a=" + N.Y(cur) + "&b=" + yb;
+}
 function run() {
   const b = get();
-  if (!b) { out.hidden = true; return; }
+  if (!b) { cur = null; out.hidden = true; $("who").textContent = ""; document.querySelectorAll(".lk[data-v], .lk .v").forEach(() => {}); ["age","man-age","birthyear-zodiac","zodiac-gap","adult","school","samjae","indian-name","joseon-name"].forEach((s) => V(s, "생년월일을 입력하면 표시")); document.querySelectorAll("a.lk").forEach((a) => a.href = "/" + a.dataset.slug + "/"); match(); return; }
   if (b > t) { N.showErr(q, "오늘 이전 날짜를 입력해 주세요"); out.hidden = true; return; }
-  N.showErr(q, "");
-  const a = N.ages(b, t), nb = N.nextBirthday(b, t), z = N.ganjiOf(N.Y(b));
-  out.innerHTML = `<div class="stats cols-3">
-    <div class="stat"><div class="k">만나이</div><div class="v">${a.man}<small>세</small></div></div>
-    <div class="stat"><div class="k">세는나이</div><div class="v">${a.korean}<small>살</small></div></div>
-    <div class="stat"><div class="k">띠</div><div class="v">${z.animal}</div></div>
-  </div>
-  <p class="note">다음 생일 ${N.fmtShort(nb.date)}까지 <b>${nb.days}일</b>, 살아온 날 <b>${N.comma(a.full.days)}일</b>. <a href="/age/?d=${N.iso(b)}" style="text-decoration:underline;text-underline-offset:3px">자세히 보기</a></p>`;
-  N.bump(out);
+  N.showErr(q, ""); cur = b;
+  const by = N.Y(b), a = N.ages(b, t), nb = N.nextBirthday(b, t), g = N.ganjiOf(by), s = N.samjae(N.jijiIndexOf(by), y), sc = N.school(by), I = N.INDIAN, J = N.JOSEON;
+  $("who").textContent = N.fmt(b, false) + "생";
+  out.innerHTML = `<p class="note">만 <b>${a.man}세</b> · 세는나이 <b>${a.korean}살</b> · ${g.color} ${g.animal}띠. 아래 항목이 이 날짜로 계산됐습니다.</p>`; N.bump(out);
+  V("age", `만 ${a.man}세 · 세는 ${a.korean}살 · 연 ${a.yearAge}세`, `살아온 날 ${N.comma(a.full.days)}일, 다음 생일 ${dd(nb.date)}`);
+  V("man-age", `${a.man}세 ${a.full.m}개월 ${a.full.d}일`, `올해 생일 ${N.mk(y, N.M(b), N.D(b)) <= t ? "지남" : "아직"}`);
+  V("birthyear-zodiac", `${g.color} ${g.animal}띠`, `${g.name}년 · 태어난 요일 ${N.WEEK[N.W(b)]}요일`);
+  V("zodiac-gap", [by - 24, by - 12, by + 12, by + 24].filter((v) => v <= y).join(" · ") + "년생", "12살 터울 같은 띠");
+  V("adult", a.man >= 19 ? "성년" : "미성년", a.man >= 19 ? `만 19세 ${N.fmt(at(b, 19), false)}` : `민법 성년 ${N.fmt(at(b, 19), false)} (${dd(at(b, 19))})`);
+  V("school", `${String(sc.univIn).slice(2)}학번`, `초등 ${sc.elemIn} · 중 ${sc.midIn} · 고 ${sc.highIn} · 대학 ${sc.univIn}년 입학`);
+  V("samjae", s.active ? `올해 ${s.phase}` : "올해 삼재 아님", s.active ? s.years.join(" · ") : `다음 삼재 ${s.nextStart}년부터`);
+  V("indian-name", `${I.y[by % 10]} ${I.m[N.M(b) - 1]}${I.d[N.D(b) - 1]}`, "연도 끝자리 · 월 · 일 조합");
+  V("joseon-name", `김${J.m[N.M(b) - 1]}${J.d[N.D(b) - 1]}`, "성은 페이지에서 바꿀 수 있습니다");
+  document.querySelectorAll("a.lk").forEach((el) => { const sl = el.dataset.slug; el.href = "/" + sl + "/?" + (["birthyear-zodiac", "zodiac-gap", "samjae", "school"].includes(sl) ? "y=" + by : sl === "zodiac-gap" ? "a=" + by : "d=" + N.iso(b)) + (sl === "zodiac-gap" ? "" : ""); });
+  document.querySelector('a.lk[data-slug="zodiac-gap"]').href = "/zodiac-gap/?a=" + by;
+  try { localStorage.setItem("birth", N.iso(b)); } catch (e) {}
+  match();
 }
 q.addEventListener("input", run);
-document.getElementById("quick").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+zm.addEventListener("input", match);
+$("quick").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+try { const sv = localStorage.getItem("birth"), d = sv && N.parseISO(sv); if (d) { N.setYMD(q, d); } } catch (e) {}
+run();
 
 })();</script>
 </body>
