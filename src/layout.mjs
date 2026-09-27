@@ -9,8 +9,10 @@ const ICON = {
 };
 export const ARROW = '<span class="ico" aria-hidden="true"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>';
 
-export function shell({ title, description, path, body, script = "", nav = "", jsonld = null }) {
+export const BUILD_DATE = new Date().toISOString().slice(0, 10);
+export function shell({ title, description, path, body, script = "", nav = "", jsonld = null, keywords = [] }) {
   const fullTitle = path === "/" ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
+  const ld = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
   return `<!doctype html>
 <html lang="ko">
 <head>
@@ -18,18 +20,33 @@ export function shell({ title, description, path, body, script = "", nav = "", j
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
+${keywords.length ? `<meta name="keywords" content="${esc(keywords.join(", "))}">` : ""}
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="author" content="${SITE.name}">
 <link rel="canonical" href="${SITE.url}${path}">
+<link rel="alternate" hreflang="ko" href="${SITE.url}${path}">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${SITE.url}${path}">
 <meta property="og:site_name" content="${SITE.name}">
+<meta property="og:image" content="${SITE.url}/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${SITE.name}: ${SITE.tagline}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(fullTitle)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="${SITE.url}/assets/og.png">
 <meta name="theme-color" content="#e6f0fb">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://code.iconify.design" crossorigin>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css?v=${V}">
 <script>try{var t=localStorage.getItem("theme");if(t==="dark")document.documentElement.dataset.theme="dark";}catch(e){}</script>
 <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
-${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
+${ld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n")}
 </head>
 <body>
 <div class="orbs" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
@@ -96,10 +113,21 @@ export function yearField(id, label, help = "") {
 }
 
 // 계산기 페이지 본문
+// 설명 카드(h2 + 본문)를 FAQ 로 변환: 생성형 검색·리치 결과용
+export function faqOf(c) {
+  const strip = (h) => h.replace(/<\/p>/g, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  const josa = (w) => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 ? ((c - 0xac00) % 28 ? "은" : "는") : "은(는)"; };
+  const out = [];
+  for (const m of c.info.matchAll(/<div class="card[^"]*"><h2>(.*?)<\/h2>([\s\S]*?)(?:<p class="src">|<\/div>)/g)) {
+    const q = strip(m[1]), a = strip(m[2]);
+    if (q && a.length > 20) out.push({ q: /[?？]$/.test(q) ? q : q + josa(q) + " 무엇인가요?", a });
+  }
+  return out;
+}
 export function calcPage(c, all) {
   const cat = CATS[c.cat];
   const related = (c.related || []).map((s) => all.find((x) => x.slug === s)).filter(Boolean);
-  return `<div class="page wrap">
+  return `<article class="page wrap">
   <nav class="crumb" aria-label="경로"><a href="/">홈</a><span class="sep">/</span><a href="/#${c.cat}">${cat.name}</a></nav>
   <h1>${c.title}</h1>
   <p class="lede">${c.lede}</p>
@@ -109,11 +137,12 @@ export function calcPage(c, all) {
       <div class="result" id="result" hidden></div>
     </section>
     <aside class="aside">
+      <div class="card bz summary"><h2>핵심 요약</h2><p>${c.description}</p><p class="src">${SITE.name} · 기준일 ${BUILD_DATE} 빌드 · 계산은 브라우저에서 실시간</p></div>
       ${c.info}
       ${related.length ? `<div class="card bz"><h2>함께 보기</h2><div class="related">${related.map((r) => `<a href="/${r.slug}/">${r.title}<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>`).join("")}</div></div>` : ""}
     </aside>
   </div>
-</div>`;
+</article>`;
 }
 
 export const CATS = {
