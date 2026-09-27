@@ -78,6 +78,7 @@ ${body}
 </main>
 <footer class="ftr">
   <div class="wrap">
+    <nav class="ftr-nav" aria-label="사이트 정보"><a href="/about/">사이트 소개</a><a href="/privacy/"><b>개인정보처리방침</b></a><a href="/contact/">문의</a></nav>
     <p>음력 변환은 한국천문연구원 음양력 자료를 따르는 <a href="https://github.com/usingsky/korean_lunar_calendar_js" rel="noopener">korean-lunar-calendar</a>(MIT)를 사용합니다. 띠궁합·삼재·손없는 날은 민속 참고 자료이며, 법률·행정 판단은 관련 기관에서 확인하세요.</p>
     <p>© ${new Date().getFullYear()} ${SITE.name}. 모든 계산은 브라우저 안에서 처리되며 입력값은 서버로 전송되지 않습니다.</p>
   </div>

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { shell, calcPage, faqOf, CATS, SITE, BUILD_DATE } from "./src/layout.mjs";
 import { home } from "./src/home.mjs";
 import { calculators } from "./src/calculators/index.mjs";
+import { pages } from "./src/pages.mjs";
 
 const OUT = "docs";
 const all = calculators;
@@ -32,8 +33,14 @@ for (const c of all) {
   writeFileSync(join(dir, "index.html"), shell({ title: c.title, description: c.description, path: `/${c.slug}/`, nav: c.cat, body: calcPage(c, all), script: indexScript + (c.script || ""), keywords: c.keys || [], jsonld: ld }));
 }
 
+// 정보 페이지
+for (const p of pages) {
+  mkdirSync(join(OUT, p.slug), { recursive: true });
+  writeFileSync(join(OUT, p.slug, "index.html"), shell({ title: p.title, description: p.description, path: `/${p.slug}/`, body: p.body, script: indexScript + (p.script || ""), jsonld: { "@context": "https://schema.org", "@type": "WebPage", name: p.title, url: `${SITE.url}/${p.slug}/`, inLanguage: "ko", dateModified: BUILD_DATE, publisher: ORG } }));
+}
+
 // sitemap · robots
-writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>${SITE.url}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n${all.map((c) => `<url><loc>${SITE.url}/${c.slug}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join("\n")}\n</urlset>\n`);
+writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>${SITE.url}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n${all.map((c) => `<url><loc>${SITE.url}/${c.slug}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join("\n")}\n${pages.map((p) => `<url><loc>${SITE.url}/${p.slug}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`).join("\n")}\n</urlset>\n`);
 // 검색·생성형 AI 크롤러 모두 허용 (GEO)
 writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\n${["GPTBot", "ChatGPT-User", "OAI-SearchBot", "ClaudeBot", "anthropic-ai", "PerplexityBot", "Google-Extended", "Bingbot", "Yeti", "Daum"].map((b) => `User-agent: ${b}\nAllow: /`).join("\n\n")}\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
 // llms.txt: 생성형 엔진이 사이트 구조를 한 번에 읽는 안내 파일
@@ -48,5 +55,6 @@ writeFileSync(join(OUT, "ads.txt"), "google.com, pub-2298882938781262, DIRECT, f
 const bad = [];
 for (const c of all) for (const k of ["title", "lede", "description", "form", "info"]) if (/[—–]/.test(c[k] || "")) bad.push(`${c.slug}.${k}`);
 if (/[—–]/.test(home(all))) bad.push("home");
+for (const p of pages) if (/[—–]/.test(p.body)) bad.push(p.slug);
 if (bad.length) { console.error("em-dash 발견:", bad.join(", ")); process.exit(1); }
-console.log(`built ${all.length + 1} pages → ${OUT}/`);
+console.log(`built ${all.length + 1 + pages.length} pages → ${OUT}/`);
