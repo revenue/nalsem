@@ -1,8 +1,8 @@
-import { ymd } from "../layout.mjs";
+import { ymd, ARROW } from "../layout.mjs";
 
-const card = (h2, body, src = "") => `<div class="card"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
+const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
 const P = (s) => `<p>${s}</p>`;
-const btns = (label = "계산") => `<div class="actions"><button class="btn btn-primary" type="submit">${label}</button><button class="btn btn-ghost btn-sm" type="button" data-share="">공유</button></div>`;
+const btns = (label = "계산") => `<div class="actions"><button class="btn btn-primary" type="submit">${label}${ARROW}</button><button class="btn btn-ghost btn-sm" type="button" data-share=""><iconify-icon icon="solar:share-linear"></iconify-icon> 공유</button></div>`;
 const pre = `const $=(i)=>document.getElementById(i);const T=N.today();const TY=N.Y(T);const out=$("result");`;
 const ymdForm = (id, label, help = "") => `<form id="f" autocomplete="off">${ymd(id, label, help)}${btns()}</form>`;
 const restore = (id, run, key = "d") => `const q=N.qs("${key}"),qd=q&&N.parseISO(q);if(qd){N.setYMD($("${id}"),qd);${run}();}`;

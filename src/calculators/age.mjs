@@ -1,8 +1,8 @@
-import { ymd, yearField } from "../layout.mjs";
+import { ymd, yearField, ARROW } from "../layout.mjs";
 
-const card = (h2, body, src = "") => `<div class="card"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
+const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
 const P = (s) => `<p>${s}</p>`;
-const btns = (label = "계산") => `<div class="actions"><button class="btn btn-primary" type="submit">${label}</button><button class="btn btn-ghost btn-sm" type="button" data-share="">공유</button></div>`;
+const btns = (label = "계산") => `<div class="actions"><button class="btn btn-primary" type="submit">${label}${ARROW}</button><button class="btn btn-ghost btn-sm" type="button" data-share=""><iconify-icon icon="solar:share-linear"></iconify-icon> 공유</button></div>`;
 const pre = `const $=(i)=>document.getElementById(i);const T=N.today();const TY=N.Y(T);const out=$("result");`;
 const AGE_INFO = card("나이 셈법 3가지", P("<b>만나이</b>는 태어난 날 0세, 생일마다 1세씩 더합니다. 국제 표준이며 2023년 6월 28일부터 법령·계약·공문서의 나이는 특별한 규정이 없으면 만나이입니다.") + P("<b>세는나이(한국나이)</b>는 태어난 해 1살, 매년 1월 1일에 1살씩 더하는 관습 셈법입니다.") + P("<b>연나이</b>는 올해에서 출생연도를 뺀 나이입니다. 병역법·청소년보호법 등 일부 법률이 씁니다."), '<a href="https://www.law.go.kr/법령/행정기본법" rel="noopener">행정기본법 제7조의2</a>');
 const ZODIAC_NOTE = P("띠는 관습적으로 양력 1월 1일 기준으로 표기합니다. 명리학에서는 입춘(2월 4일 무렵)을 기준으로 삼기도 하므로 1월생·2월 초생은 해석이 달라질 수 있습니다.");

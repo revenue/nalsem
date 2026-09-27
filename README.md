@@ -37,10 +37,14 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 | 인구·평균연령 | `src/data/stats.json` | 원하는 주기 (매월 1일 이후 공표) |
 | 임시공휴일 | 현재 미지원. 필요하면 `holidays()` 에 연도별 예외 추가 | 정부 지정 시 |
 
-## 디자인
+## 디자인 (Supanova Design Skill 적용)
 
-- 폰트 Wanted Sans Variable, 강조색 1개(`--accent`), 라이트/다크 자동 + 수동 토글
-- 모서리 규칙: 카드 16px · 입력 10px · 버튼/칩 pill
+- Vibe: Vantablack Luxe(다크 기본 `#0a0a0a`) / 라이트 토글은 Clean Structural. OS 설정과 무관하게 다크가 기본, 토글은 localStorage 저장
+- 폰트 Pretendard Variable(jsdelivr) · 강조색 1개 Warm Amber(`--accent`, 채도 <80%) · 아이콘 Iconify Solar
+- 컴포넌트: Double-Bezel 카드(`.bz`, 바깥 링 + 안쪽 코어) · pill CTA + 원형 화살표 · 플로팅 글래스 내비(z 40) · 노이즈 오버레이(z 60) · 메시 그라디언트 오브
+- 모션: 모든 전환 `0.5s cubic-bezier(.16,1,.3,1)` · 스크롤 진입 fadeInUp(blur) + 80ms 스태거(IntersectionObserver) · transform/opacity 만 · reduced-motion 시 정지
+- 타이포: 한국어 `word-break: keep-all`, 헤드라인 `line-height 1.15~1.25`, 본문 65ch
+- Supanova 원본은 Tailwind CDN + 단일 HTML 을 전제하지만, 31페이지 정적 사이트라 같은 규칙을 `site.css` 토큰으로 옮겨 적용했다
 - 페이지: 좌 도구 / 우 설명(7:5), 모바일은 세로 스택. 결과는 입력 즉시 갱신, URL 쿼리로 공유·북마크
 
 ## 라이선스

@@ -1,10 +1,13 @@
 // 페이지 셸. 모든 페이지가 같은 헤더·검색·푸터를 공유한다.
+export const V = Date.now().toString(36); // 자산 캐시 무효화
 export const SITE = { name: "날셈", url: "https://nalsem.app", tagline: "나이·날짜·음력 생활계산기" };
 
+// 아이콘: Iconify Solar 세트만 사용
 const ICON = {
-  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
-  theme: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 13.4 3.1C13 3 12.5 3 12 3z"/></svg>',
+  search: '<iconify-icon icon="solar:magnifier-linear"></iconify-icon>',
+  theme: '<iconify-icon icon="solar:sun-linear" id="theme-icon"></iconify-icon>',
 };
+export const ARROW = '<span class="ico" aria-hidden="true"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>';
 
 export function shell({ title, description, path, body, script = "", nav = "", jsonld = null }) {
   const fullTitle = path === "/" ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
@@ -21,16 +24,18 @@ export function shell({ title, description, path, body, script = "", nav = "", j
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${SITE.url}${path}">
 <meta property="og:site_name" content="${SITE.name}">
-<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f0f11" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="stylesheet" href="/assets/site.css?v=${V}">
+<script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.dataset.theme="light";}catch(e){}</script>
+<script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 </head>
 <body>
+<div class="orbs" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="noise" aria-hidden="true"></div>
 <header class="hdr">
-  <div class="wrap">
+  <div class="pill">
     <a class="brand" href="/" aria-label="${SITE.name} 홈"><span class="brand-mark" aria-hidden="true">날</span>${SITE.name}</a>
     <nav class="nav" aria-label="카테고리">
       <a href="/#age" ${nav === "age" ? 'aria-current="page"' : ""}>나이·띠</a>
@@ -39,7 +44,7 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
     </nav>
     <div class="hdr-right">
       <button class="icon-btn" id="open-search" type="button" aria-label="계산기 검색 (/)">${ICON.search}</button>
-      <button class="icon-btn" id="toggle-theme" type="button" aria-label="다크 모드 전환">${ICON.theme}</button>
+      <button class="icon-btn" id="toggle-theme" type="button" aria-label="라이트/다크 전환">${ICON.theme}</button>
     </div>
   </div>
 </header>
@@ -59,8 +64,8 @@ ${body}
   </div>
 </footer>
 <script src="/assets/vendor/korean-lunar-calendar.min.js"></script>
-<script src="/assets/calc.js"></script>
-<script src="/assets/site.js"></script>
+<script src="/assets/calc.js?v=${V}"></script>
+<script src="/assets/site.js?v=${V}"></script>
 ${script ? `<script>(function(){"use strict";\n${script}\n})();</script>` : ""}
 </body>
 </html>`;
@@ -100,13 +105,13 @@ export function calcPage(c, all) {
   <h1>${c.title}</h1>
   <p class="lede">${c.lede}</p>
   <div class="page-grid">
-    <section class="tool" aria-label="${c.title}">
+    <section class="tool bz bz-in" aria-label="${c.title}">
       ${c.form}
       <div class="result" id="result" hidden></div>
     </section>
     <aside class="aside">
       ${c.info}
-      ${related.length ? `<div class="card"><h2>함께 보기</h2><div class="related">${related.map((r) => `<a href="/${r.slug}/">${r.title}</a>`).join("")}</div></div>` : ""}
+      ${related.length ? `<div class="card bz"><h2>함께 보기</h2><div class="related">${related.map((r) => `<a href="/${r.slug}/">${r.title}<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>`).join("")}</div></div>` : ""}
     </aside>
   </div>
 </div>`;

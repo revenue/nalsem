@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 const S = JSON.parse(readFileSync(new URL("../data/stats.json", import.meta.url), "utf8"));
-const card = (h2, body, src = "") => `<div class="card"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
+const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
 const P = (s) => `<p>${s}</p>`;
 const c = (n) => Number(n).toLocaleString("ko-KR");
 const src = `<a href="${S.sourceUrl}" rel="noopener">${S.source}</a>`;
