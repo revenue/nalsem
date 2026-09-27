@@ -63,14 +63,7 @@ export function home(all) {
     ${dateRows.filter((s) => !["d-day", "solar-to-lunar", "suneung", "holidays"].includes(s)).map((s) => row(s)).join("\n    ")}
   </div>
 </section>
-
-<section class="section wrap" id="stats">
-  <div class="section-head rv"><h2>${CATS.stats.name}</h2><span class="count">${by("stats").length}개</span></div>
-  <div class="duo">
-    ${tile("population", "", "l-pop")}
-    ${tile("average-age", "", "l-avg")}
-  </div>
-</section>`;
+`;
 }
 
 home.script = (all) => `
@@ -89,8 +82,6 @@ $("l-lunar").textContent = L ? \`오늘 음력 \${L.month}.\${L.day}\` : "";
 const sd = N.diffDays(t, N.suneung(y + 1).date);
 $("l-suneung").textContent = sd >= 0 ? \`D-\${sd}\` : "";
 $("l-hol").textContent = next ? \`다음 \${N.fmtShort(next.date)}\` : "";
-$("l-pop").textContent = "5,108만 명";
-$("l-avg").textContent = "46.2세";
 
 // 생년월일 연동: 아래 카드 전부 갱신
 const q = $("qb"), get = N.ymdInputs(q), out = $("quick-result"), zm = $("zm-y");

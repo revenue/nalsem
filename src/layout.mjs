@@ -40,7 +40,6 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
     <nav class="nav" aria-label="카테고리">
       <a href="/#age" ${nav === "age" ? 'aria-current="page"' : ""}>나이·띠</a>
       <a href="/#date" ${nav === "date" ? 'aria-current="page"' : ""}>날짜·음력</a>
-      <a href="/#stats" ${nav === "stats" ? 'aria-current="page"' : ""}>통계</a>
     </nav>
     <div class="hdr-right">
       <button class="icon-btn" id="open-search" type="button" aria-label="계산기 검색 (/)">${ICON.search}</button>
@@ -120,5 +119,4 @@ export function calcPage(c, all) {
 export const CATS = {
   age: { name: "나이·띠·사람", id: "age" },
   date: { name: "날짜·음력", id: "date" },
-  stats: { name: "통계", id: "stats" },
 };
