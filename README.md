@@ -46,7 +46,7 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 
 ## 방문 통계 (GA4)
 
-- 빌드 시 측정 ID 주입: `GA_ID=G-XXXXXXXXXX npm run build`. 값이 없으면 GA 스크립트를 넣지 않는다 (`src/layout.mjs`)
+- 측정 ID `G-7V7PNG5749` (속성: 날셈, 스트림: suik.me). `src/layout.mjs` 의 `GA_ID`. 끄려면 `GA_ID= npm run build`
 - 자동 수집(향상된 측정): 페이지뷰·유입 경로·스크롤·외부 링크·체류
 - 맞춤 이벤트 (`docs/assets/calc.js` `N.track`, `site.js`): `calculate`(calculator) · `select_content`(item_id·area·from·검색어) · `search_open`/`search_close` · `share_click` · `theme_toggle`. 페이지 그룹 `content_group` = age / date / home / info
 - 🔴 **입력값(생년월일·날짜·이름)은 절대 이벤트에 넣지 않는다**

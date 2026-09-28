@@ -1,7 +1,7 @@
 // 페이지 셸. 모든 페이지가 같은 헤더·검색·푸터를 공유한다.
 export const V = Date.now().toString(36); // 자산 캐시 무효화
 // GA4 측정 ID (G-XXXXXXXXXX). 비어 있으면 GA 스크립트를 넣지 않는다.
-export const GA_ID = process.env.GA_ID || "";
+export const GA_ID = process.env.GA_ID ?? "G-7V7PNG5749";
 export const SITE = { name: "날셈", url: "https://nalsem.suik.me", tagline: "나이·날짜·음력 생활계산기" };
 
 // 아이콘: Iconify Solar 세트만 사용
@@ -18,6 +18,8 @@ export function shell({ title, description, path, body, script = "", nav = "", j
   return `<!doctype html>
 <html lang="ko">
 <head>
+${GA_ID ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());(function(){var st=function(u){try{var x=new URL(u);return x.origin+x.pathname;}catch(e){return "";}};var r=document.referrer;if(r&&/(^|\.)suik\.me$/.test(new URL(r).hostname))r=st(r);gtag("config","${GA_ID}",{content_group:"${nav || (path === "/" ? "home" : "info")}",page_location:st(location.href),page_referrer:r});})();</script>` : ""}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullTitle)}</title>
@@ -49,8 +51,6 @@ ${keywords.length ? `<meta name="keywords" content="${esc(keywords.join(", "))}"
 <link rel="preconnect" href="https://code.iconify.design" crossorigin>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2298882938781262" crossorigin="anonymous"></script>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-${GA_ID ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());(function(){var st=function(u){try{var x=new URL(u);return x.origin+x.pathname;}catch(e){return "";}};var r=document.referrer;if(r&&/(^|\.)suik\.me$/.test(new URL(r).hostname))r=st(r);gtag("config","${GA_ID}",{content_group:"${nav || (path === "/" ? "home" : "info")}",page_location:st(location.href),page_referrer:r});})();</script>` : ""}
 <link rel="stylesheet" href="/assets/site.css?v=${V}">
 <script>try{var t=localStorage.getItem("theme");if(t==="dark")document.documentElement.dataset.theme="dark";}catch(e){}</script>
 <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js" defer></script>
