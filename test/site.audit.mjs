@@ -27,6 +27,9 @@ const REQUIRED = [
   ["lang=ko", (h) => h.includes('<html lang="ko">')],
 ];
 const OLD_HOSTS = ["nalsem.unitblack.kr", "nalsem.app"];
+// GA_ID 로 빌드했으면 모든 페이지에 GA 가 있어야 한다
+const GA = (readFileSync(join(ROOT, "index.html"), "utf8").match(/gtag\/js\?id=(G-[A-Z0-9]+)/) || [])[1];
+if (GA) REQUIRED.push(["GA4 " + GA, (h) => h.includes(`gtag/js?id=${GA}`) && h.includes(`gtag("config","${GA}"`)]);
 
 const problems = [];
 const internal = new Set();

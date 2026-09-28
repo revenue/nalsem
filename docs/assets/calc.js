@@ -196,7 +196,14 @@
   }
   function setYMD(root, t) { const ins = root.querySelectorAll("input"); if (!t) return; ins[0].value = Y(t); ins[1].value = M(t); ins[2].value = D(t); }
   function showErr(field, msg) { field.classList.toggle("is-error", !!msg); const e = field.querySelector(".err"); if (e && msg) e.textContent = msg; }
-  function bump(el) { el.hidden = false; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+  // GA4 이벤트. 개인정보(생년월일·입력 날짜·이름 등 입력값)는 절대 넣지 않는다: 계산기 이름·동작 종류만.
+  function track(name, params) { try { if (typeof window.gtag === "function") window.gtag("event", name, params || {}); } catch (e) {} }
+  const calcName = () => location.pathname.replace(/^\/|\/$/g, "") || "home";
+  let touched = false, lastCalc = 0;
+  if (typeof document !== "undefined") ["input", "change", "click", "submit"].forEach((t) => document.addEventListener(t, () => { touched = true; }, true));
+  // 결과가 갱신될 때 1회 집계 (자동 렌더는 제외, 연속 입력은 5초에 1번)
+  function calcEvent(extra) { if (!touched) return; const now = Date.now(); if (now - lastCalc < 5000) return; lastCalc = now; track("calculate", Object.assign({ calculator: calcName() }, extra || {})); }
+  function bump(el) { el.hidden = false; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); calcEvent(); }
   function qs(k) { return new URLSearchParams(location.search).get(k); }
   function setQS(obj) { const p = new URLSearchParams(location.search); Object.entries(obj).forEach(([k, v]) => v == null || v === "" ? p.delete(k) : p.set(k, v)); history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p : "")); }
   async function share(title, text) {
@@ -211,5 +218,5 @@
     mk, today, isValid, Y, M, D, W, addDays, addMonths, diffDays, isLeap, daysInMonth, dayOfYear, pad, iso, fmt, fmtShort, comma, parseISO,
     diffYMD, ages, nextBirthday, zodiacOf, zodiacHanja, jijiIndexOf, ganjiOf, yearsOfZodiac, zodiacMatch, samjae,
     toLunar, toSolar, holidays, isSonEomneun, suneung, school,
-    ymdInputs, setYMD, showErr, bump, qs, setQS, share, el, esc };
+    ymdInputs, setYMD, showErr, bump, track, calcEvent, qs, setQS, share, el, esc };
 })(window);

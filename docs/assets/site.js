@@ -8,6 +8,7 @@
   tBtn && tBtn.addEventListener("click", () => {
     if (root.dataset.theme === "dark") delete root.dataset.theme; else root.dataset.theme = "dark";
     try { localStorage.setItem("theme", root.dataset.theme || "light"); } catch (e) {}
+    N.track("theme_toggle", { theme: root.dataset.theme || "light" });
     syncIcon();
   });
 
@@ -20,7 +21,7 @@
   } else rv.forEach((el) => el.classList.add("in"));
 
   const dlg = document.getElementById("search"), input = document.getElementById("search-input"), list = document.getElementById("search-list");
-  const open = () => { if (!dlg.open) { dlg.showModal(); input.value = ""; render(""); input.focus(); } };
+  const open = () => { if (!dlg.open) { dlg.showModal(); input.value = ""; render(""); input.focus(); N.track("search_open"); } };
   document.getElementById("open-search").addEventListener("click", open);
   document.addEventListener("keydown", (e) => {
     if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); open(); }
@@ -39,12 +40,24 @@
     const as = list.querySelectorAll("a");
     if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (!as.length) return; as[idx].removeAttribute("aria-selected"); idx = (idx + (e.key === "ArrowDown" ? 1 : as.length - 1)) % as.length; as[idx].setAttribute("aria-selected", "true"); as[idx].scrollIntoView({ block: "nearest" }); }
     if (e.key === "Enter") { e.preventDefault(); if (as[idx]) location.href = as[idx].href; }
+    if (e.key === "Escape") N.track("search_close", { results: items.length });
   });
 
   // 공유 버튼 (data-share)
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-share]"); if (!b) return;
+    N.track("share_click", { calculator: location.pathname.replace(/^\/|\/$/g, "") || "home" });
     const r = await N.share(document.title, b.dataset.share || document.title);
     if (r === "copied") { const t = b.textContent; b.textContent = "링크 복사됨"; setTimeout(() => (b.textContent = t), 1600); }
   });
+
+  // 내부 링크 이동: 어느 영역에서 어느 계산기로 갔는지 (검색 결과 포함)
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="/"]'); if (!a) return;
+    const to = a.getAttribute("href").split(/[?#]/)[0].replace(/^\/|\/$/g, "") || "home";
+    const area = a.closest("#search-list") ? "search" : a.closest(".lks") ? "home_linked" : a.closest(".rows") ? "home_list" : a.closest(".tiles,.duo") ? "home_tile" : a.closest(".related") ? "related" : a.closest(".hdr") ? "header" : a.closest(".ftr") ? "footer" : a.closest(".crumb") ? "breadcrumb" : "body";
+    const p = { content_type: "calculator", item_id: to, area, from: location.pathname.replace(/^\/|\/$/g, "") || "home" };
+    if (area === "search") { const q = (document.getElementById("search-input").value || "").trim().slice(0, 30); if (q) p.search_term = q; }
+    N.track("select_content", p);
+  }, true);
 })();

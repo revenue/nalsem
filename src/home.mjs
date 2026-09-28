@@ -93,6 +93,7 @@ function match() {
   const yb = parseInt(zm.value, 10);
   if (!cur || !(yb > 0)) { V("zodiac-match", cur ? "상대 출생연도를 입력하면 표시" : "생년월일을 먼저 입력해 주세요"); return; }
   const ja = N.jijiIndexOf(N.Y(cur)), jb = N.jijiIndexOf(yb), m = N.zodiacMatch(ja, jb), gb = N.ganjiOf(yb);
+  N.calcEvent({ calculator: "home_zodiac_match" });
   V("zodiac-match", m.label + " · " + m.grade, N.ganjiOf(N.Y(cur)).animal + "띠와 " + gb.animal + "띠(" + yb + "년생), " + Math.abs(N.Y(cur) - yb) + "살 차이");
   document.querySelector('[data-slug="zodiac-match"] a').href = "/zodiac-match/?a=" + N.Y(cur) + "&b=" + yb;
 }

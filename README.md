@@ -44,6 +44,13 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 - Supanova 원본은 Tailwind CDN + 단일 HTML 을 전제하지만, 31페이지 정적 사이트라 같은 규칙을 `site.css` 토큰으로 옮겨 적용했다
 - 페이지: 좌 도구 / 우 설명(7:5), 모바일은 세로 스택. 결과는 입력 즉시 갱신, URL 쿼리로 공유·북마크
 
+## 방문 통계 (GA4)
+
+- 빌드 시 측정 ID 주입: `GA_ID=G-XXXXXXXXXX npm run build`. 값이 없으면 GA 스크립트를 넣지 않는다 (`src/layout.mjs`)
+- 자동 수집(향상된 측정): 페이지뷰·유입 경로·스크롤·외부 링크·체류
+- 맞춤 이벤트 (`docs/assets/calc.js` `N.track`, `site.js`): `calculate`(calculator) · `select_content`(item_id·area·from·검색어) · `search_open`/`search_close` · `share_click` · `theme_toggle`. 페이지 그룹 `content_group` = age / date / home / info
+- 🔴 **입력값(생년월일·날짜·이름)은 절대 이벤트에 넣지 않는다**
+
 ## 배포
 
 - 도메인: **https://nalsem.suik.me** (`docs/CNAME`). 이전 도메인 nalsem.unitblack.kr 은 2026-09-28 이전 완료 후 사용 중지. `src/layout.mjs` 의 `SITE.url` 이 canonical·OG·sitemap·llms.txt 전부의 기준

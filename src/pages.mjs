@@ -2,6 +2,7 @@
 import { SITE } from "./layout.mjs";
 
 const EFFECTIVE = "2026년 9월 28일";
+import { GA_ID } from "./layout.mjs";
 const REPO = "https://github.com/revenue/nalsem";
 const sec = (h, body) => `<section class="doc-sec"><h2>${h}</h2>${body}</section>`;
 const P = (s) => `<p>${s}</p>`;
@@ -32,8 +33,11 @@ export const pages = [
           '제3자 광고 사업자의 맞춤 광고 쿠키는 <a href="https://www.aboutads.info/choices/" rel="noopener">www.aboutads.info</a>에서 거부할 수 있습니다.',
           '자세한 내용: <a href="https://policies.google.com/technologies/ads?hl=ko" rel="noopener">Google 광고 정책</a>, <a href="https://policies.google.com/technologies/partner-sites?hl=ko" rel="noopener">Google 파트너 사이트의 데이터 사용 방식</a>',
         ])) +
+      (GA_ID ? sec("3-1. 방문 통계 (Google Analytics 4)", P("사이트 개선을 위해 Google Analytics 4 로 방문 통계를 수집합니다. 수집 항목은 방문 경로(검색·링크 등 유입 경로), 본 페이지, 머문 시간, 스크롤, 기기·브라우저 종류, 대략적 지역(국가·도시 수준)과 사이트 안에서의 동작(어떤 계산기를 썼는지, 검색·공유·링크 클릭 여부)입니다.") +
+        P("<b>계산기에 입력한 생년월일·날짜·이름 등 입력값은 통계로 보내지 않습니다.</b> Google 은 IP 주소를 저장하지 않으며, 수집된 통계는 개인을 식별하지 않는 형태로 Google 서버에 보관됩니다.") +
+        UL(['거부 방법: <a href="https://tools.google.com/dlpage/gaoptout?hl=ko" rel="noopener">Google Analytics 차단 브라우저 부가기능</a>을 설치하거나 브라우저에서 쿠키를 차단하세요.', '자세한 내용: <a href="https://policies.google.com/privacy?hl=ko" rel="noopener">Google 개인정보처리방침</a>'])) : "") +
       sec("4. 외부 서비스", P("사이트 제공을 위해 아래 외부 서비스를 이용하며, 각 서비스는 접속 시 IP 주소·브라우저 정보 등 기술 정보를 자체 정책에 따라 처리할 수 있습니다.") +
-        UL(["<b>GitHub Pages</b> (웹 호스팅): 접속 로그", "<b>Cloudflare</b> (도메인 네임 서비스)", "<b>jsDelivr, Iconify</b> (글꼴·아이콘 파일 제공)", "<b>Google AdSense</b> (광고)", "<b>Google Search Console</b> (검색 노출 분석, 개인 식별 정보 없음)"])) +
+        UL(["<b>GitHub Pages</b> (웹 호스팅): 접속 로그", "<b>Cloudflare</b> (도메인 네임 서비스)", "<b>jsDelivr, Iconify</b> (글꼴·아이콘 파일 제공)", "<b>Google AdSense</b> (광고)", ...(GA_ID ? ["<b>Google Analytics 4</b> (방문 통계)"] : []), "<b>Google Search Console</b> (검색 노출 분석, 개인 식별 정보 없음)"])) +
       sec("5. 쿠키 거부 방법", P("브라우저 설정에서 쿠키 저장을 거부하거나 삭제할 수 있습니다. 쿠키를 거부해도 계산기는 모두 정상적으로 이용할 수 있으며, 광고가 맞춤형이 아닌 일반 광고로 바뀝니다.")) +
       sec("6. 아동의 개인정보", P("사이트는 만 14세 미만 아동을 대상으로 개인정보를 수집하지 않습니다.")) +
       sec("7. 문의", P(`개인정보 관련 문의는 <a href="/contact/">문의 페이지</a>의 안내를 따라 주세요.`)) +
