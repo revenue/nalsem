@@ -225,6 +225,41 @@ t("나이 계산: 2026년 귀속 기준 출생연도", () => {
   assert.equal(T.depFlags({ rel: "child", birthYear: 2017 }, { kid2017: true }).kidCredit, true);
   assert.equal(T.depFlags({ rel: "child", birthYear: 2018 }).kidCredit, false);
   assert.equal(T.depFlags({ rel: "child", birthYear: 2020 }).under6, true);
+  assert.equal(T.depFlags({ rel: "child", birthYear: 2019 }).under6, true); // 2026.1.1 현재 6세
+  assert.equal(T.depFlags({ rel: "child", birthYear: 2018 }).under6, false);
+  assert.equal(T.depFlags({ rel: "parent", birthYear: 1961 }).senior65, true);
+});
+
+// ── 설명 카드 예시 (src/calculators/tax.mjs EXAMPLE) 의 숫자가 엔진 결과와 맞는지 ──
+const manR = (won) => Math.round(won / 10_000);
+const gainOf = (r, kind, i = 0) => manR(r.reasons.filter((x) => x.kind === kind)[i].gain);
+t("설명 카드 예시: 연봉 차이 큰 부부(대표 페이지)", () => {
+  const r = T.optimize({ spouses: [sp(90_000_000, { card: { credit: 16_000_000 } }), sp(35_000_000, { card: { credit: 12_000_000 } })], deps: [child(2016), { rel: "parent", birthYear: 1958 }], december: { amount: 3_000_000, kind: "credit" } });
+  assert.deepEqual(J(r.best.assign), [0, 0]); assert.equal(r.best.decRatio, 0);
+  assert.equal(manR(r.diffVsWorst), 47); assert.equal(manR(r.diffVsAllHigh), 7);
+  assert.equal(gainOf(r, "dep", 0), 15); assert.equal(gainOf(r, "dep", 1), 15); assert.equal(gainOf(r, "card"), 7);
+  assert.equal(Math.round(r.best.persons[0].base / 1_000_000), 63); assert.equal(Math.round(r.best.persons[1].base / 100_000), 187);
+});
+t("설명 카드 예시: 자녀 둘과 아버지(부양가족 페이지)", () => {
+  const r = T.optimize({ spouses: [sp(90_000_000), sp(48_000_000)], deps: [child(2014), child(2019), { rel: "parent", birthYear: 1952 }] });
+  assert.deepEqual(J(r.best.assign), [0, 0, 0]);
+  assert.equal(manR(r.diffVsWorst), 54); assert.equal(gainOf(r, "dep", 2), 25);
+  assert.equal(r.best.persons[0].credits.child, 250_000);
+});
+t("설명 카드 예시: 수술비와 아이 병원비(의료비 페이지)", () => {
+  const r = T.optimize({ spouses: [sp(70_000_000), sp(30_000_000)], deps: [child(2022, { medical: { paid: [0, 1_500_000] } })], plannedMedicalCouple: [0, 8_000_000] });
+  assert.equal(r.best.assign[0], 0); assert.equal(r.best.plannedPayer[0], 0);
+  assert.equal(gainOf(r, "planned"), 44); assert.equal(gainOf(r, "dep"), 6);
+  assert.equal(r.best.persons[0].credits.medical, 885_000);
+  assert.ok(r.notes.some((x) => /배우자가 이미 낸 자녀1 의료비/.test(x)));
+});
+t("설명 카드 예시: 12월 300만 원(카드 페이지)", () => {
+  const h = { spouses: [sp(60_000_000, { card: { credit: 13_000_000 } }), sp(40_000_000, { card: { credit: 14_000_000 } })], deps: [], december: { amount: 3_000_000, kind: "credit" } };
+  const r = T.optimize(h);
+  assert.equal(r.best.decRatio, 0); assert.equal(gainOf(r, "card"), 5);
+  const d = T.optimize(Object.assign({}, h, { december: { amount: 3_000_000, kind: "debit" } }));
+  const base = T.optimize(Object.assign({}, h, { december: null })).best.total;
+  assert.equal(manR(base - d.best.total), 15); // 배우자 체크카드 300만 → 약 15만 원
 });
 
 console.log(`tax engine: ${n} passed, ${failed} failed`);

@@ -1,7 +1,8 @@
 import { age } from "./age.mjs";
 import { date } from "./date.mjs";
+import { tax } from "./tax.mjs";
 
-export const calculators = [...age, ...date];
+export const calculators = [...age, ...date, ...tax];
 
 // 필수 필드 점검
 for (const c of calculators) for (const k of ["slug", "title", "short", "lede", "description", "cat", "form", "info"]) if (!c[k]) throw new Error(`${c.slug || "?"}: ${k} 누락`);

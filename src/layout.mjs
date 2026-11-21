@@ -12,7 +12,7 @@ const ICON = {
 export const ARROW = '<span class="ico" aria-hidden="true"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>';
 
 export const BUILD_DATE = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST 기준
-export function shell({ title, description, path, body, script = "", nav = "", jsonld = null, keywords = [] }) {
+export function shell({ title, description, path, body, script = "", nav = "", jsonld = null, keywords = [], assets = [] }) {
   const fullTitle = path === "/" ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
   const ld = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
   return `<!doctype html>
@@ -65,6 +65,7 @@ ${ld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script
     <nav class="nav" aria-label="카테고리">
       <a href="/#age" ${nav === "age" ? 'aria-current="page"' : ""}>나이·띠</a>
       <a href="/#date" ${nav === "date" ? 'aria-current="page"' : ""}>날짜·음력</a>
+      <a href="/#tax" ${nav === "tax" ? 'aria-current="page"' : ""}>연말정산</a>
     </nav>
     <div class="hdr-right">
       <button class="icon-btn" id="open-search" type="button" aria-label="계산기 검색 (/)">${ICON.search}</button>
@@ -84,13 +85,14 @@ ${body}
 <footer class="ftr">
   <div class="wrap">
     <nav class="ftr-nav" aria-label="사이트 정보"><a href="/about/">사이트 소개</a><a href="/privacy/"><b>개인정보처리방침</b></a><a href="/contact/">문의</a></nav>
-    <p>음력 변환은 한국천문연구원 음양력 자료를 따르는 <a href="https://github.com/usingsky/korean_lunar_calendar_js" rel="noopener">korean-lunar-calendar</a>(MIT)를 사용합니다. 띠궁합·삼재·손없는 날은 민속 참고 자료이며, 법률·행정 판단은 관련 기관에서 확인하세요.</p>
+    <p>연말정산 계산기는 2026년 귀속 소득세법·조세특례제한법 기준 추정이며, 실제 세액은 홈택스에서 확인하세요. 음력 변환은 한국천문연구원 음양력 자료를 따르는 <a href="https://github.com/usingsky/korean_lunar_calendar_js" rel="noopener">korean-lunar-calendar</a>(MIT)를 사용합니다. 띠궁합·삼재·손없는 날은 민속 참고 자료이며, 법률·행정 판단은 관련 기관에서 확인하세요.</p>
     <p>© ${new Date().getFullYear()} ${SITE.name}. 모든 계산은 브라우저 안에서 처리되며 입력값은 서버로 전송되지 않습니다.</p>
   </div>
 </footer>
 <script src="/assets/vendor/korean-lunar-calendar.min.js"></script>
 <script src="/assets/calc.js?v=${V}"></script>
 <script src="/assets/site.js?v=${V}"></script>
+${assets.map((a) => `<script src="/assets/${a}?v=${V}"></script>`).join("\n")}
 ${script ? `<script>(function(){"use strict";\n${script}\n})();</script>` : ""}
 </body>
 </html>`;
@@ -157,4 +159,5 @@ export function calcPage(c, all) {
 export const CATS = {
   age: { name: "나이·띠·사람", id: "age" },
   date: { name: "날짜·음력", id: "date" },
+  tax: { name: "연말정산", id: "tax" },
 };

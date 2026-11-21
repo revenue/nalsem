@@ -170,7 +170,9 @@
     const disabled = !!d.disabled, incomeOk = d.incomeOk !== false;
     const ageOk = ageRule || disabled;
     const basic = ageOk && incomeOk;
-    return { age, rel, ageOk, incomeOk, basic, disabled, elderly: age >= 70, senior65: age >= 65, under6: age <= 6, kidCredit: rel === "child" && basic && age >= KID_MIN_AGE && (d.birthYear !== KID_EXCLUDED_BIRTH_YEAR || !!(opts && opts.kid2017)), born2017: rel === "child" && basic && d.birthYear === KID_EXCLUDED_BIRTH_YEAR, cardKid: rel === "child" && basic && age <= 20 };
+    return { age, rel, ageOk, incomeOk, basic, disabled, elderly: age >= 70, senior65: age >= 65, // "과세기간 종료일 현재 65세 이상"
+       under6: age <= 7, // 의료비 한도 없음 대상: "과세기간 개시일 현재 6세 이하"(제59조의4 ②2나) → 2019년생 포함(1월 1일생 제외는 무시)
+       kidCredit: rel === "child" && basic && age >= KID_MIN_AGE && (d.birthYear !== KID_EXCLUDED_BIRTH_YEAR || !!(opts && opts.kid2017)), born2017: rel === "child" && basic && d.birthYear === KID_EXCLUDED_BIRTH_YEAR, cardKid: rel === "child" && basic && age <= 20 };
   }
 
   // ── 배분 추천: 가능한 배분을 전부 계산해 부부 합산(결정세액 + 지방소득세)이 가장 작은 것을 고른다 ──

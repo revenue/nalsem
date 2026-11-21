@@ -53,6 +53,14 @@ export function home(all) {
   </div>
 </section>
 
+<section class="section wrap" id="tax">
+  <div class="section-head rv"><h2>${CATS.tax.name}</h2><span class="count">${by("tax").length}개</span></div>
+  <p class="lede rv tx-home-lede">맞벌이 부부가 부양가족·의료비·12월 카드를 누구에게 몰면 둘이 합쳐 세금을 덜 내는지, 모든 경우를 계산합니다. 2026년 귀속 세법 기준이고, 입력값은 브라우저 밖으로 나가지 않습니다.</p>
+  <div class="rows">
+    ${["dual-income", "dual-income-dependents", "dual-income-medical", "dual-income-card"].map((s) => row(s)).join("\n    ")}
+  </div>
+</section>
+
 <section class="section wrap" id="date">
   <div class="section-head rv"><h2>${CATS.date.name}</h2><span class="count">${by("date").length}개</span></div>
   <div class="rows">

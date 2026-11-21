@@ -19,7 +19,7 @@ const REQUIRED = [
   ["Search Console 태그", (h) => h.includes("4xD7Nv4vd_ABr-AbzHS7bG4BPbM-FVy0nVW8v0wqTwU")],
   ["공통 CSS", (h) => /\/assets\/site\.css\?v=/.test(h)],
   ["공통 JS", (h) => h.includes("/assets/site.js?v=") && h.includes("/assets/calc.js?v=")],
-  ["상단 메뉴", (h) => h.includes('href="/#age"') && h.includes('href="/#date"')],
+  ["상단 메뉴", (h) => h.includes('href="/#age"') && h.includes('href="/#date"') && h.includes('href="/#tax"')],
   ["검색 버튼", (h) => h.includes('id="open-search"')],
   ["테마 토글", (h) => h.includes('id="toggle-theme"')],
   ["푸터 링크 3종", (h) => ["/about/", "/privacy/", "/contact/"].every((l) => h.includes(`href="${l}"`))],

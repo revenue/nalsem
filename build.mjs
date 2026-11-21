@@ -14,7 +14,7 @@ const indexScript = `window.NALSEM_INDEX=${JSON.stringify(index)};`;
 // 홈
 mkdirSync(OUT, { recursive: true });
 const ORG = { "@type": "Organization", name: SITE.name, url: SITE.url, logo: `${SITE.url}/assets/og.png`, sameAs: ["https://github.com/revenue/nalsem"] };
-writeFileSync(join(OUT, "index.html"), shell({ title: SITE.name, description: `${SITE.tagline}. 만나이·세는나이, 디데이, 양력 음력 변환, 날짜 계산, 띠와 삼재, 공휴일까지 ${all.length}가지 생활 계산을 한곳에서.`, path: "/", body: home(all), script: indexScript + home.script(all), keywords: ["생활계산기", "만나이 계산기", "디데이 계산기", "양력 음력 변환", "공휴일", "띠"],
+writeFileSync(join(OUT, "index.html"), shell({ title: SITE.name, description: `${SITE.tagline}. 만나이·세는나이, 디데이, 양력 음력 변환, 날짜 계산, 띠와 삼재, 공휴일, 맞벌이 연말정산 몰아주기까지 ${all.length}가지 생활 계산을 한곳에서.`, path: "/", body: home(all), script: indexScript + home.script(all), keywords: ["생활계산기", "만나이 계산기", "디데이 계산기", "양력 음력 변환", "공휴일", "띠", "맞벌이 연말정산"],
   jsonld: [
     { "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: SITE.url, inLanguage: "ko", description: SITE.tagline, publisher: ORG },
     { "@context": "https://schema.org", "@type": "ItemList", name: `${SITE.name} 계산기 목록`, numberOfItems: all.length, itemListElement: all.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.title, url: `${SITE.url}/${c.slug}/` })) },
@@ -30,7 +30,7 @@ for (const c of all) {
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "홈", item: SITE.url + "/" }, { "@type": "ListItem", position: 2, name: CATS[c.cat].name, item: `${SITE.url}/#${c.cat}` }, { "@type": "ListItem", position: 3, name: c.title, item: `${SITE.url}/${c.slug}/` }] },
   ];
   if (faq.length) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
-  writeFileSync(join(dir, "index.html"), shell({ title: c.title, description: c.description, path: `/${c.slug}/`, nav: c.cat, body: calcPage(c, all), script: indexScript + (c.script || ""), keywords: c.keys || [], jsonld: ld }));
+  writeFileSync(join(dir, "index.html"), shell({ title: c.title, description: c.description, path: `/${c.slug}/`, nav: c.cat, body: calcPage(c, all), script: indexScript + (c.script || ""), keywords: c.keys || [], jsonld: ld, assets: c.assets || [] }));
 }
 
 // 정보 페이지
@@ -53,7 +53,7 @@ writeFileSync(join(OUT, "ads.txt"), "google.com, pub-2298882938781262, DIRECT, f
 
 // 사전 점검: 화면에 보이는 문자열에 em-dash 금지 (taste-skill §9.G)
 const bad = [];
-for (const c of all) for (const k of ["title", "lede", "description", "form", "info"]) if (/[—–]/.test(c[k] || "")) bad.push(`${c.slug}.${k}`);
+for (const c of all) for (const k of ["title", "lede", "description", "form", "info", "short"]) if (/[—–]/.test(c[k] || "")) bad.push(`${c.slug}.${k}`);
 if (/[—–]/.test(home(all))) bad.push("home");
 for (const p of pages) if (/[—–]/.test(p.body)) bad.push(p.slug);
 if (bad.length) { console.error("em-dash 발견:", bad.join(", ")); process.exit(1); }
