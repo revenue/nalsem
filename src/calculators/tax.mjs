@@ -39,7 +39,8 @@ const SEC = {
       <div><p class="tx-who">배우자</p>${money("s1-credit", "신용카드")}${money("s1-debit", "체크카드·현금영수증")}${money("s1-market", "전통시장·대중교통")}</div>
     </div><p class="help">카드사 앱이나 홈택스 '연말정산 미리보기'에서 1~9월 금액을 볼 수 있습니다. 보험료·세금·공과금·해외 사용은 빼고 넣으세요. 전통시장·대중교통 사용분은 신용·체크 칸에서 빼고 이 칸에만 넣습니다.</p>`)}
     ${group("12월에 쓸 예정 금액 (부부 합계)", `${money("dec-amt", "12월 예정 사용액", "", "300")}<div class="field"><label id="dec-kind-l">결제 수단</label><div class="seg" id="dec-kind" role="group" aria-labelledby="dec-kind-l"><button type="button" data-v="credit" aria-pressed="true">신용카드</button><button type="button" data-v="debit" aria-pressed="false">체크·현금</button></div></div><p class="help">0%~100%를 10% 단위로 나눠 부부 합산이 가장 유리한 비율을 찾습니다.</p>`)}</div>`,
-  more: () => fold("더 정확하게 (선택)", `${pair("other", "나: 그 밖의 세액공제 합계", "배우자: 그 밖의 세액공제 합계", "연금저축·IRP, 월세, 기부금, 결혼세액공제 등으로 줄어드는 세액을 대략 넣습니다. 한쪽 세금이 0원에 가까우면 추천이 바뀔 수 있어 있는 칸입니다.")}
+  more: () => fold("더 정확하게 (선택)", `${pair("other", "나: 연금저축·IRP·결혼 세액공제", "배우자: 연금저축·IRP·결혼 세액공제", "줄어드는 세액(공제액)을 대략 넣습니다. 예: 연금저축 600만 원 납입이면 72만~90만 원, 결혼세액공제 50만 원.")}
+    ${pair("itemOther", "나: 월세·기부금 세액공제", "배우자: 월세·기부금 세액공제", "이 공제를 받으면 표준세액공제(13만 원)는 받을 수 없어 따로 받습니다. 한쪽 세금이 0원에 가까우면 이 칸들로 추천이 바뀔 수 있습니다.")}
     ${pair("culture", "나: 도서·공연·영화·체육시설", "배우자: 도서·공연·영화·체육시설", "총급여 7천만 원 이하만 공제율 30%(초과자는 신용카드분으로 계산). 신용·체크 칸에서 뺀 금액을 넣으세요.")}
     ${pair("social", "나: 4대보험 근로자 부담 연간 합계", "배우자: 4대보험 근로자 부담 연간 합계", "비우면 2026년 요율(국민연금 4.75%, 건강 3.595%, 장기요양, 고용 0.9%)로 추정합니다.")}
     <div class="tx-checks"><label><input type="checkbox" id="s0-woman"> 나는 여성(부녀자공제 확인용)</label><label><input type="checkbox" id="s1-woman"> 배우자는 여성(부녀자공제 확인용)</label></div>
@@ -58,9 +59,12 @@ const DEP_TPL = `<template id="dep-tpl"><div class="tx-dep">
   <details class="tx-fold"><summary>이 가족에게 쓴 돈 (선택)</summary><div class="tx-fold-body">
     <div class="form-row cols-2">${depMoney("m0", "의료비: 내가 이미 낸 것")}${depMoney("m1", "의료비: 배우자가 이미 낸 것")}</div>
     ${depMoney("mp", "의료비: 12월에 낼 예정", "기본공제 받는 사람이 결제해야 공제됩니다. 결과에 누가 결제할지 나옵니다.")}
-    <div class="form-row cols-2">${depMoney("ea", "교육비 (낸 금액)")}${depSelect("ek", "교육 단계", `<option value="pre">취학 전</option><option value="school" selected>초·중·고</option><option value="univ">대학</option>`)}</div>
-    <div class="form-row cols-2">${depSelect("ep", "교육비 낸 사람", WHO)}${depMoney("ia", "보장성보험료 (낸 금액)")}</div>
-    <div class="form-row cols-2">${depSelect("ip", "보험 계약자(낸 사람)", WHO)}${depMoney("cd", "이 가족 명의 카드 사용액")}</div>
+    <div class="not-parent"><div class="form-row cols-2">${depMoney("ea", "교육비 (낸 금액)")}${depSelect("ek", "교육 단계", `<option value="pre">취학 전</option><option value="school" selected>초·중·고</option><option value="univ">대학</option>`)}</div>
+    ${depSelect("ep", "교육비 낸 사람", WHO)}</div>
+    <div class="form-row cols-2">${depMoney("ia", "보장성보험료 (낸 금액)")}${depSelect("ip", "보험 계약자(낸 사람)", WHO)}</div>
+    <div class="not-sibling">${depMoney("cd", "이 가족 명의 카드 사용액")}</div>
+    <p class="help only-parent">부모님 교육비는 공제 대상이 아닙니다(소득세법 제59조의4 ③, 장애인 특수교육비 제외).</p>
+    <p class="help only-sibling">형제자매 명의 카드 사용액은 공제되지 않습니다(조세특례제한법 제126조의2).</p>
   </div></details>
 </div></template>`;
 
@@ -90,7 +94,7 @@ const CHANGES_2026 = card("2026년에 바뀐 것", UL([
 const LIMITS = card("이 계산기의 범위와 한계", P(DISCLAIMER) + UL([
   "원 단위까지 맞추는 계산이 아니라 <b>누구에게 몰면 유리한지</b>를 고르는 계산입니다. 금액은 만 원 단위로 반올림해 보여 줍니다.",
   "이미 낸 의료비·카드·교육비·보험료는 낸 사람 것으로 고정합니다. 다른 사람 이름으로 공제받으면 부당공제가 되어 가산세 대상입니다.",
-  "4대보험료는 2026년 요율로 추정하고, 연금저축·주택자금·월세·기부금은 '그 밖의 세액공제 합계' 하나로 받습니다. 형제끼리 부모님을 나누는 경우, 난임시술비(30%)·산후조리원 한도는 따로 계산하지 않습니다.",
+  "4대보험료는 2026년 요율로 추정하고, 연금저축·월세·기부금 등은 '더 정확하게'의 세액공제 칸 두 개로 대략 받습니다. 주택자금 소득공제, 형제끼리 부모님을 나누는 경우, 난임시술비(30%)·산후조리원 한도, 65세 이상·장애인 배우자의 의료비 한도 없음은 따로 계산하지 않습니다.",
   "국세청의 2026년 귀속 연말정산 안내 책자는 12~1월에 나옵니다. 그 전까지는 소득세법·조세특례제한법 현행 조문과 2025년 귀속 책자를 기준으로 했고, 책자가 나오면 다시 맞춰 봅니다.",
 ]), `${SRC.itax}, ${SRC.card}, ${SRC.nts}. 대조일 2026-11-21`);
 

@@ -271,5 +271,48 @@ t("이유 문장: 예정 의료비 결제자는 '0원 낭비'로, 교육비 낸 
   assert.ok(/이미 낸 의료비·교육비·보험료 약 200만 원/.test(e.reasons[0].text), e.reasons[0].text);
 });
 
+// ── 독립 리뷰(2026-11-21) 지적 회귀 테스트 ──
+t("리뷰1: 부모님(직계존속) 교육비는 공제 대상 아님(제59조의4 ③1)", () => {
+  const r = T.optimize({ spouses: [sp(60_000_000), sp(50_000_000)], deps: [{ rel: "parent", birthYear: 1955, education: { amount: 3_000_000, kind: "univ", payer: 1 } }] });
+  for (const c of r.candidates) assert.equal(c.persons[0].credits.education + c.persons[1].credits.education, 0);
+});
+t("리뷰2: 형제자매 명의 카드는 넣지 않음", () => {
+  const r = T.optimize({ spouses: [sp(60_000_000, { card: { credit: 16_000_000 } }), sp(50_000_000)], deps: [{ rel: "other", birthYear: 2010, card: 10_000_000 }] });
+  for (const c of r.candidates) assert.equal(c.persons[0].cardUse.credit, 16_000_000);
+});
+t("리뷰3: 20세 넘은 장애인 자녀도 카드 한도 자녀등", () => {
+  const r = T.optimize({ spouses: [sp(60_000_000), sp(55_000_000, { card: { credit: 40_000_000 } })], deps: [child(1998, { disabled: true }), child(2012)] });
+  const c = r.candidates.find((x) => x.assign[0] === 1 && x.assign[1] === 1);
+  assert.equal(c.persons[1].card.basicLimit, 4_000_000);
+});
+t("리뷰4: 월세·기부금 세액공제를 받으면 표준세액공제와 같이 쓰지 않음", () => {
+  const r = T.personTax({ salary: 30_000_000, itemizedOther: 300_000 });
+  if (r.regime === "standard") assert.equal(r.credits.other, 0); else assert.equal(r.credits.other, 300_000);
+  const both = T.personTax({ salary: 30_000_000, otherCredits: 300_000 });
+  assert.equal(both.credits.other, 300_000); // 연금저축 등은 양쪽 모두
+});
+t("리뷰6: 나이 요건 밖 가족은 '기본공제는'이라고 쓰지 않음", () => {
+  const r = T.optimize({ spouses: [sp(60_000_000), sp(50_000_000)], deps: [child(2002, { education: { amount: 9_000_000, kind: "univ", payer: 1 } })] });
+  const x = r.reasons.find((y) => y.kind === "dep");
+  assert.ok(!/기본공제는/.test(x.text) && /인적공제 대상 아님/.test(x.text), x.text);
+});
+t("리뷰7·8: 130만 원 문장은 이미 그 구간이면 '되다'라고 하지 않고, 문턱 아래 의료비를 이유로 들지 않음", () => {
+  const r = T.optimize({ spouses: [sp(60_000_000), sp(28_000_000, { card: { credit: 12_000_000 } })], deps: [{ rel: "parent", birthYear: 1950 }], december: { amount: 3_000_000, kind: "credit" } });
+  for (const x of r.reasons) assert.ok(!(/130만 원 이하가 됩니다/.test(x.text) && r.best.persons[1].calc <= 1_300_000), x.text);
+  const m = T.optimize({ spouses: [sp(90_000_000), sp(40_000_000)], deps: [child(2014, { medical: { paid: [100_000, 0] } })] });
+  assert.ok(!/이미 낸/.test(m.reasons[0].text.split("함께 따라가는")[0]), m.reasons[0].text);
+});
+t("리뷰9: 2017년생 경고는 바뀐 것만, 12월 카드·결제자 변화도 포함", () => {
+  const r = T.optimize({ spouses: [sp(60_000_000), sp(50_000_000)], deps: [child(2017), child(2014)] });
+  const w = r.warnings.find((x) => /2017년생/.test(x));
+  assert.ok(w && !/자녀2은\(는\)/.test(w), w);
+});
+t("리뷰10: 가족의 예정 의료비는 그 가족 이유 문장에 함께, 따로 '세율 구간' 이유를 만들지 않음", () => {
+  const r = T.optimize({ spouses: [sp(90_000_000), sp(60_000_000)], deps: [{ rel: "parent", birthYear: 1950, plannedMedical: 8_000_000 }] });
+  assert.ok(!r.reasons.some((x) => x.kind === "planned"));
+  const d = r.reasons.find((x) => x.kind === "dep");
+  assert.ok(d.even || /12월에 낼 의료비/.test(d.text), d.text);
+});
+
 console.log(`tax engine: ${n} passed, ${failed} failed`);
 if (failed) process.exit(1);

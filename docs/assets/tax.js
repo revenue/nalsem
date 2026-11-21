@@ -141,7 +141,8 @@
     const cardUse = { credit: pos(pc.credit || 0), debit: pos(pc.debit || 0), culture: pos(pc.culture || 0), market: pos(pc.market || 0) };
     const card = cardDeduction(s, cardUse, p.kidsForCard || 0);
     const child = childCredit(p.kidsCredit || 0), birth = birthCredit(p.births);
-    const other = pos(p.otherCredits || 0);
+    const other = pos(p.otherCredits || 0); // 연금계좌·결혼세액공제 등: 표준세액공제와 같이 받을 수 있음
+    const itemOther = pos(p.itemizedOther || 0); // 월세·기부금 등: 신청하면 표준세액공제 불가(제59조의4 ⑨)
     const medicalBase = { general: pos((p.medical && p.medical.general) || 0), special: pos((p.medical && p.medical.special) || 0) };
     const insurance = mul(Math.min(pos(p.insurance || 0), 1_000_000), 12, 100);
     const medical = medicalCredit(s, medicalBase);
@@ -151,7 +152,7 @@
     const run = (itemized) => {
       const base = pos(wageIncome - personal - social.pension - (itemized ? social.special : 0) - card.amount);
       const calc = basicTax(base), wage = earnedIncomeCredit(calc, s);
-      const credits = itemized ? { wage, child, birth, insurance, medical, education, standard: 0, other } : { wage, child, birth, insurance: 0, medical: 0, education: 0, standard: 130_000, other };
+      const credits = itemized ? { wage, child, birth, insurance, medical, education, standard: 0, other: other + itemOther } : { wage, child, birth, insurance: 0, medical: 0, education: 0, standard: 130_000, other };
       const sum = Object.values(credits).reduce((a, x) => a + x, 0);
       const decided = pos(calc - sum); // 세액공제는 산출세액 한도, 결정세액은 0원 밑으로 내려가지 않는다 (제61조)
       return { base, calc, credits, creditSum: sum, decided, wasted: pos(sum - calc) };
@@ -172,7 +173,7 @@
     const basic = ageOk && incomeOk;
     return { age, rel, ageOk, incomeOk, basic, disabled, elderly: age >= 70, senior65: age >= 65, // "과세기간 종료일 현재 65세 이상"
        under6: age <= 7, // 의료비 한도 없음 대상: "과세기간 개시일 현재 6세 이하"(제59조의4 ②2나) → 2019년생 포함(1월 1일생 제외는 무시)
-       kidCredit: rel === "child" && basic && age >= KID_MIN_AGE && (d.birthYear !== KID_EXCLUDED_BIRTH_YEAR || !!(opts && opts.kid2017)), born2017: rel === "child" && basic && d.birthYear === KID_EXCLUDED_BIRTH_YEAR, cardKid: rel === "child" && basic && age <= 20 };
+       kidCredit: rel === "child" && basic && age >= KID_MIN_AGE && (d.birthYear !== KID_EXCLUDED_BIRTH_YEAR || !!(opts && opts.kid2017)), born2017: rel === "child" && basic && d.birthYear === KID_EXCLUDED_BIRTH_YEAR, cardKid: rel === "child" && basic && (age <= 20 || disabled) }; // 조특령 제121조의2 ⑱: 20세 이하(장애인은 나이 무관)
   }
 
   // ── 배분 추천: 가능한 배분을 전부 계산해 부부 합산(결정세액 + 지방소득세)이 가장 작은 것을 고른다 ──
@@ -207,12 +208,13 @@
         const self = x.who === "spouse" ? x.k : assign[x.d.idx] != null ? assign[x.d.idx] : hi;
         return (pmask >> j) & 1 ? 1 - self : self;
       });
-      const P = [0, 1].map((k) => ({ salary: S[k].salary, woman: !!S[k].woman, people: [], kidsCredit: 0, births: [], kidsForCard: 0, card: Object.assign({ credit: 0, debit: 0, culture: 0, market: 0 }, S[k].card || {}), insurance: 0, medical: { general: 0, special: 0 }, education: 0, otherCredits: S[k].otherCredits || 0, social: S[k].social }));
+      const P = [0, 1].map((k) => ({ salary: S[k].salary, woman: !!S[k].woman, people: [], kidsCredit: 0, births: [], kidsForCard: 0, card: Object.assign({ credit: 0, debit: 0, culture: 0, market: 0 }, S[k].card || {}), insurance: 0, medical: { general: 0, special: 0 }, education: 0, otherCredits: S[k].otherCredits || 0, itemizedOther: S[k].itemizedOther || 0, social: S[k].social }));
       for (let k = 0; k < 2; k++) {
         P[k].medical.special += pos(S[k].medicalSelf || 0); // 본인 의료비(한도 없음)
         P[k].medical.general += pos(S[k].medicalForSpouse || 0); // 배우자를 위해 낸 의료비(의료비 대상은 나이·소득 제한 없는 기본공제대상자, 한도 있음)
       }
-      const addEdu = (k, d) => { const e = d.education || {}; if (e.amount > 0) P[k].education += Math.min(e.amount, EDU_CAP[e.kind] || 3_000_000); };
+      // 교육비 대상은 배우자·직계비속·형제자매·입양자·위탁아동(제59조의4 ③1). 직계존속(부모·조부모)은 제외
+      const addEdu = (k, d) => { const e = d.education || {}; if (e.amount > 0 && d.rel !== "parent") P[k].education += Math.min(e.amount, EDU_CAP[e.kind] || 3_000_000); };
       for (const d of deps) {
         const a = assign[d.idx];
         const e = d.education || {}, ins = d.insurance || {};
@@ -223,7 +225,7 @@
             if (d.rel === "child" && d.birthOrder > 0) P[a].births.push(d.birthOrder);
             if (d.f.cardKid) P[a].kidsForCard++; // 카드 한도 상향의 "자녀등": 20세 이하(장애인 무관) 직계비속, 그 사람이 기본공제 받는 경우
           }
-          P[a].card.credit += pos(d.card || 0); // 가족 명의 카드: 그 가족을 기본공제 받는 사람에게(소득 요건, 나이 무관)
+          if (d.rel !== "other") P[a].card.credit += pos(d.card || 0); // 가족 명의 카드: 배우자·직계존비속만(형제자매 제외), 그 가족을 기본공제 받는 사람에게(소득 요건, 나이 무관)
           if (e.amount > 0 && e.payer === a) addEdu(a, d); // 교육비: 기본공제 받는 사람이 낸 것
           if (d.f.basic && ins.amount > 0 && ins.payer === a) P[a].insurance += ins.amount; // 보험료: 요건을 모두 갖춘 기본공제대상자, 계약·납부한 사람
         } else if (e.amount > 0 && (e.payer === 0 || e.payer === 1)) addEdu(e.payer, d); // 소득 요건 밖 가족의 교육비: 2026년부터 소득 제한 없음 → 낸 사람
@@ -256,11 +258,13 @@
     // 이유: 결정 하나만 반대로 바꾸고 나머지는 다시 최적으로 둔 경우와 비교
     const minWhere = (pred) => candidates.reduce((acc, c) => (pred(c) && (!acc || c.total < acc.total) ? c : acc), null);
     const reasons = [];
+    planned.forEach((x, j) => { if (x.who === "dep") x.d.plannedPayerBest = best.plannedPayer[j]; });
     for (const d of assignable) {
       const to = best.assign[d.idx], alt = minWhere((c) => c.assign[d.idx] !== to);
       reasons.push(reasonFor("dep", d.name, names, to, alt.total - best.total, best, alt, d, deps));
     }
     planned.forEach((x, j) => {
+      if (x.who === "dep" && best.assign[x.d.idx] != null) return; // 기본공제 받는 가족의 예정 의료비는 그 가족 이유 문장에 함께 적는다
       const to = best.plannedPayer[j], alt = minWhere((c) => c.plannedPayer[j] !== to);
       const label = x.who === "spouse" ? `${names[x.k]} 본인 의료비(앞으로 낼 ${man(x.amount)})` : `${x.d.name} 의료비(앞으로 낼 ${man(x.amount)})`;
       reasons.push(reasonFor("planned", label, names, to, alt.total - best.total, best, alt, x, deps));
@@ -275,10 +279,13 @@
     if (!h.kid2017 && deps.some((d) => d.f.born2017)) {
       used.add("kid2017");
       const alt = optimize(Object.assign({}, h, { kid2017: true }));
-      const changed = alt.best.assign.some((v, i) => v !== best.assign[i]);
-      warnings.push(changed
-        ? `2017년생 자녀: 개정 소득세법 부칙(2026.4.21)을 문언대로 읽으면 2026년에는 자녀세액공제 대상이 아니어서 그렇게 계산했습니다. 국세청 해석이 아직 없어 확정이 아니며, 공제 대상으로 보면 추천 배분이 바뀝니다(그 경우 ${alt.reasons.filter((r) => r.kind === "dep").map((r) => r.text.split(":")[0]).join(", ")}). 1월 홈택스에서 꼭 확인하세요.`
-        : "2017년생 자녀: 개정 소득세법 부칙(2026.4.21)을 문언대로 읽어 2026년 자녀세액공제에서 뺐습니다(국세청 해석 미확인). 공제 대상으로 봐도 추천 배분은 같습니다.");
+      const ab = alt.best, diff = [];
+      deps.forEach((d) => { if (ab.assign[d.idx] !== best.assign[d.idx] && ab.assign[d.idx] != null) diff.push(`${d.name}은(는) ${names[ab.assign[d.idx]]}에게`); });
+      if (ab.decRatio !== best.decRatio) diff.push("12월 카드 배분");
+      if (ab.plannedPayer.some((v, i) => v !== best.plannedPayer[i])) diff.push("앞으로 낼 의료비 결제자");
+      warnings.push(diff.length
+        ? `2017년생 자녀: 개정 소득세법 부칙(2026.4.21)을 문언대로 읽으면 2026년에는 자녀세액공제 대상이 아니어서 그렇게 계산했습니다. 국세청 해석이 아직 없어 확정이 아니며, 공제 대상으로 보면 추천이 바뀝니다(${diff.join(", ")}). 1월 홈택스에서 꼭 확인하세요.`
+        : "2017년생 자녀: 개정 소득세법 부칙(2026.4.21)을 문언대로 읽어 2026년 자녀세액공제에서 뺐습니다(국세청 해석 미확인). 공제 대상으로 봐도 추천은 같습니다.");
     }
     // 투명성: 추천 배분에서 공제되지 않는 이미 낸 돈을 알린다(돈을 옮기라는 뜻이 아님)
     const notes = [];
@@ -286,7 +293,7 @@
       const a = best.assign[d.idx];
       if (a == null) continue;
       const paid = (d.medical && d.medical.paid) || [0, 0];
-      [0, 1].forEach((k) => { if (k !== a && paid[k] > 0) notes.push(`${names[k]}가 이미 낸 ${d.name} 의료비 ${man(paid[k])}은 추천 배분(${names[a]}가 기본공제)에서는 공제되지 않습니다. 의료비는 그 가족을 기본공제 받는 사람이 낸 것만 공제됩니다. 이 손해를 넣고도 추천 배분이 합산 세금이 가장 적습니다.`); });
+      [0, 1].forEach((k) => { if (k !== a && paid[k] > 0) notes.push(`${names[k]}가 이미 낸 ${d.name} 의료비 ${man(paid[k])}은 추천 배분(${names[a]}${d.f.basic ? "가 기본공제" : " 쪽 배정"})에서는 공제되지 않습니다. 의료비는 그 가족을 기본공제 받는 사람이 낸 것만 공제됩니다. 이 손해를 넣고도 추천 배분이 합산 세금이 가장 적습니다.`); });
       const e = d.education || {};
       if (e.amount > 0 && e.payer !== a && (e.payer === 0 || e.payer === 1)) notes.push(`${names[e.payer]}가 낸 ${d.name} 교육비는 추천 배분에서는 공제되지 않습니다(기본공제 받는 사람이 낸 것만 공제).`);
       const ins = d.insurance || {};
@@ -328,11 +335,14 @@
   }
   function whyText(best, alt, to, deps) {
     const other = 1 - to, b = best.persons, a = alt.persons;
-    const lostPaid = unclaimed(alt, deps) - unclaimed(best, deps);
-    if (lostPaid > 0) return `반대로 하면 이미 낸 의료비·교육비·보험료 ${man(lostPaid)}이 공제 대상에서 빠집니다(낸 사람과 기본공제 받는 사람이 같아야 공제)`;
+    const spec = (c) => c.persons.reduce((x, p) => x + p.credits.medical + p.credits.education + p.credits.insurance, 0);
+    const lostPaid = unclaimed(alt, deps) - unclaimed(best, deps), lostCredit = spec(best) - spec(alt);
+    if (lostPaid > 0 && lostCredit >= 10_000) return `반대로 하면 이미 낸 의료비·교육비·보험료 ${man(lostPaid)}이 공제 대상에서 빠져 세액공제가 약 ${mw(lostCredit)}만 원 줄어듭니다(낸 사람과 기본공제 받는 사람이 같아야 공제)`;
     if (a[other].decided === 0 && a[other].wasted > 0) return `반대로 하면 {${other}}의 결정세액이 0원이 되어 세액공제 약 ${mw(a[other].wasted)}만 원이 쓰이지 못하고 사라집니다`;
     // 산출세액 130만 원 이하에서는 근로소득세액공제가 산출세액의 55%라, 소득공제로 산출세액이 줄면 이 공제도 같이 줄어 실제 효과가 세율의 45%뿐이다 (소득세법 제59조)
-    if (a[other].calc <= 1_300_000 && a[other].decided > 0) return `반대로 하면 {${other}}의 산출세액이 130만 원 이하가 됩니다. 이 구간에서는 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`;
+    if (a[other].calc <= 1_300_000 && a[other].decided > 0) return b[other].calc <= 1_300_000
+      ? `{${other}}는 산출세액이 130만 원 이하라 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`
+      : `반대로 하면 {${other}}의 산출세액이 130만 원 이하가 됩니다. 이 구간에서는 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`;
     if (a[other].marginal < b[other].marginal) return `반대로 하면 {${other}}의 과세표준이 더 낮은 세율 구간(${a[other].marginal}%)으로 내려가 공제 효과가 작아집니다`;
     if (b[other].marginal < b[to].marginal) return `{${to}}의 세율 구간(${b[to].marginal}%)이 {${other}}(${b[other].marginal}%)보다 높아 같은 소득공제라도 줄어드는 세금이 큽니다`;
     if (b[other].marginal > b[to].marginal) return `{${to}} 쪽은 공제 문턱(의료비 총급여 3%, 카드 25%)이 낮거나 이미 넘어 있어 실제로 공제되는 금액이 큽니다`;
@@ -351,9 +361,10 @@
       if (d.insurance && d.insurance.amount > 0) extra.push("보험료(계약한 사람 기준)");
       if (d.card > 0) extra.push("이 가족 명의 카드 사용액");
       if (d.f.cardKid) extra.push("카드 공제 한도 상향(20세 이하 자녀)");
+      if (d.plannedMedical > 0 && d.plannedPayerBest === to) extra.push(`12월에 낼 의료비 ${man(d.plannedMedical)}(기본공제 받는 사람이 결제해야 공제)`);
       if (extra.length) why += `. 함께 따라가는 것: ${extra.join(", ")}`;
     }
-    const head = kind === "dep" ? `${label}의 기본공제는 {${to}}에게` : `${label}는 {${to}}가 결제`;
+    const head = kind === "dep" ? (d.f.basic ? `${label}의 기본공제는 {${to}}에게` : `${label}(인적공제 대상 아님)의 교육비·카드 공제는 {${to}} 쪽으로`) : `${label}는 {${to}}가 결제`;
     return { kind, label, to, gain, alt, even: false, text: fill(`${head}: 반대보다 부부 합산 ${man(gain)} 덜 냅니다. ${why}.`) };
   }
   function cardReason(dec, names, best, worstDec, near) {
@@ -364,7 +375,7 @@
     const notes = [0, 1].map((k) => {
       const c = P[k].card;
       if (P[k].decided === 0) return `${names[k]}: 결정세액이 이미 0원이라 카드 공제를 더 받아도 줄일 세금이 없음`;
-      if (c.capped) return `${names[k]}: 카드 공제 한도(${mw(c.basicLimit)}만 원)에 닿음`;
+      if (c.capped) return `${names[k]}: 카드 공제 한도에 닿음(공제 ${mw(c.amount)}만 원)`;
       if (c.toThreshold > 0) return `${names[k]}: 총급여 25%(${mw(c.threshold)}만 원)까지 ${mw(c.toThreshold)}만 원 더 써야 공제 시작`;
       return `${names[k]}: 25% 문턱을 넘어 쓰는 만큼 공제(세율 구간 ${P[k].marginal}%)`;
     });

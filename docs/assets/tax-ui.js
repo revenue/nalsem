@@ -22,7 +22,7 @@
   function renumber() {
     if (!box) return;
     const c = { child: 0, parent: 0, other: 0 };
-    [...box.children].forEach((n) => { const r = n.querySelector('[data-k="rel"]').value; c[r]++; n.dataset.name = REL_NAME[r] + c[r]; n.querySelector(".dep-name").textContent = REL_NAME[r] + c[r]; n.querySelector(".only-child").hidden = r !== "child"; });
+    [...box.children].forEach((n) => { const r = n.querySelector('[data-k="rel"]').value; c[r]++; n.dataset.name = REL_NAME[r] + c[r]; n.querySelector(".dep-name").textContent = REL_NAME[r] + c[r]; n.querySelector(".only-child").hidden = r !== "child"; n.querySelector(".not-parent").hidden = r === "parent"; n.querySelector(".only-parent").hidden = r !== "parent"; n.querySelector(".not-sibling").hidden = r === "other"; n.querySelector(".only-sibling").hidden = r !== "other"; });
     form.querySelectorAll("[data-add]").forEach((b) => (b.disabled = box.children.length >= MAX_DEPS));
   }
   function addDep(rel, vals) {
@@ -57,7 +57,7 @@
       salary: val(`s${k}-sal`), woman: !!($(`s${k}-woman`) && $(`s${k}-woman`).checked),
       card: { credit: val(`s${k}-credit`), debit: val(`s${k}-debit`), market: val(`s${k}-market`), culture: val(`s${k}-culture`) },
       medicalSelf: val(`s${k}-medSelf`), medicalForSpouse: val(`s${k}-medSp`),
-      otherCredits: val(`s${k}-other`), social: val(`s${k}-social`) || undefined,
+      otherCredits: val(`s${k}-other`), itemizedOther: val(`s${k}-itemOther`), social: val(`s${k}-social`) || undefined,
     }));
     const deps = [];
     if (box) for (const n of box.children) {
@@ -72,9 +72,9 @@
         name: n.dataset.name, rel, birthYear: by, disabled: q("dis").checked, incomeOk: q("inc").checked,
         birthOrder: rel === "child" ? +q("bo").value : 0,
         medical: { paid: [won(q("m0")), won(q("m1"))] }, plannedMedical: won(q("mp")),
-        education: { amount: won(q("ea")), kind: q("ek").value, payer: +q("ep").value },
+        education: { amount: rel === "parent" ? 0 : won(q("ea")), kind: q("ek").value, payer: +q("ep").value },
         insurance: { amount: won(q("ia")), payer: +q("ip").value },
-        card: won(q("cd")),
+        card: rel === "other" ? 0 : won(q("cd")),
       });
     }
     return { names: NAMES, spouses, deps, plannedMedicalCouple: [val("s0-medPlan"), val("s1-medPlan")], december: { amount: val("dec-amt"), kind: decKind }, errs };
@@ -106,7 +106,7 @@
     const warn = [];
     r.notes.forEach((x) => warn.push(x));
     r.warnings.forEach((x) => warn.push(x));
-    if (r.nearZero && !(h.spouses[0].otherCredits || h.spouses[1].otherCredits)) warn.push("한쪽 결정세액이 0원에 가까워 추천 배분이 뒤집힐 수 있습니다. '더 정확하게'에서 연금저축·월세·기부금 등 그 밖의 세액공제 합계를 넣어 다시 보세요.");
+    if (r.nearZero && !h.spouses.some((s) => s.otherCredits || s.itemizedOther)) warn.push("한쪽 결정세액이 0원에 가까워 추천 배분이 뒤집힐 수 있습니다. '더 정확하게'에서 연금저축·월세·기부금 등 세액공제를 넣어 다시 보세요.");
     const unv = r.usedUnverified.filter((k) => k !== "social" && k !== "kid2017");
     if (unv.length) warn.push("원문으로 확정하지 못한 규칙을 썼습니다: " + unv.map((k) => T.RULES[k].label).join(", ") + ".");
     if (r.usedUnverified.includes("social")) warn.push("4대보험료는 2026년 요율로 추정했습니다. 실제 납부액은 '더 정확하게'에 넣을 수 있습니다(배분 결정에는 영향이 거의 없습니다).");
