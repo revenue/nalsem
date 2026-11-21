@@ -314,5 +314,17 @@ t("리뷰10: 가족의 예정 의료비는 그 가족 이유 문장에 함께, �
   assert.ok(d.even || /12월에 낼 의료비/.test(d.text), d.text);
 });
 
+t("샘플 검증(2026-11-22): 독립 계산과 176개 조합 원 단위 일치한 가구의 추천과 이유", () => {
+  const M = 10_000;
+  const r = T.optimize({ spouses: [sp(6500 * M, { card: { credit: 1400 * M, debit: 300 * M } }), sp(4200 * M, { woman: true, card: { credit: 900 * M, debit: 400 * M, market: 100 * M } })],
+    deps: [child(2015, { education: { amount: 200 * M, kind: "school", payer: 0 }, insurance: { amount: 60 * M, payer: 1 } }), child(2021, { medical: { paid: [0, 120 * M] } }), { rel: "parent", birthYear: 1955 }],
+    plannedMedicalCouple: [300 * M, 0], december: { amount: 400 * M, kind: "credit" } });
+  assert.deepEqual(J(r.best.assign), [0, 1, 0]); assert.equal(r.best.plannedPayer[0], 1); assert.equal(r.best.total, 4_744_558);
+  const pl = r.reasons.find((x) => x.kind === "planned");
+  assert.ok(/의료비 문턱/.test(pl.text) && !/이미 낸 의료비·교육비·보험료/.test(pl.text), pl.text);
+  const cd = r.reasons.find((x) => x.kind === "card");
+  assert.ok(!/원로 /.test(cd.text), cd.text);
+});
+
 console.log(`tax engine: ${n} passed, ${failed} failed`);
 if (failed) process.exit(1);

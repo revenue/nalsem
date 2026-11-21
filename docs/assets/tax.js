@@ -255,17 +255,23 @@
     if (best.persons.some((x) => x.card.raw > 0)) used.add("card");
     if (best.persons.some((x) => x.card.raw > 2_500_000) && deps.some((d) => d.f.cardKid)) used.add("cardKids");
 
-    // 이유: 결정 하나만 반대로 바꾸고 나머지는 다시 최적으로 둔 경우와 비교
+    // 이유: 그 결정 하나만 반대로 하고 나머지는 추천 그대로 둔 경우와 비교한다(설명과 금액이 같은 비교를 가리키게).
+    // 가족을 바꾸면 그 가족의 예정 의료비 결제자도 따라 바꾼다(기본공제 받는 사람이 내야 공제되므로).
     const minWhere = (pred) => candidates.reduce((acc, c) => (pred(c) && (!acc || c.total < acc.total) ? c : acc), null);
+    const findCase = (assign, pp, ratio) => candidates.find((c) => c.decRatio === ratio && c.assign.every((v, i) => v === assign[i]) && c.plannedPayer.every((v, i) => v === pp[i]));
     const reasons = [];
     planned.forEach((x, j) => { if (x.who === "dep") x.d.plannedPayerBest = best.plannedPayer[j]; });
     for (const d of assignable) {
-      const to = best.assign[d.idx], alt = minWhere((c) => c.assign[d.idx] !== to);
+      const to = best.assign[d.idx];
+      const assign = best.assign.map((v, i) => (i === d.idx ? 1 - v : v));
+      const pp = best.plannedPayer.map((v, j) => (planned[j].who === "dep" && planned[j].d.idx === d.idx ? 1 - v : v));
+      const alt = findCase(assign, pp, best.decRatio) || minWhere((c) => c.assign[d.idx] !== to);
       reasons.push(reasonFor("dep", d.name, names, to, alt.total - best.total, best, alt, d, deps));
     }
     planned.forEach((x, j) => {
       if (x.who === "dep" && best.assign[x.d.idx] != null) return; // 기본공제 받는 가족의 예정 의료비는 그 가족 이유 문장에 함께 적는다
-      const to = best.plannedPayer[j], alt = minWhere((c) => c.plannedPayer[j] !== to);
+      const to = best.plannedPayer[j];
+      const alt = findCase(best.assign, best.plannedPayer.map((v, i) => (i === j ? 1 - v : v)), best.decRatio) || minWhere((c) => c.plannedPayer[j] !== to);
       const label = x.who === "spouse" ? `${names[x.k]} 본인 의료비(앞으로 낼 ${man(x.amount)})` : `${x.d.name} 의료비(앞으로 낼 ${man(x.amount)})`;
       reasons.push(reasonFor("planned", label, names, to, alt.total - best.total, best, alt, x, deps));
     });
@@ -333,12 +339,14 @@
     }
     return sum;
   }
-  function whyText(best, alt, to, deps) {
+  function whyText(best, alt, to, deps, kind) {
     const other = 1 - to, b = best.persons, a = alt.persons;
     const spec = (c) => c.persons.reduce((x, p) => x + p.credits.medical + p.credits.education + p.credits.insurance, 0);
     const lostPaid = unclaimed(alt, deps) - unclaimed(best, deps), lostCredit = spec(best) - spec(alt);
     if (lostPaid > 0 && lostCredit >= 10_000) return `반대로 하면 이미 낸 의료비·교육비·보험료 ${man(lostPaid)}이 공제 대상에서 빠져 세액공제가 약 ${mw(lostCredit)}만 원 줄어듭니다(낸 사람과 기본공제 받는 사람이 같아야 공제)`;
+    const medB = b[0].credits.medical + b[1].credits.medical, medA = a[0].credits.medical + a[1].credits.medical;
     if (a[other].decided === 0 && a[other].wasted > 0) return `반대로 하면 {${other}}의 결정세액이 0원이 되어 세액공제 약 ${mw(a[other].wasted)}만 원이 쓰이지 못하고 사라집니다`;
+    if (kind === "planned" && medB - medA >= 10_000 && b[to].salary < b[other].salary) return `{${to}}가 내면 의료비 문턱(총급여 3%)이 ${mw(mul(b[to].salary, 3, 100))}만 원으로 {${other}}(${mw(mul(b[other].salary, 3, 100))}만 원)보다 낮고, 이미 낸 의료비와 합쳐 문턱을 넘는 금액이 커서 의료비 세액공제가 약 ${mw(medB - medA)}만 원 더 큽니다`;
     // 산출세액 130만 원 이하에서는 근로소득세액공제가 산출세액의 55%라, 소득공제로 산출세액이 줄면 이 공제도 같이 줄어 실제 효과가 세율의 45%뿐이다 (소득세법 제59조)
     if (a[other].calc <= 1_300_000 && a[other].decided > 0) return b[other].calc <= 1_300_000
       ? `{${other}}는 산출세액이 130만 원 이하라 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`
@@ -351,7 +359,7 @@
   function reasonFor(kind, label, names, to, gain, best, alt, d, deps) {
     const fill = (s) => s.replace(/\{(\d)\}가/g, (_, k) => subj(names[+k])).replace(/\{(\d)\}/g, (_, k) => names[+k]);
     if (gain < 10_000) return { kind, label, to, gain, alt, even: true, text: fill(`${label}: 누구로 해도 차이가 1만 원 미만입니다.`) };
-    let why = whyText(best, alt, to, deps);
+    let why = whyText(best, alt, to, deps, kind);
     if (kind === "dep") {
       const extra = [];
       if (d.f.kidCredit) extra.push("자녀세액공제");
@@ -370,7 +378,7 @@
   function cardReason(dec, names, best, worstDec, near) {
     const r = best.decRatio, amt = dec.amount, to0 = mul(amt, r, 10);
     const gain = worstDec.total - best.total;
-    const split = r === 10 ? `전부 ${names[0]} 카드로` : r === 0 ? `전부 ${names[1]} 카드로` : `${names[0]} ${man(to0)}, ${names[1]} ${man(amt - to0)}로 나눠`;
+    const split = r === 10 ? `전부 ${names[0]} 카드로` : r === 0 ? `전부 ${names[1]} 카드로` : `${names[0]} ${man(to0)}, ${names[1]} ${man(amt - to0)}으로 나눠`;
     const P = best.persons;
     const notes = [0, 1].map((k) => {
       const c = P[k].card;
