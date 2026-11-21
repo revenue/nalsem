@@ -161,4 +161,5 @@ export const CATS = {
   age: { name: "나이·띠·사람", id: "age" },
   date: { name: "날짜·음력", id: "date" },
   tax: { name: "연말정산", id: "tax" },
+  benefit: { name: "생활 지원금", id: "benefit" },
 };
