@@ -278,10 +278,22 @@
         ? `2017년생 자녀: 개정 소득세법 부칙(2026.4.21)을 문언대로 읽으면 2026년에는 자녀세액공제 대상이 아니어서 그렇게 계산했습니다. 국세청 해석이 아직 없어 확정이 아니며, 공제 대상으로 보면 추천 배분이 바뀝니다(그 경우 ${alt.reasons.filter((r) => r.kind === "dep").map((r) => r.text.split(":")[0]).join(", ")}). 1월 홈택스에서 꼭 확인하세요.`
         : "2017년생 자녀: 개정 소득세법 부칙(2026.4.21)을 문언대로 읽어 2026년 자녀세액공제에서 뺐습니다(국세청 해석 미확인). 공제 대상으로 봐도 추천 배분은 같습니다.");
     }
+    // 투명성: 추천 배분에서 공제되지 않는 이미 낸 돈을 알린다(돈을 옮기라는 뜻이 아님)
+    const notes = [];
+    for (const d of deps) {
+      const a = best.assign[d.idx];
+      if (a == null) continue;
+      const paid = (d.medical && d.medical.paid) || [0, 0];
+      [0, 1].forEach((k) => { if (k !== a && paid[k] > 0) notes.push(`${names[k]}가 이미 낸 ${d.name} 의료비 ${man(paid[k])}은 추천 배분(${names[a]}가 기본공제)에서는 공제되지 않습니다. 의료비는 그 가족을 기본공제 받는 사람이 낸 것만 공제됩니다. 이 손해를 넣고도 추천 배분이 합산 세금이 가장 적습니다.`); });
+      const e = d.education || {};
+      if (e.amount > 0 && e.payer !== a && (e.payer === 0 || e.payer === 1)) notes.push(`${names[e.payer]}가 낸 ${d.name} 교육비는 추천 배분에서는 공제되지 않습니다(기본공제 받는 사람이 낸 것만 공제).`);
+      const ins = d.insurance || {};
+      if (ins.amount > 0 && ins.payer !== a && (ins.payer === 0 || ins.payer === 1)) notes.push(`${names[ins.payer]}가 계약한 ${d.name} 보험료는 추천 배분에서는 공제되지 않습니다(기본공제 받는 사람이 계약·납부한 것만 공제).`);
+    }
     const nearZero = [best].concat(reasons.map((r) => r.alt).filter(Boolean)).some((c) => c.persons.some((x) => x.decided < 300_000 && x.salary > 0));
     const usedUnverified = [...used].filter((k) => RULES[k] && !RULES[k].verified);
     return {
-      best, worst, allHigh, candidates, hi, deps, planned, warnings, usedUnverified, nearZero,
+      best, worst, allHigh, candidates, hi, deps, planned, warnings, notes: notes.map((x) => x.replace(/나가 /g, "내가 ").replace(/배우자가 /g, "배우자가 ")), usedUnverified, nearZero,
       diffVsWorst: worst.total - best.total, diffVsAllHigh: allHigh.total - best.total,
       reasons: reasons.map((r) => { const o = Object.assign({}, r); delete o.alt; return o; }),
     };
@@ -299,14 +311,16 @@
 
   function whyText(best, alt, to) {
     const other = 1 - to, b = best.persons, a = alt.persons;
-    const spec = (c) => c.persons.reduce((s, x) => s + x.credits.medical + x.credits.education + x.credits.insurance, 0);
+    const spec = (c) => c.persons.reduce((x, p) => x + p.credits.medical + p.credits.education + p.credits.insurance, 0);
     const lost = spec(best) - spec(alt);
     if (lost >= 10_000) return `반대로 하면 이미 낸 의료비·교육비·보험료 중 공제받지 못하는 몫이 생겨 세액공제가 약 ${Math.round(lost / 10_000)}만 원 줄어듭니다(낸 사람과 기본공제 받는 사람이 같아야 함)`;
     if (a[other].decided === 0 && a[other].wasted > 0) return `반대로 하면 {${other}}의 결정세액이 0원이 되어 세액공제 약 ${Math.round(a[other].wasted / 10_000)}만 원이 쓰이지 못하고 사라집니다`;
-    if (b[to].marginal !== b[other].marginal) return b[to].marginal > b[other].marginal
-      ? `{${to}}의 세율 구간(${b[to].marginal}%)이 {${other}}(${b[other].marginal}%)보다 높아 같은 소득공제라도 줄어드는 세금이 큽니다`
-      : `{${to}} 쪽은 공제 문턱(의료비 총급여 3%, 카드 25%)이 낮거나 이미 넘어 있어 실제로 공제되는 금액이 큽니다`;
-    return `세율 구간은 같지만 공제 문턱·한도 때문에 {${to}} 쪽에서 실제로 공제되는 금액이 큽니다`;
+    // 산출세액 130만 원 이하에서는 근로소득세액공제가 산출세액의 55%라, 소득공제로 산출세액이 줄면 이 공제도 같이 줄어 실제 효과가 세율의 45%뿐이다 (소득세법 제59조)
+    if (a[other].calc <= 1_300_000 && a[other].decided > 0) return `반대로 하면 {${other}}의 산출세액이 130만 원 이하가 됩니다. 이 구간에서는 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`;
+    if (a[other].marginal < b[other].marginal) return `반대로 하면 {${other}}의 과세표준이 더 낮은 세율 구간(${a[other].marginal}%)으로 내려가 공제 효과가 작아집니다`;
+    if (b[other].marginal < b[to].marginal) return `{${to}}의 세율 구간(${b[to].marginal}%)이 {${other}}(${b[other].marginal}%)보다 높아 같은 소득공제라도 줄어드는 세금이 큽니다`;
+    if (b[other].marginal > b[to].marginal) return `{${to}} 쪽은 공제 문턱(의료비 총급여 3%, 카드 25%)이 낮거나 이미 넘어 있어 실제로 공제되는 금액이 큽니다`;
+    return `세율 구간은 같지만 공제 문턱·한도와 세액공제 계산 때문에 {${to}} 쪽에서 실제로 줄어드는 세금이 큽니다`;
   }
   function reasonFor(kind, label, names, to, gain, best, alt, d) {
     const fill = (s) => s.replace(/\{(\d)\}가/g, (_, k) => subj(names[+k])).replace(/\{(\d)\}/g, (_, k) => names[+k]);
