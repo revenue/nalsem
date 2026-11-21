@@ -22,6 +22,10 @@ src/calculators/tax.mjs  연말정산 4페이지 정의(폼·설명 카드)
 docs/assets/tax.js     연말정산 엔진 (순수 함수, 전역 TAX). 조문 출처 주석 포함
 docs/assets/tax-ui.js  연말정산 화면 (금액 입력값은 주소·저장소·통계에 넣지 않음)
 test/tax.test.mjs      연말정산 엔진 검증 (국세청 신고안내 사례 대조, 손계산 가구, 설명 카드 예시 숫자)
+src/calculators/kepco.mjs  생활 지원금: 한전 고효율 가전 지원금 계산기 정의(설명 카드·쿠팡 파트너스 링크 칸 COUPANG)
+docs/assets/kepco.js   지원금 엔진 (전역 KEPCO). 지원율·누적 한도·품목별 등급·적용기준 시행일
+docs/assets/kepco-ui.js  지원금 화면 (복지할인 유형·금액은 주소·저장소·통계에 넣지 않음)
+test/kepco.test.mjs    지원금 엔진 검증 (공식 품목표 대조, 손계산 가구)
 ```
 
 ## 명령
