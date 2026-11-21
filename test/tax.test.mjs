@@ -80,6 +80,46 @@ t("카드: 기본한도와 전통시장·대중교통 추가한도", () => {
   assert.equal(r.amount, 4_200_000);
 });
 
+// ── 국세청 「2025년 연말정산 신고안내」(2025.12) 계산 사례와 대조 ──
+t("국세청 사례: 근로소득공제(인쇄 p.95), 근로소득세액공제(p.162)", () => {
+  assert.equal(T.earnedIncomeDeduction(33_800_000), 10_320_000);
+  assert.equal(T.earnedIncomeCredit(900_000, 30_000_000), 495_000);
+  assert.equal(T.earnedIncomeCredit(2_000_000, 60_000_000), 660_000);
+});
+t("국세청 사례1 신용카드(p.137~138): 총급여 6,800만 → 530만", () => {
+  // 신용 3,200만(대중교통 200 포함) / 현금영수증 800만(전통시장 300 포함) / 체크 300만(문화체육 100 포함)
+  const r = T.cardDeduction(68_000_000, { credit: 30_000_000, debit: 7_000_000, culture: 1_000_000, market: 5_000_000 }, 0);
+  assert.equal(r.raw, 6_350_000);
+  assert.equal(r.amount, 5_300_000);
+});
+t("국세청 종합사례(p.212~219): 카드 489.5만, 과세표준 36,285,000 → 산출 4,182,750, 근로소득세액공제 66만", () => {
+  // 2025년 귀속 사례라 자녀 수 한도 상향 없이(kids 0) 대조
+  const r = T.cardDeduction(65_400_000, { credit: 13_000_000, debit: 12_000_000, culture: 1_000_000, market: 5_000_000 }, 0);
+  assert.equal(r.raw, 4_895_000);
+  assert.equal(r.amount, 4_895_000);
+  assert.equal(T.basicTax(36_285_000), 4_182_750);
+  assert.equal(T.earnedIncomeCredit(4_182_750, 65_400_000), 660_000);
+});
+t("국세청 의료비 사례(p.177): 난임 제외 부분 103.5만 (+난임 30만 = 133.5만)", () => {
+  // 그 외 부양가족 (550-300-100-100)+80+200 = 330만, 65세 이상·장애인 450만, 3% = 90만
+  assert.equal(T.medicalCredit(30_000_000, { general: 3_300_000, special: 4_500_000 }), 1_035_000);
+});
+t("국세청 보험료 사례(p.172): 110만 → 12만", () => {
+  assert.equal(T.personTax({ salary: 50_000_000, insurance: 1_100_000 }).credits.insurance, 120_000);
+});
+t("2026년 카드 기본한도: 자녀등 수에 따라 상향(조특법 제126조의2 ⑩)", () => {
+  const big = { credit: 40_000_000 };
+  assert.equal(T.cardDeduction(40_000_000, big, 0).amount, 3_000_000);
+  assert.equal(T.cardDeduction(40_000_000, big, 1).amount, 3_500_000);
+  assert.equal(T.cardDeduction(40_000_000, big, 3).amount, 4_000_000);
+  assert.equal(T.cardDeduction(80_000_000, { credit: 60_000_000 }, 1).amount, 2_750_000);
+});
+t("2017년생 자녀: 문언 해석으로 계산하고 경고", () => {
+  const r = T.optimize({ spouses: [{ salary: 60_000_000 }, { salary: 50_000_000 }], deps: [{ rel: "child", birthYear: 2017 }] });
+  assert.ok(r.warnings.some((w) => /2017년생/.test(w)));
+  assert.ok(r.usedUnverified.includes("kid2017"));
+});
+
 // ── 6. 의료비 세액공제 (소득세법 제59조의4 ②) ──
 t("의료비: 3% 문턱은 일반 의료비부터, 700만 한도", () => {
   assert.equal(T.medicalCredit(40_000_000, { general: 2_000_000, special: 0 }), 120_000); // (200만-120만)×15%
@@ -179,8 +219,11 @@ t("나이 계산: 2026년 귀속 기준 출생연도", () => {
   assert.equal(T.depFlags({ rel: "child", birthYear: 2005, disabled: true }).basic, true);
   assert.equal(T.depFlags({ rel: "parent", birthYear: 1966 }).basic, true); // 60세
   assert.equal(T.depFlags({ rel: "parent", birthYear: 1956 }).elderly, true); // 70세
-  assert.equal(T.depFlags({ rel: "child", birthYear: 2018 }).kid8, true);
-  assert.equal(T.depFlags({ rel: "child", birthYear: 2019 }).kid8, false);
+  // 자녀세액공제 2026년 9세 이상(소득세법 부칙 제21548호 제2조②1), 2017년생은 같은 조 ③ 문언상 제외
+  assert.equal(T.depFlags({ rel: "child", birthYear: 2016 }).kidCredit, true);
+  assert.equal(T.depFlags({ rel: "child", birthYear: 2017 }).kidCredit, false);
+  assert.equal(T.depFlags({ rel: "child", birthYear: 2017 }, { kid2017: true }).kidCredit, true);
+  assert.equal(T.depFlags({ rel: "child", birthYear: 2018 }).kidCredit, false);
   assert.equal(T.depFlags({ rel: "child", birthYear: 2020 }).under6, true);
 });
 
