@@ -262,5 +262,14 @@ t("설명 카드 예시: 12월 300만 원(카드 페이지)", () => {
   assert.equal(manR(base - d.best.total), 15); // 배우자 체크카드 300만 → 약 15만 원
 });
 
+t("이유 문장: 예정 의료비 결제자는 '0원 낭비'로, 교육비 낸 사람 불일치는 '이미 낸 돈'으로 설명", () => {
+  const r = T.optimize({ spouses: [sp(70_000_000), sp(30_000_000)], deps: [child(2022, { medical: { paid: [0, 1_500_000] } }), { rel: "parent", birthYear: 1950, incomeOk: false, medical: { paid: [4_000_000, 0] } }], plannedMedicalCouple: [0, 8_000_000] });
+  const pl = r.reasons.find((x) => x.kind === "planned");
+  assert.ok(/결정세액이 0원/.test(pl.text) && !/이미 낸/.test(pl.text), pl.text);
+  const e = T.optimize({ spouses: [sp(90_000_000), sp(48_000_000)], deps: [child(2017, { education: { amount: 2_000_000, kind: "school", payer: 1 } })] });
+  assert.equal(e.best.assign[0], 1);
+  assert.ok(/이미 낸 의료비·교육비·보험료 약 200만 원/.test(e.reasons[0].text), e.reasons[0].text);
+});
+
 console.log(`tax engine: ${n} passed, ${failed} failed`);
 if (failed) process.exit(1);

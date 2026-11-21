@@ -258,12 +258,12 @@
     const reasons = [];
     for (const d of assignable) {
       const to = best.assign[d.idx], alt = minWhere((c) => c.assign[d.idx] !== to);
-      reasons.push(reasonFor("dep", d.name, names, to, alt.total - best.total, best, alt, d));
+      reasons.push(reasonFor("dep", d.name, names, to, alt.total - best.total, best, alt, d, deps));
     }
     planned.forEach((x, j) => {
       const to = best.plannedPayer[j], alt = minWhere((c) => c.plannedPayer[j] !== to);
       const label = x.who === "spouse" ? `${names[x.k]} 본인 의료비(앞으로 낼 ${man(x.amount)})` : `${x.d.name} 의료비(앞으로 낼 ${man(x.amount)})`;
-      reasons.push(reasonFor("planned", label, names, to, alt.total - best.total, best, alt, x));
+      reasons.push(reasonFor("planned", label, names, to, alt.total - best.total, best, alt, x, deps));
     });
     if (dec) {
       const same = candidates.filter((c) => c.assign.every((v, i) => v === best.assign[i]) && c.plannedPayer.every((v, i) => v === best.plannedPayer[i]));
@@ -311,11 +311,24 @@
   // "약 ○○만 원" (만 원 반올림)
   function man(won) { const v = Math.round(won / 10_000); return v === 0 && won > 0 ? "1만 원 미만" : `약 ${v.toLocaleString("ko-KR")}만 원`; }
 
-  function whyText(best, alt, to) {
+  // 이미 낸 가족 의료비·교육비·보험료 중, 낸 사람과 기본공제 받는 사람이 달라 공제 대상에서 빠지는 금액
+  function unclaimed(c, deps) {
+    let sum = 0;
+    for (const d of deps) {
+      const a = c.assign[d.idx];
+      if (a == null) continue;
+      const paid = (d.medical && d.medical.paid) || [0, 0];
+      [0, 1].forEach((k) => { if (k !== a) sum += pos(paid[k] || 0); });
+      const e = d.education || {}, ins = d.insurance || {};
+      if (e.amount > 0 && e.payer !== a) sum += e.amount;
+      if (d.f.basic && ins.amount > 0 && ins.payer !== a) sum += ins.amount;
+    }
+    return sum;
+  }
+  function whyText(best, alt, to, deps) {
     const other = 1 - to, b = best.persons, a = alt.persons;
-    const spec = (c) => c.persons.reduce((x, p) => x + p.credits.medical + p.credits.education + p.credits.insurance, 0);
-    const lost = spec(best) - spec(alt);
-    if (lost >= 10_000) return `반대로 하면 이미 낸 의료비·교육비·보험료 중 공제받지 못하는 몫이 생겨 세액공제가 약 ${Math.round(lost / 10_000)}만 원 줄어듭니다(낸 사람과 기본공제 받는 사람이 같아야 함)`;
+    const lostPaid = unclaimed(alt, deps) - unclaimed(best, deps);
+    if (lostPaid > 0) return `반대로 하면 이미 낸 의료비·교육비·보험료 ${man(lostPaid)}이 공제 대상에서 빠집니다(낸 사람과 기본공제 받는 사람이 같아야 공제)`;
     if (a[other].decided === 0 && a[other].wasted > 0) return `반대로 하면 {${other}}의 결정세액이 0원이 되어 세액공제 약 ${Math.round(a[other].wasted / 10_000)}만 원이 쓰이지 못하고 사라집니다`;
     // 산출세액 130만 원 이하에서는 근로소득세액공제가 산출세액의 55%라, 소득공제로 산출세액이 줄면 이 공제도 같이 줄어 실제 효과가 세율의 45%뿐이다 (소득세법 제59조)
     if (a[other].calc <= 1_300_000 && a[other].decided > 0) return `반대로 하면 {${other}}의 산출세액이 130만 원 이하가 됩니다. 이 구간에서는 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`;
@@ -324,10 +337,10 @@
     if (b[other].marginal > b[to].marginal) return `{${to}} 쪽은 공제 문턱(의료비 총급여 3%, 카드 25%)이 낮거나 이미 넘어 있어 실제로 공제되는 금액이 큽니다`;
     return `세율 구간은 같지만 공제 문턱·한도와 세액공제 계산 때문에 {${to}} 쪽에서 실제로 줄어드는 세금이 큽니다`;
   }
-  function reasonFor(kind, label, names, to, gain, best, alt, d) {
+  function reasonFor(kind, label, names, to, gain, best, alt, d, deps) {
     const fill = (s) => s.replace(/\{(\d)\}가/g, (_, k) => subj(names[+k])).replace(/\{(\d)\}/g, (_, k) => names[+k]);
     if (gain < 10_000) return { kind, label, to, gain, alt, even: true, text: fill(`${label}: 누구로 해도 차이가 1만 원 미만입니다.`) };
-    let why = whyText(best, alt, to);
+    let why = whyText(best, alt, to, deps);
     if (kind === "dep") {
       const extra = [];
       if (d.f.kidCredit) extra.push("자녀세액공제");

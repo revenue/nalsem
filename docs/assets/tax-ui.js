@@ -91,7 +91,7 @@
       ? `<div class="result-hero"><div class="k">추천대로 하면 가장 불리하게 나눌 때보다</div><div class="v accent">${man(r.diffVsWorst)}<small>덜 냄</small></div></div>`
       : `<div class="result-hero"><div class="k">이 가구는</div><div class="v">어떻게 나눠도 비슷<small>차이 1만 원 미만</small></div></div>`;
     const hiName = NAMES[r.hi];
-    const vsHigh = r.candidates.length > 1 ? `<p class="note">${r.diffVsAllHigh >= 10_000 ? `가족과 12월 카드를 전부 소득 높은 쪽(${hiName})으로 몰았을 때보다 <b>${man(r.diffVsAllHigh)}</b> 덜 냅니다.` : `소득 높은 쪽(${hiName})으로 전부 몰았을 때와 같은 결과입니다(차이 1만 원 미만).`} 금액은 부부의 결정세액과 지방소득세를 합친 것입니다.</p>` : "";
+    const vsHigh = r.candidates.length > 1 ? `<p class="note">${r.diffVsAllHigh >= 10_000 ? `${h.december.amount > 0 ? (h.deps.length ? "가족과 12월 카드를" : "12월 카드를") : "가족을"} 전부 소득 높은 쪽(${hiName})으로 몰았을 때보다 <b>${man(r.diffVsAllHigh)}</b> 덜 냅니다.` : `소득 높은 쪽(${hiName})으로 전부 몰았을 때와 같은 결과입니다(차이 1만 원 미만).`} 금액은 부부의 결정세액과 지방소득세를 합친 것입니다.</p>` : "";
     const list = reasons.length ? `<h3 class="tx-h">추천과 이유</h3><ol class="tx-reco">${reasons.map((x) => `<li class="${x.even ? "even" : ""}"><span class="tag${x.even ? " neutral" : ""}">${KIND_TAG[x.kind]}</span><p>${esc(x.text)}</p></li>`).join("")}</ol>` : `<p class="note">부양가족, 앞으로 낼 의료비, 12월 카드 중 나눌 것이 없어 두 사람의 세금만 계산했습니다. 위 칸을 채우면 추천이 나옵니다.</p>`;
     const row = (label, f) => `<tr><td>${label}</td>${P.map((p) => `<td class="num">${f(p)}</td>`).join("")}</tr>`;
     const credits = (p) => p.creditSum - Math.max(0, p.creditSum - p.calc);
