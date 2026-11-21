@@ -95,7 +95,7 @@
     return Math.round((Date.UTC(y, m - 1, d) - t0) / 86400000);
   }
 
-  const man = (won) => { const v = won / 10000; return (Math.round(v * 10) / 10).toLocaleString("ko-KR") + "만 원"; };
+  const man = (won) => { if (!won) return "0원"; const v = won / 10000; return (Math.round(v * 10) / 10).toLocaleString("ko-KR") + "만 원"; };
   const wonStr = (won) => won.toLocaleString("ko-KR") + "원";
 
   g.KEPCO = { YEAR, LIMIT, DEADLINE, BUDGET, SRC, TYPES, ITEMS, EXCLUDED, type, item, eligible, calc, daysLeft, dot, man, wonStr };

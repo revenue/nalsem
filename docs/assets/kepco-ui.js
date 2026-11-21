@@ -64,10 +64,10 @@
     const rows = `<div class="kv">${r.rows.map((x) => {
       const why = x.eligible.ok ? (x.capped ? `${r.rate}%면 ${K.man(x.raw)}이지만 남은 한도까지만 받습니다.` : `${K.man(x.price)} × ${r.rate}%`) : (REASON[x.eligible.reason] || (() => ""))(x);
       const link = L[x.item] ? ` <a class="kp-buy" href="${esc(L[x.item])}" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 ${esc(x.label)} 보기</a>` : "";
-      return `<div><span class="k">${esc(x.label)}<small class="kp-why">${esc(why)}</small>${link}</span><span class="v">${x.eligible.ok ? K.man(x.support) : "대상 아님"}</span></div>`;
+      return `<div><span class="k">${esc(x.label)}<small class="kp-why">${esc(why)}</small>${link}</span><span class="v">${x.eligible.ok ? K.wonStr(x.support) : "대상 아님"}</span></div>`;
     }).join("")}</div>`;
     const warn = [];
-    if (r.rows.some((x) => x.eligible.ok && x.eligible.check === "date")) warn.push("적용기준 시행일을 아직 모르는 제품이 있습니다. 받은 뒤 라벨에서 등급과 함께 확인하세요. 품목별 기준일은 오른쪽 표에 있습니다.");
+    if (r.rows.some((x) => x.eligible.ok && x.eligible.check === "date")) warn.push("적용기준 시행일을 아직 모르는 제품이 있습니다. 받은 뒤 라벨에서 등급과 함께 확인하세요. 품목별 기준일은 이 페이지의 '지원 품목과 등급 기준' 표에 있습니다.");
     if (r.limitHit) warn.push("한도 30만 원을 다 씁니다. 더 사도 지원금은 늘지 않습니다.");
     if (h.prior === 0) warn.push("예전에 이 사업으로 받은 적이 있다면 그 금액을 넣어야 정확합니다(한도는 해마다 새로 생기지 않습니다).");
     if (days >= 0) warn.push(`2026년 신청 마감까지 ${days === 0 ? "오늘이 마지막 날입니다" : days + "일 남았습니다"}. 잔여 예산은 ${K.BUDGET.checked} 기준 ${(K.BUDGET.won / 1e8).toFixed(1)}억 원이었고 예산이 떨어지면 일찍 끝납니다.`);

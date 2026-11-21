@@ -109,6 +109,7 @@ t("마감 D-day", () => {
 // ── 5. 표시 형식 ──
 t("만 원 표기", () => {
   assert.equal(K.man(200000), "20만 원");
+  assert.equal(K.man(0), "0원");
   assert.equal(K.man(133500), "13.4만 원");
   assert.equal(K.wonStr(1300000), "1,300,000원");
 });

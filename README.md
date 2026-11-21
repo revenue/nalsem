@@ -39,6 +39,7 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 | 수능 날짜 (교육부 확정치) | `docs/assets/calc.js` 의 `SUNEUNG` | 매년 3월 교육부 발표 후 |
 | 임시공휴일 | 현재 미지원. 필요하면 `holidays()` 에 연도별 예외 추가 | 정부 지정 시 |
 | 연말정산 세법 연도 | `docs/assets/tax.js` 의 `YEAR`, `RULES`, 자녀세액공제 나이(2027 10세 … 2029 12세), 카드 한도, 4대보험 요율. 설명 카드 문구(`src/calculators/tax.mjs`)와 `test/tax.test.mjs` 의 예시 숫자 | 매년 12월 세법 개정 통과 후, 1월 국세청 연말정산 신고안내 책자 발간 후 |
+| 한전 고효율 가전 지원사업 | `docs/assets/kepco.js` 의 `YEAR`, `DEADLINE`, `BUDGET`(잔여예산·확인일), `TYPES`, `ITEMS`(등급·적용기준 시행일). 설명 카드(`src/calculators/kepco.mjs`)와 `test/kepco.test.mjs` | 매년 2월 새 공고 후(2025년 2-17, 2026년 2-9 시작). 12월에는 잔여예산을 주 1회 다시 확인 |
 
 ## 디자인 (Supanova Design Skill 적용)
 
