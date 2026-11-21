@@ -378,3 +378,8 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .kp-buy { display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .kp-disc { display: block; margin-top: 10px; font-size: 13px; color: var(--muted); }
 .kp-row [data-remove][hidden] { display: none; }
+.kp-pick td { word-break: keep-all; }
+.kp-pick td:nth-child(2) { overflow-wrap: anywhere; }
+.kp-pick td:nth-child(3) { white-space: nowrap; }
+.kp-pick .kp-buy { margin-top: 0; }
+.kp-model { display: block; font-size: 12px; color: var(--muted); }

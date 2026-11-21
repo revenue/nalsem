@@ -40,14 +40,14 @@
     { id: "kimchi", label: "김치냉장고", grade: 1, since: "2023-05-01", eep: "https://eep.energy.or.kr/certification/certi_list_241.aspx" },
     { id: "ac-wall", label: "에어컨 (벽걸이)", grade: 1, since: "2021-10-01", eep: "https://eep.energy.or.kr/certification/certi_list_260.aspx" },
     { id: "ac-other", label: "에어컨 (스탠드·투인원 등, 시스템 에어컨 제외)", grade: 3, since: "2021-10-01", eep: "https://eep.energy.or.kr/certification/certi_list_260.aspx" },
-    { id: "washer", label: "세탁기 (일반)", grade: 2, since: "2022-11-01", eep: "https://eep.energy.or.kr/certification/certi_list_254.aspx" },
-    { id: "drum", label: "세탁기 (드럼·세탁건조 콤보)", grade: 1, since: "2022-11-01", eep: "https://eep.energy.or.kr/certification/certi_list_255.aspx" },
-    { id: "rice", label: "전기밥솥", grade: 1, since: "2018-04-01", eep: "https://eep.energy.or.kr/certification/certi_list_253.aspx" },
+    { id: "washer", label: "세탁기 (일반)", grade: 2, since: "2022-11-01", eep: "https://eep.energy.or.kr/certification/certi_list_298.aspx" },
+    { id: "drum", label: "세탁기 (드럼·세탁건조 콤보)", grade: 1, since: "2022-11-01", eep: "https://eep.energy.or.kr/certification/certi_list_299.aspx" },
+    { id: "rice", label: "전기밥솥", grade: 1, since: "2018-04-01", eep: "https://eep.energy.or.kr/certification/certi_list_295.aspx" },
     { id: "vacuum", label: "진공청소기 (유선)", grade: 3, since: "2019-01-01", eep: "https://eep.energy.or.kr/certification/certi_list_115.aspx" },
     { id: "purifier", label: "공기청정기", grade: 1, since: "2018-01-01", eep: "https://eep.energy.or.kr/certification/certi_list_121.aspx" },
     { id: "tv", label: "TV", grade: 1, since: "2022-01-01", eep: "https://eep.energy.or.kr/certification/certi_list_143.aspx" },
     { id: "dehumid", label: "제습기", grade: 1, since: "2024-07-01", eep: "https://eep.energy.or.kr/certification/certi_list_145.aspx" },
-    { id: "dryer", label: "의류건조기", grade: 1, since: "2020-03-01", eep: "https://eep.energy.or.kr/certification/certi_list_269.aspx" },
+    { id: "dryer", label: "의류건조기", grade: 1, since: "2020-03-01", eep: "https://eep.energy.or.kr/certification/certi_list_306.aspx" },
     { id: "dishwasher", label: "식기세척기", grade: 1, since: "2025-01-01", eep: "https://eep.energy.or.kr/certification/certi_list_292.aspx" },
   ];
   const EXCLUDED = ["시스템에어컨", "이동식 에어컨", "냉난방기", "멀티전기히트펌프시스템", "냉동고", "냉온수기", "구독·렌탈 제품", "둥근 모양의 옛 효율등급 라벨 제품"];

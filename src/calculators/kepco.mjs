@@ -5,10 +5,22 @@
 // 예시의 숫자는 kepco.js 로 계산한 값이다(test/kepco.test.mjs 의 "수급자 30%" 테스트와 같다).
 import { ARROW } from "../layout.mjs";
 
-// 쿠팡 파트너스 링크: 품목 id → 링크. 사용자가 파트너스에서 만든 링크만 넣는다(비어 있으면 쿠팡 버튼과 대가성 문구를 내지 않는다).
-// 링크 후보(쿠팡 검색 주소)는 본부 저장소 ventures/kepco-appliance/coupang-links.md
-export const COUPANG = {};
-const HAS_LINKS = Object.values(COUPANG).some(Boolean);
+// 쿠팡 파트너스 링크: 품목 id → 대표 제품 하나 {url, name, model, grade}. 비어 있으면 쿠팡 버튼·제품표·대가성 문구를 내지 않는다.
+// 고른 방법(본부 저장소 ventures/kepco-appliance/coupang-links.md): 쿠팡 파트너스 검색(쿠팡랭킹순)에서 리뷰가 많은 제품 중
+// 한국에너지공단 효율등급 사이트에서 모델명으로 조회해 현재 기준 등급이 지원 대상인 것만 넣는다. "1등급" 검색 결과에도 2·3등급이 섞여 있었다.
+export const COUPANG = {
+  fridge: { url: "https://link.coupang.com/a/iR8TBSr8uG", name: "삼성전자 일반 306L 2도어 냉장고", model: "RB30D4051S9", grade: 1 },
+  kimchi: { url: "https://link.coupang.com/a/iR80zPdNHo", name: "삼성전자 김치플러스 202L 뚜껑형 김치냉장고", model: "RP20C3111EG", grade: 1 },
+  washer: { url: "https://link.coupang.com/a/iR88QylOAS", name: "삼성전자 그랑데 통버블 세탁기 16kg", model: "WA16CG6441BY", grade: 2 },
+  drum: { url: "https://link.coupang.com/a/iR89M1rR12", name: "삼성전자 그랑데 드럼 세탁기 19kg", model: "WF19T6000KW", grade: 1 },
+  rice: { url: "https://link.coupang.com/a/iR9bt66oFw", name: "쿠쿠 전기보온 에그밥솥 6인용", model: "CR-0675FW", grade: 1 },
+  purifier: { url: "https://link.coupang.com/a/iR9eahYhZQ", name: "위닉스 타워 엣지 공기청정기 43㎡", model: "AT8E430-MSK", grade: 1 },
+  tv: { url: "https://link.coupang.com/a/iR81TzyTlY", name: "삼성전자 4K UHD Mini LED TV 55인치", model: "KU55MH70AFXKR", grade: 1 },
+  dehumid: { url: "https://link.coupang.com/a/iR83vwodXg", name: "윈세이 1등급 제습기 24L", model: "W24L1A", grade: 1 },
+  dishwasher: { url: "https://link.coupang.com/a/iR84plEv48", name: "LG전자 디오스 오브제컬렉션 빌트인 식기세척기 12인용", model: "DUE1BGLE", grade: 1 },
+};
+const PICKED = "2026-11-22";
+const HAS_LINKS = Object.values(COUPANG).some((p) => p && p.url);
 export const DISCLOSURE = "이 페이지의 쿠팡 링크는 쿠팡 파트너스 활동의 일환으로, 구매가 일어나면 날셈이 일정액의 수수료를 받습니다. 구매 가격은 같습니다.";
 
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
@@ -66,6 +78,13 @@ const FORM = `<form id="kf" autocomplete="off" novalidate>
 
 const ITEM_TABLE = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>품목</th><th>효율등급</th><th>적용기준 시행일</th></tr></thead><tbody>${ITEM_ROWS.map(([i, g, d]) => `<tr><td>${i}</td><td>${g}</td><td>${d} 이후</td></tr>`).join("")}</tbody></table></div>`;
 
+const ITEM_LABEL = Object.fromEntries([["fridge", "냉장고"], ["kimchi", "김치냉장고"], ["ac-wall", "에어컨 벽걸이"], ["ac-other", "에어컨 스탠드 등"], ["washer", "세탁기 일반"], ["drum", "세탁기 드럼"], ["rice", "전기밥솥"], ["vacuum", "진공청소기(유선)"], ["purifier", "공기청정기"], ["tv", "TV"], ["dehumid", "제습기"], ["dryer", "의류건조기"], ["dishwasher", "식기세척기"]]);
+const PICK_CARD = HAS_LINKS ? card("품목별로 많이 사는 대상 제품",
+  P(`쿠팡에서 리뷰가 많은 제품 가운데, 한국에너지공단 효율등급 사이트에서 모델명으로 조회해 <b>지금 기준으로 지원 대상 등급인 것</b>만 품목별로 하나씩 골랐습니다(${PICKED} 확인). 쿠팡에서 "1등급"으로 검색해도 2·3등급 제품이 섞여 나오니 다른 제품을 살 때도 모델명을 꼭 조회하세요.`)
+  + `<div class="tbl-wrap"><table class="tbl kp-pick"><thead><tr><th>품목</th><th>제품 (쿠팡에서 보기)</th><th>등급</th></tr></thead><tbody>${Object.entries(COUPANG).filter(([, p]) => p && p.url).map(([id, p]) => `<tr><td>${ITEM_LABEL[id]}</td><td><a class="kp-buy" href="${p.url}" target="_blank" rel="sponsored nofollow noopener">${p.name}</a><small class="kp-model">${p.model}</small></td><td>${p.grade}등급</td></tr>`).join("")}</tbody></table></div>`
+  + P("가격과 재고는 쿠팡에서 수시로 바뀝니다. 색상·용량 옵션을 바꾸면 모델명이 달라져 대상이 아닐 수 있으니, 주문 전 모델명을 다시 보고 받은 뒤에는 실물 라벨을 확인하세요. 대상 여부는 한전 검수로 정해집니다.")
+  + `<p class="kp-disc">${DISCLOSURE}</p>`) : "";
+
 const INFO = [
   card("누가 받을 수 있나", UL([
     "<b>전기요금 복지할인을 받는 가구</b>만 받습니다. 장애인(중증)·유공자·기초생활수급자·사회복지시설·차상위계층·생명유지장치 가구는 구매 가격의 <b>30%</b>, 다자녀·대가족·출산 가구는 <b>15%</b>입니다.",
@@ -77,6 +96,7 @@ const INFO = [
   card("지원 품목과 등급 기준", P("11개 품목은 라벨의 <b>효율등급</b>과 <b>적용기준 시행일</b>이 둘 다 맞아야 합니다. 1등급이어도 라벨의 적용기준 시행일이 아래 날짜보다 이전이면 대상이 아닙니다.") + ITEM_TABLE
     + P("시스템에어컨, 이동식 에어컨, 냉난방기, 멀티전기히트펌프시스템, 냉동고, 냉온수기는 대상이 아닙니다. 구독·렌탈 제품과 둥근 모양의 옛 효율등급 라벨이 붙은 제품도 빠집니다.")
     + P(`판정은 제품에 붙은 실물 라벨로 합니다. 쇼핑몰 상세페이지의 등급 표시는 증빙이 되지 않으니 받은 뒤 라벨을 꼭 확인하세요. 모델별 등급은 ${a("https://eep.energy.or.kr/certification/certi_intro.aspx", "한국에너지공단 효율등급 제품검색")}에서 미리 볼 수 있습니다(참고용).`), `${OFFICIAL.items} (${CHECKED} 확인)`),
+  PICK_CARD,
   card("예시: 수급자 가구가 냉장고를 살 때", P("기초생활수급자 가구(30%)가 2025년에 이 사업으로 10만 원을 받았고, 이번에 1등급 냉장고를 150만 원에 산다고 하면 이렇게 됩니다.")
     + UL(["150만 원의 30%는 45만 원입니다.", "남은 한도는 30만 원에서 10만 원을 뺀 <b>20만 원</b>이라, 지원금은 20만 원에서 멈춥니다.", "실제 부담은 150만 원에서 20만 원을 뺀 <b>130만 원</b>이고, 남은 한도는 0원이 됩니다."])),
   card("신청 방법과 서류", UL([
