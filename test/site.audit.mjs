@@ -17,6 +17,7 @@ const REQUIRED = [
   ["애드센스 스크립트", (h) => h.includes("adsbygoogle.js?client=ca-pub-2298882938781262")],
   ["애드센스 계정 메타", (h) => h.includes('name="google-adsense-account" content="ca-pub-2298882938781262"')],
   ["Search Console 태그", (h) => h.includes("4xD7Nv4vd_ABr-AbzHS7bG4BPbM-FVy0nVW8v0wqTwU")],
+  ["네이버 서치어드바이저 태그", (h) => h.includes('<meta name="naver-site-verification" content="6c395cdbed509811f0fd70e84bfcc38ae9202bf8">')],
   ["공통 CSS", (h) => /\/assets\/site\.css\?v=/.test(h)],
   ["공통 JS", (h) => h.includes("/assets/site.js?v=") && h.includes("/assets/calc.js?v=")],
   ["상단 메뉴", (h) => h.includes('href="/#age"') && h.includes('href="/#date"') && h.includes('href="/#tax"')],

@@ -29,6 +29,7 @@ ${keywords.length ? `<meta name="keywords" content="${esc(keywords.join(", "))}"
 <meta name="author" content="${SITE.name}">
 <meta name="google-site-verification" content="4xD7Nv4vd_ABr-AbzHS7bG4BPbM-FVy0nVW8v0wqTwU">
 <meta name="google-site-verification" content="PO4IBHGRHsJC8ucC1dzmMBEXnc1pYPSAKte26dSNnec">
+<meta name="naver-site-verification" content="6c395cdbed509811f0fd70e84bfcc38ae9202bf8">
 <meta name="google-adsense-account" content="ca-pub-2298882938781262">
 <link rel="canonical" href="${SITE.url}${path}">
 <link rel="alternate" hreflang="ko" href="${SITE.url}${path}">
