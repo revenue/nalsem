@@ -366,3 +366,9 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .tx-disc { font-size: 13px; }
 .tx-home-lede { margin: -8px 0 20px; color: var(--muted); max-width: 65ch; line-height: 1.7; }
 .result .tbl td.num { white-space: nowrap; }
+/* 상단 메뉴가 3개가 되면서(연말정산 추가) 좁은 화면에서 테마 버튼이 밀려나지 않게: 로고 글자를 숨기고 메뉴 여백을 줄인다 */
+@media (max-width: 420px) { .brand { font-size: 0; gap: 0; padding-right: 0; } .brand-mark { font-size: 12px; } .nav a { padding: 8px 6px; } }
+.tx-tbl th, .tx-tbl td { white-space: normal; padding: 11px 12px; font-size: 14px; vertical-align: top; }
+.tx-tbl td.num { white-space: nowrap; }
+.tx-tbl small { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
+@media (max-width: 480px) { .tx-tbl th, .tx-tbl td { padding: 10px 8px; font-size: 13px; } }

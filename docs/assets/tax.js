@@ -306,6 +306,7 @@
     const n = all.slice(0, i + 1).filter((x) => (x.rel || "child") === rel).length;
     return (rel === "child" ? "자녀" : rel === "parent" ? "부모님" : "가족") + n;
   }
+  const mw = (won) => Math.round(won / 10_000).toLocaleString("ko-KR"); // 만 원 단위, 천 단위 쉼표
   // 주격 조사: 나 → 내가, 받침 있으면 이, 없으면 가
   function subj(w) { if (w === "나") return "내가"; const c = w.charCodeAt(w.length - 1); return w + (c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? "이" : "가"); }
   // "약 ○○만 원" (만 원 반올림)
@@ -329,7 +330,7 @@
     const other = 1 - to, b = best.persons, a = alt.persons;
     const lostPaid = unclaimed(alt, deps) - unclaimed(best, deps);
     if (lostPaid > 0) return `반대로 하면 이미 낸 의료비·교육비·보험료 ${man(lostPaid)}이 공제 대상에서 빠집니다(낸 사람과 기본공제 받는 사람이 같아야 공제)`;
-    if (a[other].decided === 0 && a[other].wasted > 0) return `반대로 하면 {${other}}의 결정세액이 0원이 되어 세액공제 약 ${Math.round(a[other].wasted / 10_000)}만 원이 쓰이지 못하고 사라집니다`;
+    if (a[other].decided === 0 && a[other].wasted > 0) return `반대로 하면 {${other}}의 결정세액이 0원이 되어 세액공제 약 ${mw(a[other].wasted)}만 원이 쓰이지 못하고 사라집니다`;
     // 산출세액 130만 원 이하에서는 근로소득세액공제가 산출세액의 55%라, 소득공제로 산출세액이 줄면 이 공제도 같이 줄어 실제 효과가 세율의 45%뿐이다 (소득세법 제59조)
     if (a[other].calc <= 1_300_000 && a[other].decided > 0) return `반대로 하면 {${other}}의 산출세액이 130만 원 이하가 됩니다. 이 구간에서는 근로소득세액공제(산출세액의 55%)도 함께 줄어, 소득공제의 실제 효과가 세율(${a[other].marginal}%)의 절반에 못 미칩니다`;
     if (a[other].marginal < b[other].marginal) return `반대로 하면 {${other}}의 과세표준이 더 낮은 세율 구간(${a[other].marginal}%)으로 내려가 공제 효과가 작아집니다`;
@@ -363,8 +364,8 @@
     const notes = [0, 1].map((k) => {
       const c = P[k].card;
       if (P[k].decided === 0) return `${names[k]}: 결정세액이 이미 0원이라 카드 공제를 더 받아도 줄일 세금이 없음`;
-      if (c.capped) return `${names[k]}: 카드 공제 한도(${Math.round(c.basicLimit / 10_000)}만 원)에 닿음`;
-      if (c.toThreshold > 0) return `${names[k]}: 총급여 25%(${Math.round(c.threshold / 10_000)}만 원)까지 ${Math.round(c.toThreshold / 10_000)}만 원 더 써야 공제 시작`;
+      if (c.capped) return `${names[k]}: 카드 공제 한도(${mw(c.basicLimit)}만 원)에 닿음`;
+      if (c.toThreshold > 0) return `${names[k]}: 총급여 25%(${mw(c.threshold)}만 원)까지 ${mw(c.toThreshold)}만 원 더 써야 공제 시작`;
       return `${names[k]}: 25% 문턱을 넘어 쓰는 만큼 공제(세율 구간 ${P[k].marginal}%)`;
     });
     if (gain < 10_000) return { kind: "card", label: `12월 카드 ${man(amt)}`, gain, even: true, text: `12월 카드 ${man(amt)}: 누구 카드로 써도 차이가 1만 원 미만입니다. ${notes.join(" / ")}.` };
