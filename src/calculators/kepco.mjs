@@ -17,6 +17,7 @@ export const COUPANG = {
   purifier: { url: "https://link.coupang.com/a/iR9eahYhZQ", name: "위닉스 타워 엣지 공기청정기 43㎡", model: "AT8E430-MSK", grade: 1 },
   tv: { url: "https://link.coupang.com/a/iR81TzyTlY", name: "삼성전자 4K UHD Mini LED TV 55인치", model: "KU55MH70AFXKR", grade: 1 },
   dehumid: { url: "https://link.coupang.com/a/iR83vwodXg", name: "윈세이 1등급 제습기 24L", model: "W24L1A", grade: 1 },
+  dryer: { url: "https://link.coupang.com/a/iSMZWpFWRE", name: "LG전자 트롬 건조기 20kg 릴리 화이트 (2026년 1등급 모델)", model: "RD20WNR", grade: 1 },
   dishwasher: { url: "https://link.coupang.com/a/iR84plEv48", name: "LG전자 디오스 오브제컬렉션 빌트인 식기세척기 12인용", model: "DUE1BGLE", grade: 1 },
 };
 const PICKED = "2026-11-22";
