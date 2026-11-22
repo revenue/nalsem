@@ -64,7 +64,8 @@
     const rows = `<div class="kv">${r.rows.map((x) => {
       const why = x.eligible.ok ? (x.capped ? `${r.rate}%면 ${K.man(x.raw)}이지만 남은 한도까지만 받습니다.` : `${K.man(x.price)} × ${r.rate}%`) : (REASON[x.eligible.reason] || (() => ""))(x);
       const p = L[x.item];
-      const link = p && p.url ? ` <a class="kp-buy" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">쿠팡에서 대상 ${esc(x.label)} 보기 (${esc(p.model)})</a>` : "";
+      const img = p && p.img ? `<img class="kp-thumb" src="${esc(p.img)}" alt="" width="48" height="48" decoding="async" referrerpolicy="no-referrer">` : "";
+      const link = p && p.url ? ` <a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img}<span>쿠팡에서 대상 ${esc(x.label)} 보기 (${esc(p.model)})</span></a>` : "";
       return `<div><span class="k">${esc(x.label)}<small class="kp-why">${esc(why)}</small>${link}</span><span class="v">${x.eligible.ok ? K.wonStr(x.support) : "대상 아님"}</span></div>`;
     }).join("")}</div>`;
     const warn = [];
