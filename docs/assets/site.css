@@ -379,10 +379,14 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .kp-disc { display: block; margin-top: 10px; font-size: 13px; color: var(--muted); }
 .kp-row [data-remove][hidden] { display: none; }
 .kp-pick td { word-break: keep-all; }
-.kp-pick td:nth-child(2) { overflow-wrap: anywhere; }
-.kp-pick td:nth-child(3) { white-space: nowrap; }
+.kp-pick td.kp-p { overflow-wrap: anywhere; }
+.kp-pick td.kp-g { white-space: nowrap; }
+.kp-pick td.kp-c { vertical-align: top; }
 .kp-pick .kp-buy { margin-top: 0; }
 .kp-model { display: block; font-size: 12px; color: var(--muted); }
 .kp-pick .kp-img { display: block; width: 64px; height: 64px; object-fit: contain; background: #fff; border-radius: 8px; margin-bottom: 6px; }
 .kp-buy-row { display: flex; align-items: center; gap: 10px; }
 .kp-buy-row .kp-thumb { width: 48px; height: 48px; flex: none; object-fit: contain; background: #fff; border-radius: 8px; }
+.kp-buys { display: grid; gap: 6px; margin-top: 6px; }
+.kp-buys .kp-buy { margin-top: 0; }
+.kp-buys-h { font-size: 12px; color: var(--faint); font-weight: 500; }

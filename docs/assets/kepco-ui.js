@@ -1,6 +1,6 @@
 /* 날셈 고효율 가전 지원금 화면: #kf 폼을 읽어 KEPCO.calc 로 계산하고 #result 에 그린다.
    복지할인 유형과 금액은 주소(쿼리)·localStorage·통계 이벤트에 넣지 않고 어디로도 보내지 않는다.
-   통계는 N.bump 가 계산기 이름만 보낸다(calc.js). 쿠팡 링크는 window.KEPCO_LINKS(빌드 때 넣음)가 있을 때만 보인다. */
+   통계는 N.bump 가 계산기 이름만 보낸다(calc.js). 쿠팡 링크는 window.KEPCO_LINKS(빌드 때 넣음, 품목 id → 제품 배열)가 있을 때만 보인다. */
 (function () {
   "use strict";
   const $ = (id) => document.getElementById(id);
@@ -63,9 +63,9 @@
     const L = links();
     const rows = `<div class="kv">${r.rows.map((x) => {
       const why = x.eligible.ok ? (x.capped ? `${r.rate}%면 ${K.man(x.raw)}이지만 남은 한도까지만 받습니다.` : `${K.man(x.price)} × ${r.rate}%`) : (REASON[x.eligible.reason] || (() => ""))(x);
-      const p = L[x.item];
-      const img = p && p.img ? `<img class="kp-thumb" src="${esc(p.img)}" alt="" width="48" height="48" decoding="async" referrerpolicy="no-referrer">` : "";
-      const link = p && p.url ? ` <a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img}<span>쿠팡에서 대상 ${esc(x.label)} 보기 (${esc(p.model)})</span></a>` : "";
+      const ps = (L[x.item] || []).filter((p) => p && p.url);
+      const img = (p) => p.img ? `<img class="kp-thumb" src="${esc(p.img)}" alt="" width="48" height="48" decoding="async" referrerpolicy="no-referrer">` : "";
+      const link = ps.length ? `<span class="kp-buys"><small class="kp-buys-h">쿠팡에서 대상 ${esc(x.label)} 보기</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)} (${esc(p.model)})</span></a>`).join("")}</span>` : "";
       return `<div><span class="k">${esc(x.label)}<small class="kp-why">${esc(why)}</small>${link}</span><span class="v">${x.eligible.ok ? K.wonStr(x.support) : "대상 아님"}</span></div>`;
     }).join("")}</div>`;
     const warn = [];
