@@ -86,7 +86,7 @@ t("배달 음식점 6,000만(2025년 이전 개업) → 55,000원", () => {
   assert.equal(r.cr.card, 715000);
   assert.equal(r.payable, 55000);
 });
-t("프리랜서형 그 밖의 서비스업 5,000만(30%) → 1,350,000원", () => {
+t("프리랜서형 그 밖의 서비스업 5,000만(30%), 2025년 매출 4,800만 미만 → 1,350,000원", () => {
   // 50,000,000 × 30% × 10% = 1,500,000. 매입 300만 → 15,000. 카드 1,000만 → 130,000. 전자신고 5,000. 1,500,000 − 150,000 = 1,350,000
   const r = S.calc({ rows: [{ ind: "service", sales: 5000 * M }], purchase: 300 * M, card: 1000 * M });
   assert.equal(r.gross, 1500000);
@@ -158,9 +158,31 @@ t("7월 예정부과 세액 차감과 더 낸 금액 표시", () => {
   assert.equal(r3.exempt, true);
   assert.equal(r3.prepaidOver, 100000);
 });
-t("전자세금계산서 발급세액공제: 건당 200원, 연 100만 원 한도", () => {
-  assert.equal(S.calc({ rows: [{ ind: "retail", sales: 6000 * M }], einv: 30 }).cr.einv, 6000);
-  assert.equal(S.calc({ rows: [{ ind: "retail", sales: 6000 * M }], einv: 6000 }).cr.einv, 1000000);
+t("전자세금계산서 발급세액공제: 건당 200원, 연 100만 원 한도, 영수증 발급 간이과세자(신규·2025년 4,800만 미만)는 제외", () => {
+  assert.equal(S.calc({ rows: [{ ind: "retail", sales: 6000 * M }], prevOver: true, einv: 30 }).cr.einv, 6000);
+  assert.equal(S.calc({ rows: [{ ind: "retail", sales: 6000 * M }], prevOver: true, einv: 6000 }).cr.einv, 1000000);
+  const a = S.calc({ rows: [{ ind: "retail", sales: 6000 * M }], einv: 30 }); // 2025년 4,800만 미만 → 영수증 발급자
+  assert.equal(a.cr.einv, 0); assert.ok(a.warn.includes("einv-not-eligible"));
+  assert.equal(S.calc({ open: 1, rows: [{ ind: "retail", sales: 6000 * M }], prevOver: true, einv: 30 }).cr.einv, 0); // 2026년 개업은 첫 과세기간
+});
+t("카드 발행세액공제 업종 요건: 2025년 4,800만 이상 기존 사업자는 소비자 대상 업종만 (법 제46조①1호가)", () => {
+  // 정보통신업 6,000만, 카드 3,000만: 영수증 발급자면 390,000원 공제, 2025년 4,800만 이상이면 공제 없음(보수적으로 0)
+  assert.equal(S.calc({ rows: [{ ind: "ict", sales: 6000 * M }], card: 3000 * M }).cr.card, 390000);
+  const r = S.calc({ rows: [{ ind: "ict", sales: 6000 * M }], card: 3000 * M, prevOver: true });
+  assert.equal(r.cr.card, 0); assert.equal(r.cardOk, false); assert.ok(r.warn.includes("card-not-eligible"));
+  assert.equal(r.payable, 1800000 - 5000); // 60,000,000 × 3% − 전자신고
+  // 음식점은 그대로 공제, 그 밖의 서비스업은 공제하되 확인 안내
+  assert.equal(S.calc({ rows: [{ ind: "food", sales: 6000 * M }], card: 5500 * M, prevOver: true }).cr.card, 715000);
+  const sv = S.calc({ rows: [{ ind: "service", sales: 6000 * M }], card: 1000 * M, prevOver: true });
+  assert.equal(sv.cr.card, 130000); assert.ok(sv.warn.includes("card-check"));
+  // 2026년 개업자는 업종과 관계없이 공제 (법 제46조①1호나, 제36조①2호나)
+  assert.equal(S.calc({ open: 2, rows: [{ ind: "ict", sales: 6000 * M }], card: 3000 * M, prevOver: true }).cr.card, 390000);
+});
+t("경고: 4,800만 이상이면 2027-07-01부터 세금계산서 발급 대상, 부동산임대업은 일반과세 전환", () => {
+  assert.ok(S.calc({ rows: [{ ind: "food", sales: 6000 * M }] }).warn.includes("invoice-next"));
+  assert.ok(S.calc({ rows: [{ ind: "rent", sales: 5000 * M }] }).warn.includes("rent-over"));
+  assert.ok(!S.calc({ rows: [{ ind: "food", sales: 3000 * M }] }).warn.includes("invoice-next"));
+  assert.ok(!S.calc({ open: 1, rows: [{ ind: "food", sales: 800000000 }] }).warn.includes("invoice-next")); // 1억400만 이상은 over-simple 로 안내
 });
 t("원 미만 버림과 경고", () => {
   const r = S.calc({ rows: [{ ind: "lodging", sales: 50000033 }], purchase: 999, card: 60000000 });

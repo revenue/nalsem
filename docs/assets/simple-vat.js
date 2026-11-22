@@ -9,7 +9,7 @@
    - 부가가치세법 시행령 [시행 2026.2.27] 제109조①(1억 400만 원), 제111조②(업종별 부가가치율 표), 제89조②(전자세금계산서 건당 200원)
    - 조세특례제한법 제104조의8②, 같은 법 시행령 [시행 2026.9.18] 제104조의5④(부가세 전자신고세액공제 5천 원, 2026.2.27 개정)
    국세청 「사례로 배우는 부가가치세 전자신고 방법」 간이 음식점업·소매업(2024.1) 사례를 test/simple-vat.test.mjs 가 원 단위까지 재현한다.
-   해마다 손볼 것: YEAR·DUE·CARD(공제율·한도·기한)·EFILE. 2026-08 정부 세제개편안은 2027년 공급분부터 카드 공제를 1.2%·500만 원으로 줄이는 안(국회 통과 확인 필요). */
+   해마다 손볼 것: YEAR·DUE·CARD(공제율·한도·기한)·EFILE. 현행 법 제46조①3호는 2027년 공급분부터 1%·연 500만 원이고, 2026-08 정부 세제개편안은 1.2%·500만 원 안(2차 자료, 국회 통과 확인 필요). */
 (function (g) {
   "use strict";
 
@@ -36,9 +36,12 @@
     { id: "ict", rate: 30, label: "정보통신업", ex: "" },
     { id: "service", rate: 30, label: "그 밖의 서비스업", ex: "미용실, 세탁소, 수리점 등" },
     { id: "rent", rate: 40, label: "부동산임대업", ex: "연 공급대가 4,800만 원 이상이면 간이과세 불가" },
-    { id: "pro", rate: 40, label: "전문·과학·기술서비스업, 사업지원·임대서비스업 등", ex: "금융·보험 관련 서비스, 부동산 관련 서비스 포함. 대부분 간이과세 불가(최종소비자 대상 예외)" },
+    { id: "pro", rate: 40, label: "전문·과학·기술서비스업, 사업지원·임대서비스업 등", ex: "금융·보험 관련 서비스, 부동산 관련 서비스 포함. 전문·과학·기술서비스업과 사업시설관리·사업지원·임대서비스업은 최종소비자 대상이 아니면 간이과세 불가" },
   ];
 
+  // 카드 발행세액공제 업종 요건(2025년 매출 4,800만 원 이상인 기존 간이과세자만 해당): B2C 는 확실, CHECK 는 소비자 대상일 때만(화면에서 확인 안내)
+  const CARD_B2C = ["retail", "food", "lodging"];
+  const CARD_CHECK = ["service", "transport"];
   const fl = Math.floor;
   const won = (v) => Math.max(0, fl(Number(v) || 0));
   const industry = (id) => INDUSTRIES.find((x) => x.id === id) || null;
@@ -54,8 +57,8 @@
 
   // 계산. rows: [{ ind, sales }] 업종별 2026년 공급대가(부가세 포함 매출), purchase: 세금계산서·카드·현금영수증으로 받은 매입 공급대가,
   // card: 매출 중 신용카드·현금영수증·간편결제 등으로 받은 금액, einv: 전자세금계산서 발급 건수, prepaid: 7월에 이미 낸 예정부과·예정신고 세액,
-  // efile: 직접 전자신고 여부, opts.efileAmount: 전자신고세액공제 금액(과거 사례 재현용)
-  function calc({ rows = [], open = "before", purchase = 0, card = 0, einv = 0, prepaid = 0, efile = true } = {}, opts = {}) {
+  // prevOver: (2025년 이전 개업자) 2025년 공급대가가 4,800만 원 이상이었는지, efile: 직접 전자신고 여부, opts.efileAmount: 전자신고세액공제 금액(과거 사례 재현용)
+  function calc({ rows = [], open = "before", prevOver = false, purchase = 0, card = 0, einv = 0, prepaid = 0, efile = true } = {}, opts = {}) {
     const mo = months(open);
     if (mo == null) return { error: "open" };
     const lines = [];
@@ -72,11 +75,16 @@
     const exempt = sales * 12 < EXEMPT * mo;
     const overSimple = sales * 12 >= SIMPLE_MAX * mo;
 
+    // 영수증만 발급하는 간이과세자(법 제36조①2호): 2026년 개업(첫 과세기간) 또는 2025년 공급대가 4,800만 원 미만.
+    // 이들은 카드 발행세액공제를 업종과 관계없이 받고(법 제46조①1호나), 전자세금계산서 발급세액공제는 받지 않는다(법 제63조④).
+    // 그 밖의 간이과세자는 주로 소비자 대상 업종(시행령 제88조②→제73조①: 소매·음식·숙박·미용·여객운송 등)만 카드 공제를 받는다(법 제46조①1호가).
+    const receiptOnly = mo < 12 || open !== "before" || !prevOver;
+    const cardOk = receiptOnly || lines.every((x) => CARD_B2C.includes(x.ind) || CARD_CHECK.includes(x.ind));
     const cardIn = won(card), purchaseIn = won(purchase);
     const cr = {
       purchase: fl((purchaseIn * PURCHASE_PERMILLE) / 1000),
-      cardRaw: fl((cardIn * CARD.permille) / 1000),
-      einv: Math.min(won(einv) * EINV.per, EINV.cap),
+      cardRaw: cardOk ? fl((cardIn * CARD.permille) / 1000) : 0,
+      einv: receiptOnly ? 0 : Math.min(won(einv) * EINV.per, EINV.cap),
       efile: efile ? (opts.efileAmount ?? EFILE) : 0,
     };
     cr.card = Math.min(cr.cardRaw, CARD.cap);
@@ -95,8 +103,12 @@
     if (lines.some((x) => ["mfg", "build", "rent", "pro"].includes(x.ind))) warn.push("excluded-industry");
     if (mo < 12) warn.push("annualized");
     if (overSimple) warn.push("over-simple");
+    if (!cardOk && cardIn > 0) warn.push("card-not-eligible");
+    if (!receiptOnly && cardOk && cardIn > 0 && lines.some((x) => CARD_CHECK.includes(x.ind))) warn.push("card-check");
+    if (receiptOnly && won(einv) > 0) warn.push("einv-not-eligible");
+    if (!overSimple && sales * 12 >= EXEMPT * mo) warn.push(lines.some((x) => x.ind === "rent") ? "rent-over" : "invoice-next");
 
-    return { months: mo, lines, sales, annual, exempt, overSimple, gross, credits, cr, afterCredits, lost, prepaid: pre, payable, prepaidOver, warn };
+    return { months: mo, receiptOnly, cardOk, lines, sales, annual, exempt, overSimple, gross, credits, cr, afterCredits, lost, prepaid: pre, payable, prepaidOver, warn };
   }
 
   // 신고 기한까지 남은 날 (한국 시간 기준, 오늘 포함하지 않음)

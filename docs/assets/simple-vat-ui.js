@@ -43,6 +43,7 @@
       prepaid: won($("sv-pre")),
       einv: Math.floor(num($("sv-einv"))),
       efile: $("sv-efile").checked,
+      prevOver: $("sv-prev").checked,
     };
   }
 
@@ -65,12 +66,13 @@
     if (r.lines.length > 1) steps.push(line("업종별 세액 합계", "", W(r.gross)));
     if (r.cr.purchase) steps.push(line("매입 공제 (0.5%)", `${MAN(h.purchase)} × 0.5%`, "−" + W(r.cr.purchase)));
     if (r.cr.cardRaw) steps.push(line("카드·현금영수증 매출 공제 (1.3%)", r.cr.cardCapped ? `${W(r.cr.cardRaw)}이지만 연 1,000만 원 한도까지` : `${MAN(h.card)} × 1.3%`, "−" + W(r.cr.card)));
+    if (!r.cardOk && h.card) steps.push(line("카드·현금영수증 매출 공제", "고른 업종은 공제 대상이 아닐 수 있어 빼고 계산", "0원"));
     if (r.cr.einv) steps.push(line("전자세금계산서 발급 공제", `${h.einv}건 × 200원 (연 100만 원까지)`, "−" + W(r.cr.einv)));
     if (r.cr.efile) steps.push(line("전자신고 공제", "홈택스·손택스로 직접 신고할 때", "−" + W(r.cr.efile)));
     if (r.lost) steps.push(line("공제 중 세금을 넘는 부분", "간이과세자는 돌려받지 못합니다", "0원 처리"));
     steps.push(line("공제 후 세액", "", W(r.afterCredits)));
     if (r.prepaid && !r.exempt) steps.push(line("7월에 이미 낸 세액", "", "−" + W(Math.min(r.prepaid, r.afterCredits))));
-    if (r.exempt) steps.push(line("납부면제 적용", `${r.months < 12 ? "12개월 환산 매출" : "매출"} ${MAN(r.annual)} < 4,800만 원`, "0원"));
+    if (r.exempt) steps.push(line("납부면제 적용", `${r.months < 12 ? "12개월 환산 매출" : "매출"} ${W(r.annual)} < 48,000,000원`, "0원"));
     steps.push(line("1월에 낼 세금", "", `<b>${W(r.payable)}</b>`));
     const calcHtml = `<h3 class="tx-h">계산 과정</h3><div class="kv">${steps.join("")}</div>`;
 
@@ -79,9 +81,14 @@
     if (r.warn.includes("annualized")) warn.push(`2026년 ${13 - r.months}월 개업으로 보고 ${r.months}개월 매출 ${MAN(r.sales)}을 12개월 ${MAN(r.annual)}으로 환산해 판정했습니다. 세금 자체는 실제 매출로 계산합니다.`);
     if (r.warn.includes("card-over-sales")) warn.push("카드·현금영수증 매출이 전체 매출보다 큽니다. 매출에는 카드 매출까지 모두 넣어야 합니다.");
     if (r.warn.includes("over-simple")) warn.push("12개월 기준 매출이 1억 400만 원 이상이라 2027년 7월 1일부터 일반과세자로 바뀝니다(관할 세무서 통지). 일반과세자는 1월·7월 두 번 신고합니다.");
-    else if (!r.exempt) warn.push("매출이 4,800만 원 이상이면 다음 해부터 세금계산서를 발급해야 하는 간이과세자가 될 수 있습니다. 시작 시점은 홈택스 안내로 확인하세요.");
+    if (r.warn.includes("invoice-next")) warn.push("2026년 매출(신규는 12개월 환산)이 4,800만 원 이상이라 2027년 7월 1일부터 영수증 대신 세금계산서를 발급하는 간이과세자가 됩니다.");
+    if (r.warn.includes("rent-over")) warn.push("부동산임대업은 연 매출이 4,800만 원 이상이면 간이과세를 받을 수 없어 2027년 7월 1일부터 일반과세자로 바뀝니다.");
+    if (r.warn.includes("card-not-eligible")) warn.push("2025년 매출이 4,800만 원 이상인 간이과세자는 소매·음식점·숙박·미용·여객운송처럼 주로 소비자를 상대하는 업종만 카드 매출 공제를 받습니다. 고른 업종이 소비자 대상이라면 공제를 받을 수 있으니 홈택스 신고 화면의 공제액을 확인하세요.");
+    if (r.warn.includes("card-check")) warn.push("2025년 매출이 4,800만 원 이상이면 카드 매출 공제는 주로 소비자를 상대하는 업종만 받습니다. 사업자에게 주로 파는 업종이면 공제가 빠질 수 있습니다.");
+    if (r.warn.includes("einv-not-eligible")) warn.push("2026년에 개업했거나 2025년 매출이 4,800만 원 미만이면 영수증 발급 간이과세자라 전자세금계산서 발급 공제를 받지 않습니다.");
     if (r.warn.includes("excluded-industry")) warn.push("고른 업종은 업종·규모에 따라 간이과세를 받을 수 없는 경우가 있습니다. 사업자등록증의 과세유형이 '간이과세자'인지 확인하세요.");
-    if (r.prepaidOver) warn.push(`이미 낸 ${W(r.prepaidOver)}은 이번 세액보다 많습니다. 돌려받는지는 홈택스 신고서의 '차감 납부할 세액'에서 확인하세요(이 계산기에서 확인하지 못한 부분입니다).`);
+    if (r.prepaidOver && r.exempt) warn.push(`납부면제라 7월에 낸 ${W(r.prepaidOver)}은 돌려받습니다(부가가치세법 제69조④). 홈택스 신고서에서 확인하세요.`);
+    else if (r.prepaidOver) warn.push(`이미 낸 ${W(r.prepaidOver)}이 이번 세액보다 많습니다. 돌려받는지는 홈택스 신고서의 '차감 납부할 세액'에서 확인하세요(이 계산기에서 확인하지 못한 부분입니다).`);
     const warnHtml = `<div class="tx-warn" role="note"><h3>확인할 것</h3><ul>${warn.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
 
     const hometax = `<details class="tx-fold"><summary>홈택스 신고 순서</summary><div class="tx-fold-body"><ol class="tx-ul">
