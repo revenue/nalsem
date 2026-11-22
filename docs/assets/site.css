@@ -386,3 +386,9 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .kp-pick .kp-img { display: block; width: 64px; height: 64px; object-fit: contain; background: #fff; border-radius: 8px; margin-bottom: 6px; }
 .kp-buy-row { display: flex; align-items: center; gap: 10px; }
 .kp-buy-row .kp-thumb { width: 48px; height: 48px; flex: none; object-fit: contain; background: #fff; border-radius: 8px; }
+/* 간이과세자 부가세 계산기 */
+.sv-row [data-remove][hidden] { display: none; }
+.tool ol.tx-ul { padding-left: 20px; }
+.result ol.tx-ul li, .result .tx-fold .tx-ul li { font-size: 14px; line-height: 1.7; }
+.sv-stats .stat .v { white-space: nowrap; }
+@media (max-width: 639px) { .sv-stats .stat .v { font-size: 20px; } }
