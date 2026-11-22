@@ -386,3 +386,15 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .kp-pick .kp-img { display: block; width: 64px; height: 64px; object-fit: contain; background: #fff; border-radius: 8px; margin-bottom: 6px; }
 .kp-buy-row { display: flex; align-items: center; gap: 10px; }
 .kp-buy-row .kp-thumb { width: 48px; height: 48px; flex: none; object-fit: contain; background: #fff; border-radius: 8px; }
+/* 급여·인건비: 2027 알바 인건비 계산기 */
+#result .kv .ap-sum .k, #result .kv .ap-sum .v { color: var(--text); font-weight: 700; }
+#result .kv > div { min-width: 0; }
+#result .kv .k { min-width: 0; overflow-wrap: anywhere; }
+#result .kv .v { white-space: nowrap; }
+.ap-funnel { padding: 14px 16px; border-radius: 18px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--ring); font-size: 15px; font-weight: 600; line-height: 1.6; word-break: keep-all; }
+.ap-funnel a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.ap-promo { scroll-margin-top: 96px; }
+.ap-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .ap-stats.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 439px) { .ap-stats { grid-template-columns: minmax(0, 1fr); } }
+.ap-stats .stat .v { overflow-wrap: anywhere; }

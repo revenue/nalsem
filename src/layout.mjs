@@ -12,7 +12,7 @@ const ICON = {
 export const ARROW = '<span class="ico" aria-hidden="true"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>';
 
 export const BUILD_DATE = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST 기준
-export function shell({ title, description, path, body, script = "", nav = "", jsonld = null, keywords = [], assets = [] }) {
+export function shell({ title, description, path, body, script = "", nav = "", jsonld = null, keywords = [], assets = [], modules = [] }) {
   const fullTitle = path === "/" ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
   const ld = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
   return `<!doctype html>
@@ -94,6 +94,7 @@ ${body}
 <script src="/assets/calc.js?v=${V}"></script>
 <script src="/assets/site.js?v=${V}"></script>
 ${assets.map((a) => `<script src="/assets/${a}?v=${V}"></script>`).join("\n")}
+${modules.map((a) => `<script type="module" src="/assets/${a}?v=${V}"></script>`).join("\n")}
 ${script ? `<script>(function(){"use strict";\n${script}\n})();</script>` : ""}
 </body>
 </html>`;
@@ -162,4 +163,5 @@ export const CATS = {
   date: { name: "날짜·음력", id: "date" },
   tax: { name: "연말정산", id: "tax" },
   benefit: { name: "생활 지원금", id: "benefit" },
+  pay: { name: "급여·인건비", id: "pay" },
 };
