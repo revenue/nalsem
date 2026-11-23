@@ -386,7 +386,6 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .kp-pick .kp-img { display: block; width: 64px; height: 64px; object-fit: contain; background: #fff; border-radius: 8px; margin-bottom: 6px; }
 .kp-buy-row { display: flex; align-items: center; gap: 10px; }
 .kp-buy-row .kp-thumb { width: 48px; height: 48px; flex: none; object-fit: contain; background: #fff; border-radius: 8px; }
-<<<<<<< HEAD
 /* 급여·인건비: 2027 알바 인건비 계산기 */
 #result .kv .ap-sum .k, #result .kv .ap-sum .v { color: var(--text); font-weight: 700; }
 #result .kv > div { min-width: 0; }
@@ -399,11 +398,10 @@ details.tx-fold[open] > summary::before { content: "−"; }
 @media (min-width: 640px) { .ap-stats.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 439px) { .ap-stats { grid-template-columns: minmax(0, 1fr); } }
 .ap-stats .stat .v { overflow-wrap: anywhere; }
-=======
+
 /* 간이과세자 부가세 계산기 */
 .sv-row [data-remove][hidden] { display: none; }
 .tool ol.tx-ul { padding-left: 20px; }
 .result ol.tx-ul li, .result .tx-fold .tx-ul li { font-size: 14px; line-height: 1.7; }
 .sv-stats .stat .v { white-space: nowrap; }
 @media (max-width: 639px) { .sv-stats .stat .v { font-size: 20px; } }
->>>>>>> origin/main
