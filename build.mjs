@@ -1,6 +1,7 @@
 // 정적 빌드: src/ 정의 → docs/ HTML. `npm run build`
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { execFileSync } from "node:child_process";
 import { shell, calcPage, faqOf, CATS, SITE, BUILD_DATE } from "./src/layout.mjs";
 import { home } from "./src/home.mjs";
 import { calculators } from "./src/calculators/index.mjs";
@@ -8,6 +9,20 @@ import { pages } from "./src/pages.mjs";
 import { INDEXNOW_KEY } from "./src/indexnow.mjs";
 
 const OUT = "docs";
+
+// 페이지별 실제 수정일: 원본 파일들의 마지막 커밋 날짜(KST). 커밋 안 된 변경이 있거나 git이 없으면 빌드 날짜.
+// 매 빌드마다 모든 lastmod를 오늘로 바꾸면 검색엔진이 lastmod를 믿지 않으므로, 내용이 바뀐 페이지만 날짜가 바뀌게 한다.
+const git = (args) => execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], env: { ...process.env, TZ: "Asia/Seoul" } }).trim();
+const modDate = (paths) => {
+  try {
+    if (git(["status", "--porcelain", "--", ...paths])) return BUILD_DATE;
+    return git(["log", "-1", "--date=format-local:%Y-%m-%d", "--format=%cd", "--", ...paths]) || BUILD_DATE;
+  } catch { return BUILD_DATE; }
+};
+const calcDate = (c) => modDate([`src/calculators/${c.src}`, ...[...(c.assets || []), ...(c.modules || [])].map((a) => `docs/assets/${a}`)]);
+for (const c of calculators) c.updated = calcDate(c);
+const PAGES_DATE = modDate(["src/pages.mjs"]);
+const HOME_DATE = [...calculators.map((c) => c.updated), modDate(["src/home.mjs"])].sort().at(-1);
 const all = calculators;
 const index = all.map((c) => ({ slug: c.slug, title: c.title, cat: CATS[c.cat].name, keys: (c.keys || []).map((k) => k.toLowerCase()) }));
 const indexScript = `window.NALSEM_INDEX=${JSON.stringify(index)};`;
@@ -27,7 +42,7 @@ for (const c of all) {
   mkdirSync(dir, { recursive: true });
   const faq = faqOf(c);
   const ld = [
-    { "@context": "https://schema.org", "@type": "WebApplication", name: c.title, url: `${SITE.url}/${c.slug}/`, applicationCategory: "UtilitiesApplication", operatingSystem: "Web", browserRequirements: "Requires JavaScript", inLanguage: "ko", description: c.description, dateModified: BUILD_DATE, isAccessibleForFree: true, offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" }, publisher: ORG },
+    { "@context": "https://schema.org", "@type": "WebApplication", name: c.title, url: `${SITE.url}/${c.slug}/`, applicationCategory: "UtilitiesApplication", operatingSystem: "Web", browserRequirements: "Requires JavaScript", inLanguage: "ko", description: c.description, dateModified: c.updated, isAccessibleForFree: true, offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" }, publisher: ORG },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "홈", item: SITE.url + "/" }, { "@type": "ListItem", position: 2, name: CATS[c.cat].name, item: `${SITE.url}/#${c.cat}` }, { "@type": "ListItem", position: 3, name: c.title, item: `${SITE.url}/${c.slug}/` }] },
   ];
   if (faq.length) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
@@ -37,11 +52,11 @@ for (const c of all) {
 // 정보 페이지
 for (const p of pages) {
   mkdirSync(join(OUT, p.slug), { recursive: true });
-  writeFileSync(join(OUT, p.slug, "index.html"), shell({ title: p.title, description: p.description, path: `/${p.slug}/`, body: p.body, script: indexScript + (p.script || ""), jsonld: { "@context": "https://schema.org", "@type": "WebPage", name: p.title, url: `${SITE.url}/${p.slug}/`, inLanguage: "ko", dateModified: BUILD_DATE, publisher: ORG } }));
+  writeFileSync(join(OUT, p.slug, "index.html"), shell({ title: p.title, description: p.description, path: `/${p.slug}/`, body: p.body, script: indexScript + (p.script || ""), jsonld: { "@context": "https://schema.org", "@type": "WebPage", name: p.title, url: `${SITE.url}/${p.slug}/`, inLanguage: "ko", dateModified: PAGES_DATE, publisher: ORG } }));
 }
 
 // sitemap · robots
-writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>${SITE.url}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n${all.map((c) => `<url><loc>${SITE.url}/${c.slug}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join("\n")}\n${pages.map((p) => `<url><loc>${SITE.url}/${p.slug}/</loc><lastmod>${BUILD_DATE}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`).join("\n")}\n</urlset>\n`);
+writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>${SITE.url}/</loc><lastmod>${HOME_DATE}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n${all.map((c) => `<url><loc>${SITE.url}/${c.slug}/</loc><lastmod>${c.updated}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join("\n")}\n${pages.map((p) => `<url><loc>${SITE.url}/${p.slug}/</loc><lastmod>${PAGES_DATE}</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>`).join("\n")}\n</urlset>\n`);
 // 검색·생성형 AI 크롤러 모두 허용 (GEO)
 writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\n${["GPTBot", "ChatGPT-User", "OAI-SearchBot", "ClaudeBot", "anthropic-ai", "PerplexityBot", "Google-Extended", "Bingbot", "Yeti", "Daum"].map((b) => `User-agent: ${b}\nAllow: /`).join("\n\n")}\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
 // llms.txt: 생성형 엔진이 사이트 구조를 한 번에 읽는 안내 파일

@@ -150,7 +150,7 @@ export function calcPage(c, all) {
       <div class="result" id="result" hidden></div>
     </section>
     <aside class="aside">
-      <div class="card bz summary"><h2>핵심 요약</h2><p>${c.description}</p><p class="src">${SITE.name} · 기준일 ${BUILD_DATE} 빌드 · 계산은 브라우저에서 실시간</p></div>
+      <div class="card bz summary"><h2>핵심 요약</h2><p>${c.description}</p><p class="src">${SITE.name} · 최종 수정 ${c.updated || BUILD_DATE} · 계산은 브라우저에서 실시간</p></div>
       ${c.info}
       ${related.length ? `<div class="card bz"><h2>함께 보기</h2><div class="related">${related.map((r) => `<a href="/${r.slug}/">${r.title}<iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>`).join("")}</div></div>` : ""}
     </aside>
