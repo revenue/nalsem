@@ -27,7 +27,7 @@ docs/assets/kepco.js   지원금 엔진 (전역 KEPCO). 지원율·누적 한도
 docs/assets/kepco-ui.js  지원금 화면 (복지할인 유형·금액은 주소·저장소·통계에 넣지 않음)
 test/kepco.test.mjs    지원금 엔진 검증 (공식 품목표 대조, 손계산 가구)
 src/calculators/simple-vat.mjs  사업자 세금: 간이과세자 부가세 계산기 정의(설명 카드·고지 문구, 제휴 링크 없음)
-docs/assets/simple-vat.js  간이과세자 부가세 엔진 (전역 SVAT). 납부면제 4,800만 원(신규 12개월 환산)·업종별 부가가치율·매입 0.5%·카드 1.3% 공제. 조문 출처 주석
+docs/assets/simple-vat.js  간이과세자 부가세 엔진 (전역 SVAT). 납부면제 4,800만 원(신규 개업·2026-07-01 일반→간이 전환자는 12개월 환산, 전환자 재고납부세액 가산)·업종별 부가가치율·매입 0.5%·카드 1.3% 공제. 조문 출처 주석
 docs/assets/simple-vat-ui.js  간이과세 화면 (매출·매입 금액은 주소·저장소·통계에 넣지 않음)
 test/simple-vat.test.mjs  간이과세 엔진 검증 (국세청 간이 음식점·소매업 신고 사례 원 단위 대조, 손계산 사례, 빌드된 페이지 점검)
 ```
