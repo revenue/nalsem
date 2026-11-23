@@ -165,4 +165,5 @@ export const CATS = {
   biz: { name: "사업자 세금", id: "biz" },
   benefit: { name: "생활 지원금", id: "benefit" },
   pay: { name: "급여·인건비", id: "pay" },
+  wedding: { name: "결혼 준비", id: "wedding" },
 };

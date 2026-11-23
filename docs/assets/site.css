@@ -405,3 +405,24 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .result ol.tx-ul li, .result .tx-fold .tx-ul li { font-size: 14px; line-height: 1.7; }
 .sv-stats .stat .v { white-space: nowrap; }
 @media (max-width: 639px) { .sv-stats .stat .v { font-size: 20px; } }
+
+/* 결혼 준비: 식대·축의금, 양가 분담 */
+.wd-groups { display: grid; gap: 10px; }
+.wd-g { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr); gap: 8px; align-items: center; }
+.wd-c, .wd-g .ymd { min-width: 0; }
+.wd-g input { min-width: 0; }
+.wd-head { font-size: 13px; color: var(--muted); font-weight: 600; }
+.wd-c::before { content: attr(data-l); display: none; font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 4px 4px; }
+@media (max-width: 559px) {
+  .wd-g { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 12px; border-radius: 16px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--ring); }
+  .wd-g > :first-child, .wd-g > :last-child { grid-column: 1 / -1; }
+  .wd-c::before { display: block; }
+  .wd-head { display: none; }
+}
+.ws-row [data-remove][hidden], .ws-ratio[hidden] { display: none; }
+.wd-neg { color: #d64545; }
+.wd-tbl td { white-space: normal; word-break: keep-all; }
+.wd-tbl td.num { white-space: nowrap; }
+.stats.wd-stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.wd-stats .stat .v { white-space: nowrap; font-size: clamp(18px, 4.6vw, 24px); }
+.wd-stats .stat .v small { display: block; white-space: normal; }
