@@ -1,8 +1,8 @@
 # 날셈 (nalsem)
 
-나이·날짜·음력 생활계산기와 맞벌이 연말정산 몰아주기 계산기. 서버 없이 동작하는 정적 사이트입니다. 모든 계산은 브라우저 안에서 처리됩니다.
+나이·날짜·음력 생활계산기, 맞벌이 연말정산 몰아주기 계산기, 간이과세자 부가세 계산기. 서버 없이 동작하는 정적 사이트입니다. 모든 계산은 브라우저 안에서 처리됩니다.
 
-- 계산기 32개: 나이·띠·사람 16, 날짜·음력 12, 연말정산 4
+- 계산기 34개: 나이·띠·사람 16, 날짜·음력 12, 연말정산 4, 사업자 세금 1, 생활 지원금 1
 - 연말정산: 2026년 귀속 소득세법·조세특례제한법 현행 조문 기준(2026-11-21 대조). 부부의 결정세액을 계산해 부양가족·예정 의료비 결제자·12월 카드 배분을 전수 계산으로 추천. 이미 낸 돈은 낸 사람에게 고정
 - 음력 변환: [korean-lunar-calendar](https://github.com/usingsky/korean_lunar_calendar_js) (MIT, 한국천문연구원 기준, 1000~2050년) 번들
 - 공휴일: 관공서의 공휴일에 관한 규정 + 대체공휴일 규칙으로 연도별 자동 계산 (임시공휴일 미포함)
@@ -26,6 +26,10 @@ src/calculators/kepco.mjs  생활 지원금: 한전 고효율 가전 지원금 �
 docs/assets/kepco.js   지원금 엔진 (전역 KEPCO). 지원율·누적 한도·품목별 등급·적용기준 시행일
 docs/assets/kepco-ui.js  지원금 화면 (복지할인 유형·금액은 주소·저장소·통계에 넣지 않음)
 test/kepco.test.mjs    지원금 엔진 검증 (공식 품목표 대조, 손계산 가구)
+src/calculators/simple-vat.mjs  사업자 세금: 간이과세자 부가세 계산기 정의(설명 카드·고지 문구, 제휴 링크 없음)
+docs/assets/simple-vat.js  간이과세자 부가세 엔진 (전역 SVAT). 납부면제 4,800만 원(신규 12개월 환산)·업종별 부가가치율·매입 0.5%·카드 1.3% 공제. 조문 출처 주석
+docs/assets/simple-vat-ui.js  간이과세 화면 (매출·매입 금액은 주소·저장소·통계에 넣지 않음)
+test/simple-vat.test.mjs  간이과세 엔진 검증 (국세청 간이 음식점·소매업 신고 사례 원 단위 대조, 손계산 사례, 빌드된 페이지 점검)
 ```
 
 ## 명령
@@ -43,6 +47,7 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 | 수능 날짜 (교육부 확정치) | `docs/assets/calc.js` 의 `SUNEUNG` | 매년 3월 교육부 발표 후 |
 | 임시공휴일 | 현재 미지원. 필요하면 `holidays()` 에 연도별 예외 추가 | 정부 지정 시 |
 | 연말정산 세법 연도 | `docs/assets/tax.js` 의 `YEAR`, `RULES`, 자녀세액공제 나이(2027 10세 … 2029 12세), 카드 한도, 4대보험 요율. 설명 카드 문구(`src/calculators/tax.mjs`)와 `test/tax.test.mjs` 의 예시 숫자 | 매년 12월 세법 개정 통과 후, 1월 국세청 연말정산 신고안내 책자 발간 후 |
+| 간이과세자 부가세 | `docs/assets/simple-vat.js` 의 `YEAR`, `DUE`, `CARD`(공제율·한도·기한: 현행 2026-12-31까지 1.3%·1천만 원, 2026-08 개편안은 2027년분 1.2%·500만 원), `EFILE`(5천 원), 설명 카드(`src/calculators/simple-vat.mjs`)와 `test/simple-vat.test.mjs` | 매년 12월 세법 개정 통과 후, 1월 신고 전 국세청 안내 확인 |
 | 한전 고효율 가전 지원사업 | `docs/assets/kepco.js` 의 `YEAR`, `DEADLINE`, `BUDGET`(잔여예산·확인일), `TYPES`, `ITEMS`(등급·적용기준 시행일). 설명 카드(`src/calculators/kepco.mjs`)와 `test/kepco.test.mjs` | 매년 2월 새 공고 후(2025년 2-17, 2026년 2-9 시작). 12월에는 잔여예산을 주 1회 다시 확인 |
 
 ## 디자인 (Supanova Design Skill 적용)

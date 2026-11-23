@@ -61,6 +61,14 @@ export function home(all) {
   </div>
 </section>
 
+<section class="section wrap" id="biz">
+  <div class="section-head rv"><h2>${CATS.biz.name}</h2><span class="count">${by("biz").length}개</span></div>
+  <p class="lede rv tx-home-lede">부업·소상공인 간이과세자가 1월 부가세를 내야 하는지, 내야 하면 얼마인지 계산합니다. 2026년 귀속 기준이고, 입력값은 브라우저 밖으로 나가지 않습니다.</p>
+  <div class="rows">
+    ${by("biz").map((c) => row(c.slug)).join("\n    ")}
+  </div>
+</section>
+
 <section class="section wrap" id="benefit">
   <div class="section-head rv"><h2>${CATS.benefit.name}</h2><span class="count">${by("benefit").length}개</span></div>
   <div class="rows">

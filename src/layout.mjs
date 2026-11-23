@@ -86,7 +86,7 @@ ${body}
 <footer class="ftr">
   <div class="wrap">
     <nav class="ftr-nav" aria-label="사이트 정보"><a href="/about/">사이트 소개</a><a href="/privacy/"><b>개인정보처리방침</b></a><a href="/contact/">문의</a></nav>
-    <p>연말정산 계산기는 2026년 귀속 소득세법·조세특례제한법 기준 추정이며, 실제 세액은 홈택스에서 확인하세요. 음력 변환은 한국천문연구원 음양력 자료를 따르는 <a href="https://github.com/usingsky/korean_lunar_calendar_js" rel="noopener">korean-lunar-calendar</a>(MIT)를 사용합니다. 띠궁합·삼재·손없는 날은 민속 참고 자료이며, 법률·행정 판단은 관련 기관에서 확인하세요.</p>
+    <p>연말정산 계산기는 2026년 귀속 소득세법·조세특례제한법 기준 추정이며, 실제 세액은 홈택스에서 확인하세요. 간이과세자 부가세 계산기는 2026년 귀속 부가가치세법 기준 참고용 추정이며 세무 상담·신고 대리를 하지 않습니다. 음력 변환은 한국천문연구원 음양력 자료를 따르는 <a href="https://github.com/usingsky/korean_lunar_calendar_js" rel="noopener">korean-lunar-calendar</a>(MIT)를 사용합니다. 띠궁합·삼재·손없는 날은 민속 참고 자료이며, 법률·행정 판단은 관련 기관에서 확인하세요.</p>
     <p>© ${new Date().getFullYear()} ${SITE.name}. 모든 계산은 브라우저 안에서 처리되며 입력값은 서버로 전송되지 않습니다.</p>
   </div>
 </footer>
@@ -128,7 +128,7 @@ export function yearField(id, label, help = "") {
 // 계산기 페이지 본문
 // 설명 카드(h2 + 본문)를 FAQ 로 변환: 생성형 검색·리치 결과용
 export function faqOf(c) {
-  const strip = (h) => h.replace(/<\/p>/g, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  const strip = (h) => h.replace(/<\/(p|li|td)>/g, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   const josa = (w) => { const c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 ? ((c - 0xac00) % 28 ? "은" : "는") : "은(는)"; };
   const out = [];
   for (const m of c.info.matchAll(/<div class="card[^"]*"><h2>(.*?)<\/h2>([\s\S]*?)(?:<p class="src">|<\/div>)/g)) {
@@ -162,6 +162,7 @@ export const CATS = {
   age: { name: "나이·띠·사람", id: "age" },
   date: { name: "날짜·음력", id: "date" },
   tax: { name: "연말정산", id: "tax" },
+  biz: { name: "사업자 세금", id: "biz" },
   benefit: { name: "생활 지원금", id: "benefit" },
   pay: { name: "급여·인건비", id: "pay" },
 };
