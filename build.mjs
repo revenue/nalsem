@@ -49,6 +49,8 @@ writeFileSync(join(OUT, "llms.txt"), `# ${SITE.name}\n\n> ${SITE.tagline}. 서�
 writeFileSync(join(OUT, "404.html"), shell({ title: "페이지를 찾을 수 없습니다", description: "요청한 페이지가 없습니다.", path: "/404.html", body: `<div class="page wrap"><h1>페이지를 찾을 수 없습니다</h1><p class="lede">주소가 바뀌었거나 없는 페이지입니다. 홈에서 계산기를 찾아 주세요.</p><p style="margin-top:24px"><a class="btn btn-primary" href="/">홈으로</a></p></div>`, script: indexScript }).replace('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">', '<meta name="robots" content="noindex">'));
 writeFileSync(join(OUT, ".nojekyll"), "");
 // 애드센스 판매자 인증
+// IndexNow 키 파일: 네이버·빙에 새 페이지 수집을 알릴 때 소유 확인용 (공개 값)
+writeFileSync(join(OUT, "de2c9e45d939f5e3972ab8d7abbcc047.txt"), "de2c9e45d939f5e3972ab8d7abbcc047\n");
 writeFileSync(join(OUT, "ads.txt"), "google.com, pub-2298882938781262, DIRECT, f08c47fec0942fa0\n");
 
 // 사전 점검: 화면에 보이는 문자열에 em-dash 금지 (taste-skill §9.G)
