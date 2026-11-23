@@ -6,7 +6,9 @@ import { simpleVat } from "./simple-vat.mjs";
 import { alba } from "./alba.mjs";
 import { wedding } from "./wedding.mjs";
 
-export const calculators = [...age, ...date, ...tax, ...simpleVat, ...kepco, ...alba, ...wedding];
+// src: 사이트맵 lastmod·dateModified를 페이지별 실제 수정일(git)로 내기 위한 원본 파일 이름
+const from = (list, src) => list.map((c) => ({ ...c, src }));
+export const calculators = [...from(age, "age.mjs"), ...from(date, "date.mjs"), ...from(tax, "tax.mjs"), ...from(simpleVat, "simple-vat.mjs"), ...from(kepco, "kepco.mjs"), ...from(alba, "alba.mjs"), ...from(wedding, "wedding.mjs")];
 
 // 필수 필드 점검
 for (const c of calculators) for (const k of ["slug", "title", "short", "lede", "description", "cat", "form", "info"]) if (!c[k]) throw new Error(`${c.slug || "?"}: ${k} 누락`);
