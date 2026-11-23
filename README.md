@@ -73,6 +73,7 @@ npm run serve   # 로컬 미리보기 http://localhost:4173
 - 호스팅: GitHub Pages, `main` 브랜치 `/docs` 폴더
 - DNS: `suik.me` (가비아 DNS) 에 `nalsem CNAME revenue.github.io.` 추가. 반영 후 Pages 설정에서 "Enforce HTTPS" 켜기
 - 배포 = `npm run build` 후 `docs/` 커밋·푸시. 별도 CI 없음
+- 새 페이지 공개 뒤: Pages 반영이 끝나면 `npm run indexnow -- /새-슬러그/` 로 네이버·빙(IndexNow)에 수집을 알린다. 인자 없이 돌리면 사이트맵 전체. 키는 `src/indexnow.mjs`, 키 파일 `docs/<키>.txt` 는 빌드가 만든다. 구글은 IndexNow를 받지 않으므로 Search Console에서 따로 요청
 
 ## 라이선스
 

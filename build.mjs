@@ -5,6 +5,7 @@ import { shell, calcPage, faqOf, CATS, SITE, BUILD_DATE } from "./src/layout.mjs
 import { home } from "./src/home.mjs";
 import { calculators } from "./src/calculators/index.mjs";
 import { pages } from "./src/pages.mjs";
+import { INDEXNOW_KEY } from "./src/indexnow.mjs";
 
 const OUT = "docs";
 const all = calculators;
@@ -50,7 +51,7 @@ writeFileSync(join(OUT, "404.html"), shell({ title: "페이지를 찾을 수 없
 writeFileSync(join(OUT, ".nojekyll"), "");
 // 애드센스 판매자 인증
 // IndexNow 키 파일: 네이버·빙에 새 페이지 수집을 알릴 때 소유 확인용 (공개 값)
-writeFileSync(join(OUT, "de2c9e45d939f5e3972ab8d7abbcc047.txt"), "de2c9e45d939f5e3972ab8d7abbcc047\n");
+writeFileSync(join(OUT, `${INDEXNOW_KEY}.txt`), `${INDEXNOW_KEY}\n`);
 writeFileSync(join(OUT, "ads.txt"), "google.com, pub-2298882938781262, DIRECT, f08c47fec0942fa0\n");
 
 // 사전 점검: 화면에 보이는 문자열에 em-dash 금지 (taste-skill §9.G)
