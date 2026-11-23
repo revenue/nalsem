@@ -79,7 +79,7 @@ function init() {
     if (r.accidentBlank) warn.push("산재보험은 빠져 있어요. 업종 요율 × 지급총액만큼 더 들어요. 2027년 요율은 12월 말 고시예요.");
     warn.push(`이 달은 일요일이 ${r.weeks}번이라 주휴를 최대 ${r.weeks}번 넣었어요. 첫 주가 지난달에 걸쳐 있어도 일요일이 이 달이면 이 달에 넣어요.`);
     const warnHtml = `<div class="tx-warn" role="note"><h3>확인할 것</h3><ul>${warn.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>`;
-    const funnel = `<p class="ap-funnel">직원 여러 명을 매달 관리하려면 → <a href="#template-coming-soon" data-template-link>2027 급여대장 엑셀(9,900원)</a></p>`;
+    const funnel = `<p class="ap-funnel">직원 여러 명을 매달 관리하려면 → <a href="https://suikster0.gumroad.com/l/horyty" rel="noopener" data-template-link data-placement="result">2027 급여대장 엑셀(9,900원)</a></p>`;
     const foot = `<p class="note">참고용 계산이에요. 노무 자문이 아니에요. 소득세는 빼고 계산했어요.</p>`;
     out.innerHTML = hero + stats + h3("지급 내역") + pay + h3("근로자 4대보험 공제") + eeT + h3("사업주 4대보험") + erT + extra + warnHtml + funnel + foot;
   }
@@ -99,9 +99,10 @@ function init() {
   form.addEventListener("submit", (e) => { e.preventDefault(); run(); out.scrollIntoView({ behavior: "smooth", block: "start" }); });
 
   // 급여대장 안내 링크 클릭 (판매 링크 클릭 가설 H1 측정). 입력값은 넣지 않는다.
-  out.addEventListener("click", (e) => {
-    if (!e.target.closest("[data-template-link]")) return;
-    if (N) N.track("template_click", { calculator: "alba-pay", item_id: "payroll-template-2027", placement: "result" });
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("[data-template-link]");
+    if (!link) return;
+    if (N) N.track("template_click", { calculator: "alba-pay", item_id: "payroll-template-2027", placement: link.dataset.placement || "result" });
   });
 
   // 예시: 설명 카드의 예시와 같은 값 (alba-pay-input.js EXAMPLE)
