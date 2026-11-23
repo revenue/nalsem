@@ -10,19 +10,72 @@ import { ARROW } from "../layout.mjs";
 // 한국에너지공단 효율등급 사이트에서 모델명으로 조회해 현재 기준 등급이 지원 대상인 것만 넣는다. "1등급" 검색 결과에도 2·3등급이 섞여 있었다.
 // 품목 id → 대상 제품 목록(앞의 것이 대표). 표와 계산 결과에 이 순서로 보인다.
 export const COUPANG = {
-  fridge: [{ url: "https://link.coupang.com/a/iR8TBSr8uG", name: "삼성전자 일반 306L 2도어 냉장고", model: "RB30D4051S9", grade: 1, img: "https://t4c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224491800435-03ecfea4-15c6-4713-987a-6bee62c9aa37.jpg" }],
-  kimchi: [{ url: "https://link.coupang.com/a/iR80zPdNHo", name: "삼성전자 김치플러스 202L 뚜껑형 김치냉장고", model: "RP20C3111EG", grade: 1, img: "https://thumbnail13.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224569294063-d2984d96-0d33-4771-87eb-0f14e962e4a6.jpg" }],
-  "ac-wall": [{ url: "https://link.coupang.com/a/iSNpx9hXQy", name: "TCL 인버터 벽걸이 에어컨 5.7평", model: "TAC-08CSD", grade: 1, img: "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/71175740537336-fabd56a5-660f-43f0-a9b0-f6e41a8c74a4.jpg" }],
+  fridge: [
+    { url: "https://link.coupang.com/a/iR8TBSr8uG", name: "삼성전자 일반 306L 2도어 냉장고", model: "RB30D4051S9", grade: 1, img: "https://t4c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224491800435-03ecfea4-15c6-4713-987a-6bee62c9aa37.jpg" },
+    { url: "https://link.coupang.com/a/iU5RI3x6MS", name: "LG전자 디오스 오브제 매직스페이스 4도어 870L", model: "T873MTE111", grade: 1, img: "https://thumbnail3.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2446555321092196-2735d83f-b4b9-4a2d-bf2b-db9f3dede6b3.jpg" },
+    { url: "https://link.coupang.com/a/iU5SxFI3gW", name: "LG전자 디오스 오브제 양문형 냉장고 832L", model: "S834MQQ111", grade: 1, img: "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/bda8/14a69af4c8ef8bf870e8953167e88ca1465cbf1ec62635d863b0b7a443fb.png" },
+  ],
+  kimchi: [
+    { url: "https://link.coupang.com/a/iR80zPdNHo", name: "삼성전자 김치플러스 202L 뚜껑형 김치냉장고", model: "RP20C3111EG", grade: 1, img: "https://thumbnail13.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224569294063-d2984d96-0d33-4771-87eb-0f14e962e4a6.jpg" },
+    { url: "https://link.coupang.com/a/iU5Vrf2oy4", name: "LG전자 디오스 김치톡톡 뚜껑형 217L", model: "K225SS131", grade: 1, img: "https://t2a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/10/22/16/1/f4b067fc-2d4a-417c-9cea-057d0523e287.jpg" },
+    { url: "https://link.coupang.com/a/iU5V97348a", name: "LG전자 디오스 김치톡톡 스탠드형 3도어 327L", model: "Z330MQQF11", grade: 1, img: "https://t5c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/10/24/10/6/a0949f4e-0cb0-49a1-8504-642464cecc9e.jpg" },
+    { url: "https://link.coupang.com/a/iU5WYQvQLQ", name: "삼성전자 비스포크 AI 김치플러스 4도어 490L", model: "RK70F49M2Z", grade: 1, img: "https://thumbnail15.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34177759969663-53f53cc0-6c6e-4434-8329-d81f6523ac03.jpg" },
+  ],
+  "ac-wall": [
+    { url: "https://link.coupang.com/a/iSNpx9hXQy", name: "TCL 인버터 벽걸이 에어컨 5.7평", model: "TAC-08CSD", grade: 1, img: "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/71175740537336-fabd56a5-660f-43f0-a9b0-f6e41a8c74a4.jpg" },
+    { url: "https://link.coupang.com/a/iU5XIC7X5g", name: "삼성전자 AI 무풍콤보 벽걸이 에어컨 8.9평", model: "AR60F09D11WT", grade: 1, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34504845173707-d0f70969-280f-43aa-9173-c95739b6070c.jpg" },
+  ],
   "ac-other": [{ url: "https://link.coupang.com/a/iSNqw0dONg", name: "캐리어 인버터 스탠드 에어컨 23.4평", model: "OAMB-0851NAWSD", grade: 3, img: "https://thumbnail6.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/04/22/9/0/3d842043-ff83-4082-8592-675ea3b409a9.jpg" }],
-  washer: [{ url: "https://link.coupang.com/a/iR88QylOAS", name: "삼성전자 그랑데 통버블 세탁기 16kg", model: "WA16CG6441BY", grade: 2, img: "https://t2c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34223277602881-1394d57e-fad8-44a8-8b24-5c5764c02859.jpg" }],
-  drum: [{ url: "https://link.coupang.com/a/iR89M1rR12", name: "삼성전자 그랑데 드럼 세탁기 19kg", model: "WF19T6000KW", grade: 1, img: "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224353028803-efa8e9b9-6984-46c4-b9e6-fbe8ca543fd3.jpg" }],
-  rice: [{ url: "https://link.coupang.com/a/iR9bt66oFw", name: "쿠쿠 전기보온 에그밥솥 6인용", model: "CR-0675FW", grade: 1, img: "https://thumbnail15.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/dc57/ff0f92d0e66b5fe69d6f0cdce47d52ea6c9335fc264b7107041c0c87afd8.jpg" }],
-  vacuum: [{ url: "https://link.coupang.com/a/iSNq2aJijk", name: "LG전자 싸이킹3 싸이클론 진공청소기", model: "K83IGY", grade: 3, img: "https://t2c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/1759001647059995-195f6f24-69a9-44f2-be3d-286817c4c417.jpg" }],
-  purifier: [{ url: "https://link.coupang.com/a/iR9eahYhZQ", name: "위닉스 타워 엣지 공기청정기 43㎡", model: "AT8E430-MSK", grade: 1, img: "https://thumbnail1.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/167929895859531-595230e2-1ffb-4a32-b505-7a6886b4a2b9.png" }],
-  tv: [{ url: "https://link.coupang.com/a/iR81TzyTlY", name: "삼성전자 4K UHD Mini LED TV 55인치", model: "KU55MH70AFXKR", grade: 1, img: "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/xtj5pkrt/e37079c99ab24af2b9af990f2ba4d074.jpg" }],
-  dehumid: [{ url: "https://link.coupang.com/a/iR83vwodXg", name: "윈세이 1등급 제습기 24L", model: "W24L1A", grade: 1, img: "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/05/21/12/7/4d1d0b11-af36-4462-93f7-0d28cb2f45cf.jpg" }],
-  dryer: [{ url: "https://link.coupang.com/a/iSMZWpFWRE", name: "LG전자 트롬 건조기 20kg 릴리 화이트 (2026년 1등급 모델)", model: "RD20WNR", grade: 1, img: "https://thumbnail5.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/10/30/14/0/4d780dbd-112d-44a3-a917-889c639dd49c.jpg" }],
-  dishwasher: [{ url: "https://link.coupang.com/a/iR84plEv48", name: "LG전자 디오스 오브제컬렉션 빌트인 식기세척기 12인용", model: "DUE1BGLE", grade: 1, img: "https://thumbnail5.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/qfm6nvqm/a11d406ca6444659a8493064ccc61ceb.jpg" }],
+  washer: [
+    { url: "https://link.coupang.com/a/iR88QylOAS", name: "삼성전자 그랑데 통버블 세탁기 16kg", model: "WA16CG6441BY", grade: 2, img: "https://t2c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34223277602881-1394d57e-fad8-44a8-8b24-5c5764c02859.jpg" },
+    { url: "https://link.coupang.com/a/iU5YsEB17A", name: "LG전자 트롬 통돌이 세탁기 10kg", model: "TR10MV4", grade: 2, img: "https://t5c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/02/19/13/1/6079285b-4b06-4cff-acaa-aad918ee16f1.jpg" },
+    { url: "https://link.coupang.com/a/iU5Zdzxg6K", name: "LG전자 통돌이 세탁기 13kg", model: "TR13WV4", grade: 1, img: "https://t3c.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/ad94/ca9d12c74bf20fc40f8d6f75931fbd8d2b74f71d64019902cd5f0dc45976.png" },
+    { url: "https://link.coupang.com/a/iU5ZW5MFO0", name: "삼성전자 그랑데 통버블 세탁기 21kg", model: "WA21A8376KV", grade: 1, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/5601/a51048364275dab3a471af9e1411f002a0ede5485d4c69f536f5c3f0cde0.jpg" },
+  ],
+  drum: [
+    { url: "https://link.coupang.com/a/iR89M1rR12", name: "삼성전자 그랑데 드럼 세탁기 19kg", model: "WF19T6000KW", grade: 1, img: "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224353028803-efa8e9b9-6984-46c4-b9e6-fbe8ca543fd3.jpg" },
+    { url: "https://link.coupang.com/a/iU50GLGBB6", name: "삼성전자 그랑데 드럼 세탁기 21kg", model: "WF21T6000KV", grade: 1, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224144432547-a7a2711e-79c3-4057-82c7-38799fe821e0.jpg" },
+    { url: "https://link.coupang.com/a/iU51sAUriC", name: "LG전자 트롬 드럼 세탁기 21kg", model: "F21VDSKR", grade: 1, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/03/05/10/6/be61f6ab-51e1-4ca8-b210-81d7f28958cb.jpg" },
+    { url: "https://link.coupang.com/a/iU52aSCkuG", name: "LG전자 트롬 오브제 세탁기 24kg", model: "FX24GNGR", grade: 1, img: "https://t2c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/03/05/10/1/a4c52b23-9552-49e3-af26-c75029f03e34.jpg" },
+  ],
+  rice: [
+    { url: "https://link.coupang.com/a/iR9bt66oFw", name: "쿠쿠 전기보온 에그밥솥 6인용", model: "CR-0675FW", grade: 1, img: "https://thumbnail15.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/dc57/ff0f92d0e66b5fe69d6f0cdce47d52ea6c9335fc264b7107041c0c87afd8.jpg" },
+    { url: "https://link.coupang.com/a/iU52UE83dQ", name: "쿠첸 더핏 슬림 압력밥솥 6인용", model: "CRS-FSWD0640W", grade: 1, img: "https://thumbnail8.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/936473410487268-493dc6d2-d694-41ce-9636-efec59a6e902.jpg" },
+    { url: "https://link.coupang.com/a/iU53FY2ZEG", name: "쿠첸 마이컴 미니 밥솥 3~4인용", model: "CJE-CD0302", grade: 1, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/42d3/91841793bc79314fee702fa5e4cc00806c0af402f31ba4ad3c388c96d8b8.jpg" },
+    { url: "https://link.coupang.com/a/iU54tjamPY", name: "쿠쿠 트윈프레셔 IH 압력밥솥 6인용", model: "CRP-LHTR0610FGWM", grade: 1, img: "https://thumbnail12.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/460029883558897-a7d02c36-f75a-483f-9cd4-9ad92eaaa69b.jpg" },
+  ],
+  vacuum: [
+    { url: "https://link.coupang.com/a/iSNq2aJijk", name: "LG전자 싸이킹3 싸이클론 진공청소기", model: "K83IGY", grade: 3, img: "https://t2c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/1759001647059995-195f6f24-69a9-44f2-be3d-286817c4c417.jpg" },
+    { url: "https://link.coupang.com/a/iU55c0jzm8", name: "LG전자 싸이킹 싸이클론 진공청소기", model: "C40WGY", grade: 3, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/1025_amir_coupang_oct_80k/38b9/678a565314463890435e9d02ed4ee24713b63a634099038b27c4ff946046.jpg" },
+    { url: "https://link.coupang.com/a/iU55XEiTu0", name: "삼성전자 파워모션 4100 진공청소기", model: "VC33M4151L4", grade: 3, img: "https://thumbnail1.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/8a0d/7e792c8433ab79e4d0efc1ecc21146abc6d65166030b86df61672fa9a38e.jpg" },
+  ],
+  purifier: [
+    { url: "https://link.coupang.com/a/iR9eahYhZQ", name: "위닉스 타워 엣지 공기청정기 43㎡", model: "AT8E430-MSK", grade: 1, img: "https://thumbnail1.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/167929895859531-595230e2-1ffb-4a32-b505-7a6886b4a2b9.png" },
+    { url: "https://link.coupang.com/a/iU56GRwtSm", name: "위닉스 타워 프라임 공기청정기 85.8㎡", model: "APRM833-JWK", grade: 1, img: "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/65932856053142-2c14b44d-28a6-4a97-85e6-aa4a4b83901c.jpg" },
+    { url: "https://link.coupang.com/a/iU57qFoEWO", name: "쿠쿠 인스퓨어 공기청정기 53.8㎡", model: "AC-17TV20FNG", grade: 1, img: "https://t4a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/182461866774816-efa08817-836b-4fe3-81af-ed9a716e7bce.png" },
+    { url: "https://link.coupang.com/a/iU58aAOlie", name: "위닉스 타워 프라임 플러스 공기청정기 122.1㎡", model: "ATTM115-MSK", grade: 1, img: "https://thumbnail14.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/597622118095245-c00e9d0c-abda-4041-8ad6-1990df05924c.png" },
+  ],
+  tv: [
+    { url: "https://link.coupang.com/a/iR81TzyTlY", name: "삼성전자 4K UHD Mini LED TV 55인치", model: "KU55MH70AFXKR", grade: 1, img: "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/xtj5pkrt/e37079c99ab24af2b9af990f2ba4d074.jpg" },
+    { url: "https://link.coupang.com/a/iU6ehgWgO4", name: "삼성전자 4K UHD Mini LED TV 43인치", model: "KU43MH70AFXKR", grade: 1, img: "https://thumbnail8.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/sxstve7j/ecdcec9e55ac440bb0d7889a51f4db1f.jpg" },
+    { url: "https://link.coupang.com/a/iU6e2axHK8", name: "삼성전자 4K UHD QLED TV 65인치", model: "KQ65QF6AAFXKR", grade: 1, img: "https://thumbnail1.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/f792/b42f274a81b4fdb3028bb80852fd2d6ee9d8893551051b1452e558598aeb.jpg" },
+  ],
+  dehumid: [
+    { url: "https://link.coupang.com/a/iR83vwodXg", name: "윈세이 1등급 제습기 24L", model: "W24L1A", grade: 1, img: "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/05/21/12/7/4d1d0b11-af36-4462-93f7-0d28cb2f45cf.jpg" },
+    { url: "https://link.coupang.com/a/iU58Wb1OE0", name: "삼성전자 인버터 제습기 18L", model: "AY70H18100GVD", grade: 1, img: "https://t1a.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/34224076169429-2fc0698c-5404-46fb-b07d-1418b522ba80.jpg" },
+    { url: "https://link.coupang.com/a/iU59F3tJxQ", name: "LG전자 휘센 오브제 제습기 20L", model: "DQ205PEGA", grade: 1, img: "https://thumbnail5.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/02/19/14/8/a64d8ace-ffce-45a9-9502-e0efcf7ac960.jpg" },
+    { url: "https://link.coupang.com/a/iU6apGf4Ue", name: "위닉스 뽀송 인버터 제습기 20L", model: "DXWE200-OEK", grade: 1, img: "https://thumbnail14.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/03/17/14/7/0ca17430-ac1b-4119-8785-a7317b2f9c78.jpg" },
+  ],
+  dryer: [
+    { url: "https://link.coupang.com/a/iSMZWpFWRE", name: "LG전자 트롬 건조기 20kg 릴리 화이트 (2026년 1등급 모델)", model: "RD20WNR", grade: 1, img: "https://thumbnail5.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/10/30/14/0/4d780dbd-112d-44a3-a917-889c639dd49c.jpg" },
+    { url: "https://link.coupang.com/a/iU6a9Pi7Q4", name: "LG전자 트롬 오브제 건조기 20kg 네이처 그린 (2026년 1등급 모델)", model: "RD20GNGR", grade: 1, img: "https://t3c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/10/30/14/1/705a9fa3-9700-421f-a6ef-fc501d1ac004.jpg" },
+    { url: "https://link.coupang.com/a/iU6bTR7aA8", name: "LG전자 트롬 AI 오브제 건조기 25kg (2026년 1등급 모델)", model: "RD25ISR", grade: 1, img: "https://t1c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/10/28/13/5/5c64ea3f-abe5-4dbb-ae12-56af475f2c56.jpg" },
+  ],
+  dishwasher: [
+    { url: "https://link.coupang.com/a/iR84plEv48", name: "LG전자 디오스 오브제컬렉션 빌트인 식기세척기 12인용", model: "DUE1BGLE", grade: 1, img: "https://thumbnail5.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/qfm6nvqm/a11d406ca6444659a8493064ccc61ceb.jpg" },
+    { url: "https://link.coupang.com/a/iU6cGDMTro", name: "LG전자 디오스 오브제 빌트인 식기세척기 14인용", model: "DUE6BGL3E", grade: 1, img: "https://t5c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/386904105938993-fa961fe1-b741-4f6c-8754-9019b707c5f6.jpg" },
+    { url: "https://link.coupang.com/a/iU6dvaSHSu", name: "쿠쿠 인테리어 식기세척기 6인용", model: "CDW-CS0620TWE", grade: 1, img: "https://thumbnail12.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/729132754975992-d3823654-60d5-4f7a-bd63-cc68f7e051ba.png" },
+  ],
 };
 const PICKED = "2026-11-22";
 const HAS_LINKS = Object.values(COUPANG).some((list) => list.some((p) => p && p.url));
@@ -85,7 +138,7 @@ const ITEM_TABLE = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>품�
 
 const ITEM_LABEL = Object.fromEntries([["fridge", "냉장고"], ["kimchi", "김치냉장고"], ["ac-wall", "에어컨 벽걸이"], ["ac-other", "에어컨 스탠드 등"], ["washer", "세탁기 일반"], ["drum", "세탁기 드럼"], ["rice", "전기밥솥"], ["vacuum", "진공청소기(유선)"], ["purifier", "공기청정기"], ["tv", "TV"], ["dehumid", "제습기"], ["dryer", "의류건조기"], ["dishwasher", "식기세척기"]]);
 const PICK_CARD = HAS_LINKS ? card("품목별로 많이 사는 대상 제품",
-  P(`쿠팡에서 리뷰가 많은 제품 가운데, 한국에너지공단 효율등급 사이트에서 모델명으로 조회해 <b>지금 기준으로 지원 대상 등급인 것</b>만 품목별로 하나씩 골랐습니다(${PICKED} 확인). 쿠팡에서 "1등급"으로 검색해도 2·3등급 제품이 섞여 나오니 다른 제품을 살 때도 모델명을 꼭 조회하세요.`)
+  P(`쿠팡에서 리뷰가 많은 제품 가운데, 한국에너지공단 효율등급 사이트에서 모델명으로 조회해 <b>지금 기준으로 지원 대상 등급인 것</b>만 품목별로 2~4개씩 골랐습니다(맨 위가 리뷰가 가장 많거나 값이 덜 드는 대표 제품)(${PICKED} 확인). 쿠팡에서 "1등급"으로 검색해도 2·3등급 제품이 섞여 나오니 다른 제품을 살 때도 모델명을 꼭 조회하세요.`)
   + `<div class="tbl-wrap"><table class="tbl kp-pick"><thead><tr><th>품목</th><th>제품 (쿠팡에서 보기)</th><th>등급</th></tr></thead><tbody>${Object.entries(COUPANG).flatMap(([id, list]) => list.filter((p) => p && p.url).map((p, i, a) => `<tr>${i === 0 ? `<td class="kp-c" rowspan="${a.length}">${ITEM_LABEL[id]}</td>` : ""}<td class="kp-p"><a class="kp-buy" href="${p.url}" target="_blank" rel="sponsored nofollow noopener">${p.img ? `<img class="kp-img" src="${p.img}" alt="" width="64" height="64" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ""}${p.name}</a><small class="kp-model">${p.model}</small></td><td class="kp-g">${p.grade}등급</td></tr>`)).join("")}</tbody></table></div>`
   + P("가격과 재고는 쿠팡에서 수시로 바뀝니다. 색상·용량 옵션을 바꾸면 모델명이 달라져 대상이 아닐 수 있으니, 주문 전 모델명을 다시 보고 받은 뒤에는 실물 라벨을 확인하세요. 대상 여부는 한전 검수로 정해집니다.")
   + `<p class="kp-disc">${DISCLOSURE}</p>`) : "";
