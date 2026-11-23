@@ -193,6 +193,48 @@ t("원 미만 버림과 경고", () => {
   assert.ok(S.calc({ rows: [] }).warn.includes("no-sales"));
 });
 
+// ── 3-1. 2026-07-01 일반과세자 → 간이과세자 전환 (법 제5조④1호, 제64조, 제66조①, 제69조①단서·③3호, 시행령 제112조⑤⑦) ──
+t("전환자: 과세기간 7~12월 6개월, 12개월 환산 판정, 예정부과 없음", () => {
+  assert.equal(S.months("switch"), 6);
+  // 음식점 7~12월 2,500만 → 환산 5,000만 ≥ 4,800만이라 면제 아님. 25,000,000 × 15% × 10% = 375,000 − 전자신고 5,000 = 370,000
+  const r = S.calc({ open: "switch", rows: [{ ind: "food", sales: 2500 * M }], prepaid: 100000 });
+  assert.equal(r.months, 6);
+  assert.equal(r.annual, 50000000);
+  assert.equal(r.exempt, false);
+  assert.equal(r.gross, 375000);
+  assert.equal(r.prepaid, 0); // 예정부과기간(1~6월)은 일반과세자 기간이라 7월 예정고지분이 없다
+  assert.equal(r.payable, 370000);
+  assert.ok(r.warn.includes("switch") && !r.warn.includes("annualized"));
+});
+t("전환자: 납부면제여도 재고납부세액은 낸다", () => {
+  // 소매 7~12월 2,000만 → 환산 4,000만 < 4,800만 면제. 재고납부세액 120,000 만 낸다
+  const r = S.calc({ open: "switch", rows: [{ ind: "retail", sales: 2000 * M }], stock: 120000 });
+  assert.equal(r.exempt, true);
+  assert.equal(r.stock, 120000);
+  assert.equal(r.payable, 120000);
+  assert.equal(S.calc({ open: "switch", rows: [{ ind: "retail", sales: 2000 * M }] }).payable, 0);
+});
+t("전환자: 면제가 아니면 공제 후 세액 + 재고납부세액, 공제는 재고납부세액을 줄이지 않음(보수적)", () => {
+  // 음식점 3,000만: 450,000 − 매입 1,000만×0.5% 50,000 − 카드 2,000만×1.3% 260,000 − 5,000 = 135,000, + 재고 50,000 = 185,000
+  const a = S.calc({ open: "switch", rows: [{ ind: "food", sales: 3000 * M }], card: 2000 * M, purchase: 1000 * M, stock: 50000 });
+  assert.equal(a.afterCredits, 135000);
+  assert.equal(a.payable, 185000);
+  // 소매 2,500만(환산 5,000만): 375,000 − 매입 100,000 − 카드 325,000 − 5,000 → 0 (넘는 55,000 소멸), 재고 70,000 은 그대로
+  const b = S.calc({ open: "switch", rows: [{ ind: "retail", sales: 2500 * M }], card: 2500 * M, purchase: 2000 * M, stock: 70000 });
+  assert.equal(b.afterCredits, 0);
+  assert.equal(b.lost, 55000);
+  assert.equal(b.payable, 70000);
+});
+t("전환자: 영수증 발급 여부는 2025년 매출로 판단, 재고납부세액은 전환자가 아니면 무시", () => {
+  assert.equal(S.calc({ open: "switch", rows: [{ ind: "service", sales: 3000 * M }] }).receiptOnly, true);
+  const p = S.calc({ open: "switch", prevOver: true, rows: [{ ind: "service", sales: 3000 * M }], einv: 10 });
+  assert.equal(p.receiptOnly, false);
+  assert.equal(p.cr.einv, 2000);
+  const n = S.calc({ rows: [{ ind: "food", sales: 6000 * M }], stock: 99999 });
+  assert.equal(n.stock, 0);
+  assert.equal(n.payable, 900000 - 5000);
+});
+
 // ── 4. 기한까지 남은 날 (한국 시간) ──
 t("신고 기한 D-day", () => {
   assert.equal(S.daysLeft(new Date("2026-11-22T03:00:00Z")), 64);
@@ -213,6 +255,7 @@ t("페이지: 고지 문구·구조화 데이터·사이트맵·홈 연결, 제�
   assert.ok(h.includes('"@type":"WebApplication"') && h.includes('"@type":"FAQPage"') && h.includes('"@type":"BreadcrumbList"'), "JSON-LD");
   assert.ok(h.includes("/assets/simple-vat.js?v=") && h.includes("/assets/simple-vat-ui.js?v="), "엔진·화면 스크립트");
   for (const bad of ["coupang", "link.coupang", "rel=\"sponsored", "신고해 드립니다", "대신 신고", "절세 전략", "세무 상담을 제공"]) assert.ok(!h.includes(bad), "금지: " + bad);
+  assert.ok(h.includes('value="switch"') && h.includes('id="sv-stock"') && h.includes("2026년 7월에 간이과세자로 바뀌었다면?"), "7월 전환자 선택지·재고납부세액 칸·설명 카드");
   assert.ok(readFileSync("docs/sitemap.xml", "utf8").includes("https://nalsem.suik.me/simple-vat/"), "사이트맵");
   assert.ok(readFileSync("docs/llms.txt", "utf8").includes("https://nalsem.suik.me/simple-vat/"), "llms.txt");
   const home = readFileSync("docs/index.html", "utf8");

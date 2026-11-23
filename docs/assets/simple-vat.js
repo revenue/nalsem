@@ -6,6 +6,9 @@
      제47조·제63조④(전자세금계산서 발급세액공제, 연 100만 원), 제61조(간이과세 적용 범위, 신규는 12개월 환산),
      제62조(적용기간), 제63조(납부세액 = 공급대가 × 부가가치율 × 10%, 매입 공급대가 0.5% 공제, 공제 합계가 세액을 넘으면 넘는 부분 없음),
      제66조(예정부과), 제67조(과세기간 끝난 뒤 25일 이내 확정신고, 이미 낸 세액 공제), 제69조(공급대가 4,800만 원 미만 납부의무 면제, 신규는 12개월 환산·1개월 미만 끝수는 1개월)
+   - 2026-07-01 일반과세자 → 간이과세자 전환자(2026-11-24 같은 조문 대조): 과세기간 7.1~12.31(법 제5조④1호), 그 기간 공급대가를 12개월로 환산해 면제 판정(제69조③3호),
+     예정부과기간(1~6월)은 일반과세 기간이라 예정부과 없음(제66조①), 재고납부세액(제64조)은 세무서가 전환일부터 90일 안에 통지하고(시행령 제112조⑤)
+     확정신고 때 더해 내며(같은 조 ⑦) 납부면제여도 낸다(제69조① 단서). 공제가 재고납부세액까지 줄이는지는 확인 못 해 업종별 세액까지만 뺀다(보수적)
    - 부가가치세법 시행령 [시행 2026.2.27] 제109조①(1억 400만 원), 제111조②(업종별 부가가치율 표), 제89조②(전자세금계산서 건당 200원)
    - 조세특례제한법 제104조의8②, 같은 법 시행령 [시행 2026.9.18] 제104조의5④(부가세 전자신고세액공제 5천 원, 2026.2.27 개정)
    국세청 「사례로 배우는 부가가치세 전자신고 방법」 간이 음식점업·소매업(2024.1) 사례를 test/simple-vat.test.mjs 가 원 단위까지 재현한다.
@@ -48,8 +51,10 @@
 
   // 2026년 영업 개월 수. open: "before"(2025년 이전 개업) 또는 2026년 개업 월(1~12).
   // 법 제69조③: 개업일부터 12월 31일까지를 12개월로 환산하고 1개월 미만 끝수는 1개월. 그래서 m월 중 어느 날 개업해도 13 − m 개월.
+  // "switch": 2026-07-01 일반과세자 → 간이과세자 전환자. 간이 과세기간이 7~12월 6개월이다(법 제5조④1호, 제69조③3호).
   function months(open) {
     if (open === "before" || open == null || open === "") return 12;
+    if (open === "switch") return 6;
     const m = Number(open);
     if (!(m >= 1 && m <= 12) || fl(m) !== m) return null;
     return 13 - m;
@@ -57,9 +62,10 @@
 
   // 계산. rows: [{ ind, sales }] 업종별 2026년 공급대가(부가세 포함 매출), purchase: 세금계산서·카드·현금영수증으로 받은 매입 공급대가,
   // card: 매출 중 신용카드·현금영수증·간편결제 등으로 받은 금액, einv: 전자세금계산서 발급 건수, prepaid: 7월에 이미 낸 예정부과·예정신고 세액,
-  // prevOver: (2025년 이전 개업자) 2025년 공급대가가 4,800만 원 이상이었는지, efile: 직접 전자신고 여부, opts.efileAmount: 전자신고세액공제 금액(과거 사례 재현용)
-  function calc({ rows = [], open = "before", prevOver = false, purchase = 0, card = 0, einv = 0, prepaid = 0, efile = true } = {}, opts = {}) {
+  // prevOver: (2025년 이전 개업자·전환자) 2025년 공급대가가 4,800만 원 이상이었는지, stock: (전환자만) 세무서가 통지한 재고납부세액, efile: 직접 전자신고 여부, opts.efileAmount: 전자신고세액공제 금액(과거 사례 재현용)
+  function calc({ rows = [], open = "before", prevOver = false, purchase = 0, card = 0, einv = 0, prepaid = 0, stock = 0, efile = true } = {}, opts = {}) {
     const mo = months(open);
+    const sw = open === "switch";
     if (mo == null) return { error: "open" };
     const lines = [];
     for (const r of rows) {
@@ -78,7 +84,8 @@
     // 영수증만 발급하는 간이과세자(법 제36조①2호): 2026년 개업(첫 과세기간) 또는 2025년 공급대가 4,800만 원 미만.
     // 이들은 카드 발행세액공제를 업종과 관계없이 받고(법 제46조①1호나), 전자세금계산서 발급세액공제는 받지 않는다(법 제63조④).
     // 그 밖의 간이과세자는 주로 소비자 대상 업종(시행령 제88조②→제73조①: 소매·음식·숙박·미용·여객운송 등)만 카드 공제를 받는다(법 제46조①1호가).
-    const receiptOnly = mo < 12 || open !== "before" || !prevOver;
+    // 전환자는 2025년에 이미 사업을 했으므로 기존 사업자와 같이 2025년 공급대가로 본다.
+    const receiptOnly = (open !== "before" && !sw) || !prevOver;
     const cardOk = receiptOnly || lines.every((x) => CARD_B2C.includes(x.ind) || CARD_CHECK.includes(x.ind));
     const cardIn = won(card), purchaseIn = won(purchase);
     const cr = {
@@ -93,22 +100,24 @@
     // 공제 합계가 세액을 넘으면 넘는 부분은 없는 것으로 본다(법 제63조⑥, 제46조②, 조특법 제104조의8②). 간이과세자는 환급이 없다.
     const afterCredits = Math.max(0, gross - credits);
     const lost = Math.max(0, credits - gross);
-    const pre = won(prepaid);
-    const payable = exempt ? 0 : Math.max(0, afterCredits - pre);
+    const pre = sw ? 0 : won(prepaid);
+    const stk = sw ? won(stock) : 0;
+    const payable = (exempt ? 0 : Math.max(0, afterCredits - pre)) + stk;
     const prepaidOver = exempt ? pre : Math.max(0, pre - afterCredits);
 
     const warn = [];
     if (cardIn > sales) warn.push("card-over-sales");
     if (sales === 0) warn.push("no-sales");
     if (lines.some((x) => ["mfg", "build", "rent", "pro"].includes(x.ind))) warn.push("excluded-industry");
-    if (mo < 12) warn.push("annualized");
+    if (sw) warn.push("switch");
+    else if (mo < 12) warn.push("annualized");
     if (overSimple) warn.push("over-simple");
     if (!cardOk && cardIn > 0) warn.push("card-not-eligible");
     if (!receiptOnly && cardOk && cardIn > 0 && lines.some((x) => CARD_CHECK.includes(x.ind))) warn.push("card-check");
     if (receiptOnly && won(einv) > 0) warn.push("einv-not-eligible");
     if (!overSimple && sales * 12 >= EXEMPT * mo) warn.push(lines.some((x) => x.ind === "rent") ? "rent-over" : "invoice-next");
 
-    return { months: mo, receiptOnly, cardOk, lines, sales, annual, exempt, overSimple, gross, credits, cr, afterCredits, lost, prepaid: pre, payable, prepaidOver, warn };
+    return { months: mo, switched: sw, stock: stk, receiptOnly, cardOk, lines, sales, annual, exempt, overSimple, gross, credits, cr, afterCredits, lost, prepaid: pre, payable, prepaidOver, warn };
   }
 
   // 신고 기한까지 남은 날 (한국 시간 기준, 오늘 포함하지 않음)
