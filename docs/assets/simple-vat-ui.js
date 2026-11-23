@@ -44,6 +44,7 @@
       einv: Math.floor(num($("sv-einv"))),
       efile: $("sv-efile").checked,
       prevOver: $("sv-prev").checked,
+      stock: Math.floor(num($("sv-stock"))),
     };
   }
 
@@ -52,12 +53,14 @@
   function render(h, r) {
     const days = S.daysLeft(new Date());
     const due = days >= 0 ? `신고 기한 2027년 1월 25일(월)${days > 0 ? `, ${days}일 남음` : ", 오늘까지"}` : "2027년 1월 25일 기한이 지났습니다. 기한 후 신고는 홈택스에서 확인하세요";
-    const hero = r.exempt
+    const hero = r.exempt && r.stock
+      ? `<div class="result-hero"><div class="k">2026년분 1월 부가세: 납부면제, 재고납부세액만 냄</div><div class="v">약 ${W(r.payable)}<small>신고하고 재고납부세액 납부</small></div></div>`
+      : r.exempt
       ? `<div class="result-hero"><div class="k">2026년분 1월 부가세: 납부면제</div><div class="v accent">0원<small>신고는 해야 합니다</small></div></div>`
       : `<div class="result-hero"><div class="k">2026년분 1월 부가세 예상 납부세액</div><div class="v ${r.payable ? "" : "accent"}">${r.payable ? "약 " + W(r.payable) : "0원"}<small>${r.payable ? "신고하고 납부" : "공제로 0원, 신고는 해야 합니다"}</small></div></div>`;
     const stats = `<div class="stats cols-3 sv-stats">
-      <div class="stat"><div class="k">2026년 매출 (부가세 포함)</div><div class="v">${MAN(r.sales)}</div></div>
-      <div class="stat"><div class="k">${r.months < 12 ? `12개월 환산 (${r.months}개월 영업)` : "면제 판정 매출"}</div><div class="v">${MAN(r.annual)}</div></div>
+      <div class="stat"><div class="k">${r.switched ? "2026년 7~12월 매출" : "2026년 매출"} (부가세 포함)</div><div class="v">${MAN(r.sales)}</div></div>
+      <div class="stat"><div class="k">${r.switched ? "12개월 환산 (7~12월 6개월)" : r.months < 12 ? `12개월 환산 (${r.months}개월 영업)` : "면제 판정 매출"}</div><div class="v">${MAN(r.annual)}</div></div>
       <div class="stat"><div class="k">납부면제 기준</div><div class="v">${r.exempt ? "미만" : "이상"}<small>4,800만 원</small></div></div>
     </div>`;
 
@@ -72,13 +75,19 @@
     if (r.lost) steps.push(line("공제 중 세금을 넘는 부분", "간이과세자는 돌려받지 못합니다", "0원 처리"));
     steps.push(line("공제 후 세액", "", W(r.afterCredits)));
     if (r.prepaid && !r.exempt) steps.push(line("7월에 이미 낸 세액", "", "−" + W(Math.min(r.prepaid, r.afterCredits))));
-    if (r.exempt) steps.push(line("납부면제 적용", `${r.months < 12 ? "12개월 환산 매출" : "매출"} ${W(r.annual)} < 48,000,000원`, "0원"));
+    if (r.exempt && r.switched) steps.push(line("납부면제 적용", `12개월 환산 매출 ${W(r.annual)} < 48,000,000원`, "0원"));
+    else if (r.exempt) steps.push(line("납부면제 적용", `${r.months < 12 ? "12개월 환산 매출" : "매출"} ${W(r.annual)} < 48,000,000원`, "0원"));
+    if (r.stock) steps.push(line("재고납부세액", r.exempt ? "세무서 통지 금액, 납부면제여도 냅니다" : "세무서 통지 금액", "+" + W(r.stock)));
     steps.push(line("1월에 낼 세금", "", `<b>${W(r.payable)}</b>`));
     const calcHtml = `<h3 class="tx-h">계산 과정</h3><div class="kv">${steps.join("")}</div>`;
 
     const warn = [due + "."];
     warn.push(r.exempt ? "납부면제여도 신고서는 내야 합니다. 홈택스 신고 화면에서 매출을 넣으면 면제가 반영되는지 확인하세요." : "카드 매출과 매입은 홈택스에서 불러온 금액이 기준입니다. 넣은 금액과 다르면 세액도 달라집니다.");
     if (r.warn.includes("annualized")) warn.push(`2026년 ${13 - r.months}월 개업으로 보고 ${r.months}개월 매출 ${MAN(r.sales)}을 12개월 ${MAN(r.annual)}으로 환산해 판정했습니다. 세금 자체는 실제 매출로 계산합니다.`);
+    if (r.warn.includes("switch")) {
+      warn.push(`2026년 7월 1일 간이과세 전환자로 보고 7~12월 매출 ${MAN(r.sales)}을 12개월 ${MAN(r.annual)}으로 환산해 판정했습니다(부가가치세법 제69조③). 1~6월 매출은 넣지 않습니다.`);
+      warn.push(r.stock ? "재고납부세액은 세무서 통지 금액 그대로 더했습니다. 카드·매입 공제가 재고납부세액까지 줄이는지는 확인하지 못해 업종별 세액에서만 뺐습니다. 홈택스 신고서의 금액을 기준으로 하세요." : "일반과세자 때 매입세액을 공제받은 재고·설비가 있었다면 세무서가 재고납부세액을 통지합니다(시행령 제112조). 통지를 받았다면 금액을 넣으세요. 납부면제여도 냅니다.");
+    }
     if (r.warn.includes("card-over-sales")) warn.push("카드·현금영수증 매출이 전체 매출보다 큽니다. 매출에는 카드 매출까지 모두 넣어야 합니다.");
     if (r.warn.includes("over-simple")) warn.push("12개월 기준 매출이 1억 400만 원 이상이라 2027년 7월 1일부터 일반과세자로 바뀝니다(관할 세무서 통지). 일반과세자는 1월·7월 두 번 신고합니다.");
     if (r.warn.includes("invoice-next")) warn.push("2026년 매출(신규는 12개월 환산)이 4,800만 원 이상이라 2027년 7월 1일부터 영수증 대신 세금계산서를 발급하는 간이과세자가 됩니다.");
@@ -87,7 +96,7 @@
     if (r.warn.includes("card-check")) warn.push("2025년 매출이 4,800만 원 이상이면 카드 매출 공제는 주로 소비자를 상대하는 업종만 받습니다. 사업자에게 주로 파는 업종이면 공제가 빠질 수 있습니다.");
     if (r.warn.includes("einv-not-eligible")) warn.push("2026년에 개업했거나 2025년 매출이 4,800만 원 미만이면 영수증 발급 간이과세자라 전자세금계산서 발급 공제를 받지 않습니다.");
     if (r.warn.includes("excluded-industry")) warn.push("고른 업종은 업종·규모에 따라 간이과세를 받을 수 없는 경우가 있습니다. 사업자등록증의 과세유형이 '간이과세자'인지 확인하세요.");
-    if (r.prepaidOver && r.exempt) warn.push(`납부면제라 7월에 낸 ${W(r.prepaidOver)}은 돌려받습니다(부가가치세법 제69조④). 홈택스 신고서에서 확인하세요.`);
+    if (r.prepaidOver && r.exempt && !r.switched) warn.push(`납부면제라 7월에 낸 ${W(r.prepaidOver)}은 돌려받습니다(부가가치세법 제69조④). 홈택스 신고서에서 확인하세요.`);
     else if (r.prepaidOver) warn.push(`이미 낸 ${W(r.prepaidOver)}이 이번 세액보다 많습니다. 돌려받는지는 홈택스 신고서의 '차감 납부할 세액'에서 확인하세요(이 계산기에서 확인하지 못한 부분입니다).`);
     const warnHtml = `<div class="tx-warn" role="note"><h3>확인할 것</h3><ul>${warn.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
 
@@ -120,6 +129,9 @@
     render(h, r);
     N.bump(out);
   }
+  const stockWrap = $("sv-stock-wrap");
+  const syncOpen = () => { if (stockWrap) stockWrap.hidden = $("sv-open").value !== "switch"; };
+  $("sv-open").addEventListener("change", syncOpen);
   form.addEventListener("input", schedule);
   form.addEventListener("change", schedule);
   form.addEventListener("submit", (e) => { e.preventDefault(); run(); out.scrollIntoView({ behavior: "smooth", block: "start" }); });
@@ -136,6 +148,7 @@
     box.innerHTML = "";
     x.rows.forEach((r) => addRow(r));
     $("sv-open").value = x.open; $("sv-card").value = x.card; $("sv-buy").value = x.buy;
+    syncOpen();
     run();
   });
   addRow();
