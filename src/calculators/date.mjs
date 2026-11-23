@@ -14,7 +14,7 @@ export const date = [
     slug: "d-day", cat: "date", title: "디데이 계산기", short: "오늘부터 그날까지 며칠",
     lede: "날짜를 넣으면 오늘부터 남은 날(D-) 또는 지난 날(D+)을 계산합니다. 결과 링크를 북마크하면 언제든 바로 확인할 수 있습니다.",
     description: "디데이 계산기. 목표 날짜까지 남은 일수(D-day)와 지난 일수를 주·개월 단위로 함께 계산하고 링크로 저장하세요.",
-    keys: ["디데이", "dday", "d-day", "남은날"], related: ["date-diff", "anniversary", "suneung"],
+    keys: ["디데이", "dday", "d-day", "남은날"], related: ["date-diff", "anniversary", "suneung", "wedding-meal"],
     form: `<form id="f" autocomplete="off">${ymd("t", "목표 날짜")}<div class="field"><label for="memo">이름 (선택)</label><input id="memo" type="text" maxlength="30" placeholder="예: 결혼식" autocomplete="off"></div>${btns()}</form>`,
     info: card("D-day 세는 법", P("D-day는 목표일 당일이 D-0(D-day)이고 하루 전이 D-1입니다. 목표일이 지나면 D+1, D+2로 셉니다.") + P("'100일'처럼 당일을 1일로 세는 기념일 계산은 <a href=\"/anniversary/\" style=\"text-decoration:underline\">기념일 계산기</a>를 쓰세요.")),
     script: pre + `const f=$("t"),get=N.ymdInputs(f),memo=$("memo");
@@ -74,7 +74,7 @@ out.innerHTML=\`<div class="result-hero"><div class="k">오늘 \${N.fmt(T)}</div
     slug: "anniversary", cat: "date", title: "기념일 계산기", short: "100일·200일·1주년이 언제인지",
     lede: "시작일을 넣으면 100일, 200일, 300일, 500일, 1000일과 1주년, 2주년 날짜를 한 번에 계산합니다. 사귄 날, 결혼기념일, 개업일에 쓰세요.",
     description: "기념일 계산기. 사귄 날·결혼일·개업일을 넣으면 100일, 200일, 1000일, N주년 날짜와 남은 날을 한 번에 확인하세요.",
-    keys: ["기념일", "100일", "1000일", "커플", "결혼기념일", "주년"], related: ["d-day", "baby-100", "date-add"],
+    keys: ["기념일", "100일", "1000일", "커플", "결혼기념일", "주년"], related: ["d-day", "baby-100", "date-add", "wedding-meal"],
     form: `<form id="f" autocomplete="off">${ymd("s", "시작일", "첫날을 1일로 셉니다")}<div class="field"><label>첫날 세기</label><div class="seg" id="mode"><button type="button" data-v="1" aria-pressed="true">첫날 = 1일</button><button type="button" data-v="0" aria-pressed="false">첫날 = 0일</button></div></div>${btns()}</form>`,
     info: card("첫날을 어떻게 셀까", P("우리나라에서는 사귄 날을 1일로 세는 것이 일반적입니다. 이 기준으로 100일은 시작일에서 99일 뒤입니다.") + P("'첫날 = 0일'로 바꾸면 시작일에서 100일 뒤가 100일이 됩니다.")),
     script: pre + `const f=$("s"),get=N.ymdInputs(f);let inc=1;const seg=$("mode");seg.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));inc=+b.dataset.v;run();});
@@ -135,7 +135,7 @@ inp.addEventListener("input",run);if(N.qs("y"))inp.value=N.qs("y");run();`,
     slug: "son-eomneun-nal", cat: "date", title: "손없는 날", short: "이사·개업하기 좋은 날 달력",
     lede: "음력 끝자리가 9·0인 날, 이른바 손없는 날을 달마다 보여줍니다. 이사, 개업, 혼례 날짜를 잡을 때 참고하는 민속 달력입니다.",
     description: "손없는 날 달력. 이사·개업·혼례 날짜로 찾는 손없는 날(음력 9·10·19·20·29·30일)을 월별로 요일과 함께 확인하세요.",
-    keys: ["손없는날", "이사날짜", "이사하기좋은날", "개업"], related: ["today-lunar", "holidays", "lunar-to-solar"],
+    keys: ["손없는날", "이사날짜", "이사하기좋은날", "개업"], related: ["today-lunar", "holidays", "lunar-to-solar", "wedding-split"],
     form: `<form id="f" autocomplete="off"><div class="field"><label for="ym">달 선택</label><div class="ymd" style="grid-template-columns:1fr 1fr"><div class="unit" data-unit="년"><input id="ym-y" type="text" inputmode="numeric" maxlength="4" autocomplete="off"></div><div class="unit" data-unit="월"><input id="ym-m" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="월"></div></div></div></form>`,
     info: card("손없는 날이란", P("'손(損)'은 날짜에 따라 방위를 옮겨 다니며 사람 일을 방해한다는 귀신을 뜻합니다. 음력 1·2일은 동쪽, 3·4일은 남쪽, 5·6일은 서쪽, 7·8일은 북쪽에 있고, 9·10일에는 하늘로 올라가 아무 방위에도 없다고 하여 이날을 손없는 날이라 합니다.") + P("과학적 근거는 없지만 이사 비용이 몰리는 날이므로 일정과 비용을 함께 고려하세요.")),
     script: pre + `const yi=$("ym-y"),mi=$("ym-m");yi.value=TY;mi.value=N.M(T);

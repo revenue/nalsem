@@ -390,3 +390,43 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .kp-buys { display: grid; gap: 6px; margin-top: 6px; }
 .kp-buys .kp-buy { margin-top: 0; }
 .kp-buys-h { font-size: 12px; color: var(--faint); font-weight: 500; }
+/* 급여·인건비: 2027 알바 인건비 계산기 */
+#result .kv .ap-sum .k, #result .kv .ap-sum .v { color: var(--text); font-weight: 700; }
+#result .kv > div { min-width: 0; }
+#result .kv .k { min-width: 0; overflow-wrap: anywhere; }
+#result .kv .v { white-space: nowrap; }
+.ap-funnel { padding: 14px 16px; border-radius: 18px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--ring); font-size: 15px; font-weight: 600; line-height: 1.6; word-break: keep-all; }
+.ap-funnel a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.ap-promo { scroll-margin-top: 96px; }
+.ap-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .ap-stats.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 439px) { .ap-stats { grid-template-columns: minmax(0, 1fr); } }
+.ap-stats .stat .v { overflow-wrap: anywhere; }
+
+/* 간이과세자 부가세 계산기 */
+.sv-row [data-remove][hidden] { display: none; }
+.tool ol.tx-ul { padding-left: 20px; }
+.result ol.tx-ul li, .result .tx-fold .tx-ul li { font-size: 14px; line-height: 1.7; }
+.sv-stats .stat .v { white-space: nowrap; }
+@media (max-width: 639px) { .sv-stats .stat .v { font-size: 20px; } }
+
+/* 결혼 준비: 식대·축의금, 양가 분담 */
+.wd-groups { display: grid; gap: 10px; }
+.wd-g { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr); gap: 8px; align-items: center; }
+.wd-c, .wd-g .ymd { min-width: 0; }
+.wd-g input { min-width: 0; }
+.wd-head { font-size: 13px; color: var(--muted); font-weight: 600; }
+.wd-c::before { content: attr(data-l); display: none; font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 4px 4px; }
+@media (max-width: 559px) {
+  .wd-g { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 12px; border-radius: 16px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--ring); }
+  .wd-g > :first-child, .wd-g > :last-child { grid-column: 1 / -1; }
+  .wd-c::before { display: block; }
+  .wd-head { display: none; }
+}
+.ws-row [data-remove][hidden], .ws-ratio[hidden] { display: none; }
+.wd-neg { color: #d64545; }
+.wd-tbl td { white-space: normal; word-break: keep-all; }
+.wd-tbl td.num { white-space: nowrap; }
+.stats.wd-stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.wd-stats .stat .v { white-space: nowrap; font-size: clamp(18px, 4.6vw, 24px); }
+.wd-stats .stat .v small { display: block; white-space: normal; }

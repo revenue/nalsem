@@ -30,7 +30,7 @@ for (const c of all) {
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "홈", item: SITE.url + "/" }, { "@type": "ListItem", position: 2, name: CATS[c.cat].name, item: `${SITE.url}/#${c.cat}` }, { "@type": "ListItem", position: 3, name: c.title, item: `${SITE.url}/${c.slug}/` }] },
   ];
   if (faq.length) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
-  writeFileSync(join(dir, "index.html"), shell({ title: c.title, description: c.description, path: `/${c.slug}/`, nav: c.cat, body: calcPage(c, all), script: indexScript + (c.script || ""), keywords: c.keys || [], jsonld: ld, assets: c.assets || [] }));
+  writeFileSync(join(dir, "index.html"), shell({ title: c.title, description: c.description, path: `/${c.slug}/`, nav: c.cat, body: calcPage(c, all), script: indexScript + (c.script || ""), keywords: c.keys || [], jsonld: ld, assets: c.assets || [], modules: c.modules || [] }));
 }
 
 // 정보 페이지
