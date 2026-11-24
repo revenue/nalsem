@@ -14,7 +14,7 @@ export const date = [
     slug: "d-day", cat: "date", title: "디데이 계산기", short: "오늘부터 그날까지 며칠",
     lede: "날짜를 넣으면 오늘부터 남은 날(D-) 또는 지난 날(D+)을 계산합니다. 결과 링크를 북마크하면 언제든 바로 확인할 수 있습니다.",
     description: "디데이 계산기. 목표 날짜까지 남은 일수(D-day)와 지난 일수를 주·개월 단위로 함께 계산하고 링크로 저장하세요.",
-    keys: ["디데이", "dday", "d-day", "남은날"], related: ["date-diff", "anniversary", "suneung", "wedding-meal"],
+    keys: ["디데이", "dday", "d-day", "남은날"], related: ["date-diff", "anniversary", "suneung", "wedding-payment"],
     form: `<form id="f" autocomplete="off">${ymd("t", "목표 날짜")}<div class="field"><label for="memo">이름 (선택)</label><input id="memo" type="text" maxlength="30" placeholder="예: 결혼식" autocomplete="off"></div>${btns()}</form>`,
     info: card("D-day 세는 법", P("D-day는 목표일 당일이 D-0(D-day)이고 하루 전이 D-1입니다. 목표일이 지나면 D+1, D+2로 셉니다.") + P("'100일'처럼 당일을 1일로 세는 기념일 계산은 <a href=\"/anniversary/\" style=\"text-decoration:underline\">기념일 계산기</a>를 쓰세요.")),
     script: pre + `const f=$("t"),get=N.ymdInputs(f),memo=$("memo");

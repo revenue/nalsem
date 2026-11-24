@@ -1,8 +1,8 @@
-// 날셈 결혼 준비 계산기 2개: 화면 입력 → 결혼 시트 엔진(wedding-engine.js) 입력 변환과 결과 정리.
+// 날셈 결혼 준비 계산기 3개(식대·축의금, 양가 분담, 결제 일정): 화면 입력 → 결혼 시트 엔진(wedding-engine.js) 입력 변환과 결과 정리.
 // 계산 규칙은 엔진에만 있다(본부 저장소 ventures/wedding-sheet/template/engine.mjs 를 그대로 복사, 엑셀 수식과 53개 상황 대조).
 // 이 파일은 간단한 화면 입력을 엔진 입력으로 바꾸고 결과를 묶기만 한다.
 // 브라우저(wedding-ui.js)와 Node 테스트(test/wedding.test.mjs)가 같이 쓴다. 입력값은 어디로도 보내지 않는다.
-import { guests, compute, excelSerial, METHODS } from "./wedding-engine.js";
+import { guests, compute, excelSerial, serialToIso, METHODS } from "./wedding-engine.js";
 
 export { METHODS };
 export const SHEET = { href: "https://suikster0.gumroad.com/l/szoblx", price: "9,900원", name: "2027 결혼 준비 결제 일정·양가 분담 엑셀" };
@@ -90,4 +90,78 @@ export function splitCalc(h) {
   });
   const usesGuests = rows.some((r) => r.method === "하객 비율");
   return { lines, split: R.split, guestShare: R.guests.share, usesGuests, noGuests: usesGuests && !(n(h.guestsGroom) + n(h.guestsBride)) };
+}
+
+// ── 결제 일정 (계약금·중도금·잔금) ─────────────────────────
+// 시트 예시판 결제일정 탭과 같은 항목. 식대 줄은 하객·식대 탭 대신 금액(16,896,000원)을 바로 넣었다.
+// 기준일 2026-11-23이면 시트 예시판 요약 탭과 같은 값이 나온다(D-173, 계약 총액 39,236,000, 낸 돈 1,800,000, 다음 결제 12-01 D-8).
+export const PAY_BASE = "2026-11-23";
+const P = (amount, date, paid = false) => ({ amount, date, paid });
+export const PAY_EXAMPLE = {
+  today: PAY_BASE, wedding: "2027-05-15", budget: 42000000,
+  rows: [
+    { name: "식대 (보증 200명 기준)", total: 16896000, dep: P(null, ""), mid: P(null, ""), bal: { date: "", paid: false } },
+    { name: "예식장 대관료·연출", total: 3500000, dep: P(1000000, "2026-10-10", true), mid: P(null, ""), bal: { date: "", paid: false } },
+    { name: "스드메 패키지", total: 2940000, dep: P(300000, "2026-11-05", true), mid: P(1300000, "2027-02-20"), bal: { date: "2027-05-01", paid: false } },
+    { name: "본식 스냅·영상", total: 1800000, dep: P(500000, "2026-11-20", true), mid: P(null, ""), bal: { date: "2027-05-08", paid: false } },
+    { name: "예물(반지·시계)", total: 4000000, dep: P(1000000, "2026-12-05"), mid: P(null, ""), bal: { date: "2027-03-20", paid: false } },
+    { name: "예단", total: 2000000, dep: P(null, ""), mid: P(null, ""), bal: { date: "2027-02-14", paid: false } },
+    { name: "신혼여행 (항공·숙소)", total: 6000000, dep: P(1000000, "2026-12-01"), mid: P(null, ""), bal: { date: "2027-04-15", paid: false } },
+    { name: "청첩장·답례품", total: 600000, dep: P(null, ""), mid: P(null, ""), bal: { date: "2027-03-10", paid: false } },
+    { name: "혼주 한복 대여", total: 800000, dep: P(null, ""), mid: P(null, ""), bal: { date: "2027-05-10", paid: false } },
+    { name: "사회·축가·헬퍼", total: 700000, dep: P(null, ""), mid: P(null, ""), bal: { date: "", paid: false } },
+  ],
+};
+
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
+const ser = (iso) => (typeof iso === "string" && ISO.test(iso) ? excelSerial(iso) : null);
+
+// "예시로 채우기": 오늘이 기준일과 같은 위치가 되도록 모든 날짜를 같은 날수만큼 옮긴다(D-day와 상태가 예시 카드와 같게 나온다).
+export function payExampleFor(todayIso) {
+  const t = ser(todayIso);
+  const shift = t === null ? 0 : t - excelSerial(PAY_BASE);
+  const mv = (iso) => (ser(iso) === null ? "" : serialToIso(ser(iso) + shift));
+  return {
+    today: t === null ? PAY_BASE : todayIso, wedding: mv(PAY_EXAMPLE.wedding), budget: PAY_EXAMPLE.budget,
+    rows: PAY_EXAMPLE.rows.map((r) => ({ name: r.name, total: r.total, dep: { ...r.dep, date: mv(r.dep.date) }, mid: { ...r.mid, date: mv(r.mid.date) }, bal: { ...r.bal, date: mv(r.bal.date) } })),
+  };
+}
+
+/**
+ * h = { today: 'YYYY-MM-DD', wedding: 'YYYY-MM-DD' | '', budget,
+ *       rows:[{ name, total, dep:{amount, date, paid}, mid:{amount, date, paid}, bal:{date ('' = 예식일), paid} }] }
+ * 잔금 = 총액 − 계약금 − 중도금 (엔진). 돌려주는 것: 요약(D-day·계약 총액·낸 돈·남은 돈·연체·이번 달), 다음 결제 5건, 항목별 상태, 달마다 낼 돈.
+ */
+export function payCalc(h) {
+  const today = ser(h.today);
+  if (today === null) return { error: "기준일을 확인해 주세요." };
+  const rows = (h.rows || []).filter((r) => n(r.total) > 0).slice(0, MAX_ROWS);
+  if (!rows.length) return { error: "항목과 총액을 한 줄 이상 넣어 주세요." };
+  const part = (p) => ({ amount: n(p?.amount), date: ser(p?.date), paid: p?.paid ? "O" : null });
+  const items = [{}].concat(rows.map((r) => ({
+    name: r.name || "", total: n(r.total), method: "반반",
+    dep: part(r.dep), mid: part(r.mid), bal: { date: ser(r.bal?.date), paid: r.bal?.paid ? "O" : null },
+  })));
+  const wedding = ser(h.wedding);
+  const R = compute({ settings: { today, weddingDate: wedding, budget: n(h.budget) || null, defaultRatio: 0.5 }, guests: { groups: [] }, items });
+  const D = R.dashboard;
+  const iso = (s) => (s === "" || s === null ? "" : serialToIso(s));
+  const lines = rows.map((r, i) => {
+    const x = R.items[i + 1];
+    return { name: r.name || `항목 ${i + 1}`, total: x.total, paid: x.paid, unpaid: x.unpaid, balAmount: x.balAmount, next: iso(x.next), nextAmount: x.nextAmount, dday: x.dday, status: x.status };
+  });
+  const M = R.monthly;
+  const months = M.months.map((m) => ({ month: serialToIso(m.month).slice(0, 7), total: m.total, unpaid: m.unpaid })).map((m, k) => ({ ...m, cumulative: M.cumulative[k] }));
+  const lastUsed = months.reduce((a, m, k) => (m.total !== 0 ? k : a), -1);
+  return {
+    today: h.today, wedding: iso(wedding), weddingDday: D.weddingDday,
+    contractTotal: D.contractTotal, paid: D.paid, unpaid: D.unpaid,
+    budget: D.budget, budgetLeft: D.budgetLeft,
+    overdueAmount: D.overdueAmount, thisMonthDue: D.thisMonthDue, overdueCount: D.overdueCount, soonCount: D.soonCount,
+    upcoming: D.upcoming.filter(Boolean).map((u) => ({ ...u, date: iso(u.date) })),
+    lines, months: months.slice(0, lastUsed + 1),
+    before: M.before, after: M.after, noDate: M.noDate,
+    amountIssues: lines.filter((x) => x.status === "금액 확인").map((x) => x.name),
+    noDateItems: lines.filter((x) => x.status === "날짜 입력").map((x) => x.name),
+  };
 }

@@ -430,3 +430,30 @@ details.tx-fold[open] > summary::before { content: "−"; }
 .stats.wd-stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
 .wd-stats .stat .v { white-space: nowrap; font-size: clamp(18px, 4.6vw, 24px); }
 .wd-stats .stat .v small { display: block; white-space: normal; }
+/* 결혼 준비: 결제 일정 */
+input[type="date"] { width: 100%; min-width: 0; height: 52px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-input); background: var(--surface-2); color: inherit; font: inherit; font-size: 16px; outline: none; transition: var(--t); }
+input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); background: var(--surface); }
+.wp-part { display: grid; grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: center; margin-top: 10px; }
+.wp-l { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.wp-chk { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 500; font-size: 14px; }
+.wp-chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+.wp-c { min-width: 0; }
+.wp-auto { min-width: 0; height: 52px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--r-input); background: var(--surface-2); box-shadow: 0 0 0 1px var(--ring); font-variant-numeric: tabular-nums; }
+
+.wp-auto output { font-weight: 600; margin-left: auto; white-space: nowrap; }
+.wp-row [data-remove][hidden] { display: none; }
+.wp-st { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--ring); white-space: nowrap; }
+.wp-st[data-st="임박"] { background: #fff4cc; color: #7a5a00; box-shadow: none; }
+.wp-st[data-st="연체"], .wp-st[data-st="금액 확인"] { background: #fde2e2; color: #a12626; box-shadow: none; }
+.wp-st[data-st="완료"] { color: var(--muted); }
+@media (max-width: 559px) {
+  .wp-part { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .wp-l { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+}
+@media (max-width: 559px) {
+  .wp-part { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  .wp-part input[type="text"] { font-size: 16px; padding: 0 10px; }
+  .wp-part .unit::after { display: none; }
+  .wp-part input[type="date"] { font-size: 15px; padding: 0 8px; }
+}
+.wp-amt { white-space: nowrap; font-variant-numeric: tabular-nums; }

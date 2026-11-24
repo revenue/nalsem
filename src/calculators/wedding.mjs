@@ -1,10 +1,10 @@
-// 결혼 준비: 결혼식 식대·축의금 계산기, 결혼 비용 양가 분담 계산기.
+// 결혼 준비: 결혼식 식대·축의금 계산기, 결혼 비용 양가 분담 계산기, 결혼 준비 결제 일정 계산기.
 // 계산은 docs/assets/wedding-engine.js(결혼 준비 시트와 같은 엔진, 본부 저장소 ventures/wedding-sheet/template/engine.mjs 그대로 복사)가 하고,
 // docs/assets/wedding-input.js 가 간단한 입력을 엔진 입력으로 바꾼다. 화면은 docs/assets/wedding-ui.js.
 // 시세 출처: 본부 저장소 ventures/wedding-sheet/benchmark.md 6장 (2026-11-22~23 확인). 예시 카드의 숫자는 빌드 때 엔진으로 계산한다.
 // 입력값(인원·금액)은 주소·통계·저장소에 넣지 않는다. 세금·위약금은 다루지 않는다.
 import { ARROW } from "../layout.mjs";
-import { mealCalc, splitCalc, MEAL_EXAMPLE, SPLIT_EXAMPLE, SHEET, METHODS, PAYER_OPTS } from "../../docs/assets/wedding-input.js";
+import { mealCalc, splitCalc, payCalc, MEAL_EXAMPLE, SPLIT_EXAMPLE, PAY_EXAMPLE, SHEET, METHODS, PAYER_OPTS, MAX_ROWS } from "../../docs/assets/wedding-input.js";
 
 const CHECKED = "2026-11-23";
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
@@ -163,13 +163,85 @@ const SPLIT_INFO = [
   promo("wedding-sheet", "업체·항목 40줄에 계약금·중도금·잔금 날짜까지 넣으면 D-day와 상태(예정·임박·연체·완료), 달마다 낼 돈과 양가 몫, 누가 누구에게 얼마를 보내면 되는지가 자동으로 계산돼요. 이 계산기와 같은 분담 방식 5가지를 써요."),
 ].join("");
 
+// ── 결제 일정 ───────────────────────────────────────────────
+const dateInput = (attr, label) => `<input ${attr} type="date" min="2020-01-01" max="2035-12-31"${label ? ` aria-label="${label}"` : ""}>`;
+const part = (k, title, { auto = false } = {}) => `<div class="wp-part" data-part="${k}">
+      <div class="wp-l"><b>${title}</b><label class="wp-chk"><input type="checkbox" data-k="${k}-paid"> 냄</label></div>
+      ${auto ? `<div class="wp-auto" aria-live="polite"><output data-k="bal-amount">0원</output></div>` : `<div class="wp-c">${unitInput(`data-k="${k}-amount"`, "원", { label: `${title} 금액` })}</div>`}
+      <div class="wp-c">${dateInput(`data-k="${k}-date"`, `${title} 날짜`)}</div>
+    </div>`;
+const PAY_ROW_TPL = `<template id="wp-tpl"><div class="tx-dep wp-row">
+  <div class="tx-dep-head"><b class="wp-name">항목</b><button type="button" class="tx-x" data-remove aria-label="이 항목 빼기"><iconify-icon icon="solar:close-circle-linear"></iconify-icon></button></div>
+  <div class="form-row cols-2">
+    <div class="field"><label data-for="name">항목 이름</label><input data-k="name" type="text" autocomplete="off" placeholder="예: 스드메 패키지"></div>
+    <div class="field"><label data-for="total">총액</label>${unitInput(`data-k="total"`, "원", { ph: "2940000" })}</div>
+  </div>
+  ${part("dep", "계약금")}
+  ${part("mid", "중도금")}
+  ${part("bal", "잔금 (자동)", { auto: true })}
+</div></template>`;
+
+const PAY_FORM = `<form id="wpf" autocomplete="off" novalidate>
+  ${PAY_ROW_TPL}
+  <fieldset class="tx-group"><legend>예식</legend>
+    <div class="form-row cols-2">
+      ${field("wp-wedding", "예식일", `<input id="wp-wedding" type="date" min="2020-01-01" max="2035-12-31">`, "잔금 날짜를 비운 항목은 예식일에 내는 것으로 봐요.")}
+      ${field("wp-budget", "총 예산 (선택)", unitInput(`id="wp-budget"`, "원", { ph: "42000000" }), "넣으면 계약 총액을 빼고 남은 돈을 보여 줘요.")}
+    </div>
+  </fieldset>
+  <fieldset class="tx-group"><legend>업체·항목</legend>
+    <div id="wp-rows" class="tx-deps"></div>
+    <div class="actions"><button class="btn btn-ghost btn-sm" type="button" id="wp-add"><iconify-icon icon="solar:add-circle-linear"></iconify-icon> 항목 더하기</button></div>
+    <p class="help">총액과 계약금·중도금만 넣으면 잔금은 자동이에요. 이미 낸 회차는 '냄'을 체크하세요. 최대 ${MAX_ROWS}줄이에요.</p>
+  </fieldset>
+  <p class="help">D-day와 상태는 오늘 날짜를 기준으로 계산해요. 14일 이내면 '임박', 날짜가 지났는데 안 냈으면 '연체'예요.</p>
+  ${actions("wp-example")}
+</form>`;
+
+const pe = payCalc(PAY_EXAMPLE);
+const md = (iso) => { const [, m, d] = iso.split("-"); return `${+m}월 ${+d}일`; };
+const dd = (n) => (n === 0 ? "D-day" : n > 0 ? `D-${n}` : `D+${-n}`);
+const PAY_INFO = [
+  card("계약금·중도금·잔금, 이렇게 넣어요", UL([
+    "업체마다 <b>총액</b>과 <b>계약금·중도금의 금액과 날짜</b>를 넣어요. 잔금은 총액 − 계약금 − 중도금으로 자동 계산돼요.",
+    "잔금 날짜를 비우면 예식일에 내는 것으로 봐요. 예식장 식대처럼 당일 정산하는 항목은 그대로 비워 두면 돼요.",
+    "회차가 더 많으면 같은 업체를 두 줄로 나눠 적어요. 예: 스드메 1차, 스드메 2차",
+    "이미 낸 회차는 '냄'을 체크하세요. 낸 돈·남은 돈과 상태(예정·임박·연체·완료)가 바로 바뀌어요.",
+  ])),
+  card(`예시: 2027년 5월 15일 예식, 항목 ${PAY_EXAMPLE.rows.length}개`, P(`기준일 ${md(PAY_EXAMPLE.today)}, 총 예산 ${won(PAY_EXAMPLE.budget)}으로 계산했어요. '예시로 채우기'를 누르면 오늘 날짜에 맞춰 날짜를 옮겨 채워요.`)
+    + UL([
+      `예식 <b>${dd(pe.weddingDday)}</b>, 계약 총액 <b>${won(pe.contractTotal)}</b>`,
+      `낸 돈 ${won(pe.paid)}, 남은 돈 ${won(pe.unpaid)}, 예산에서 남은 돈 ${won(pe.budgetLeft)}`,
+      `다음 결제: ${md(pe.upcoming[0].date)} ${pe.upcoming[0].name} ${won(pe.upcoming[0].amount)} (${dd(pe.upcoming[0].dday)}, ${pe.upcoming[0].status})`,
+      `14일 안에 낼 결제 ${pe.soonCount}건, 가장 많이 내는 달은 예식 달(${won(pe.months.at(-1).total)})`,
+    ])),
+  card("2026년 예식 비용 시세", UL([
+    "예식장 + 스드메 평균 <b>2,112만 원</b> (2026년 10월 예식, 전년보다 8.5% 올라요). 2027년 10월 예식 계약 평균은 2,214만 원",
+    "예식장 평균 1,788만 원(중간값 1,520만 원), 스드메 평균 324만 원(중간값 294만 원)",
+    "지역별 총비용: 강남 3,419만 원, 강남 외 서울 3,154만 원, 수도권 2,834만 원, 비수도권 1,569만 원 (2026-08 기준, 식비가 61%)",
+    "계약금·중도금·잔금 비율은 공식 통계가 없어요. 업체 계약서에 적힌 금액과 날짜를 그대로 넣으세요.",
+  ]), `${SRC.kca}, ${SRC.sbs} (${CHECKED} 확인)`),
+  card("이렇게 계산해요", UL([
+    "잔금 = 총액 − 계약금 − 중도금. 계약금과 중도금을 더한 금액이 총액보다 크면 '금액 확인'으로 표시해요.",
+    "다음 결제는 아직 안 낸 회차 중 날짜가 가장 빠른 것이에요. 같은 항목의 같은 날 회차는 합쳐서 보여 줘요.",
+    "상태: 다 냈으면 완료, 날짜가 지났으면 연체, 14일 이내면 임박, 그 밖에는 예정이에요.",
+    "달마다 낼 돈은 회차 날짜가 속한 달에 금액을 더해요. 이번 달부터 24개월까지 보여 줘요.",
+  ])),
+  card("이 페이지에 대해", UL([
+    "<b>참고용 계산이에요.</b> 실제 금액과 날짜는 업체 계약서와 안내를 기준으로 하세요.",
+    "계약 해지 위약금, 카드 할부 이자는 다루지 않아요. 양가가 나눠 내는 금액은 결혼 비용 양가 분담 계산기에서 볼 수 있어요.",
+    `계산은 날셈의 ${SHEET.name}과 같은 엔진으로 해요. 엑셀 수식과 53가지 상황을 맞춰 봤어요.`,
+  ])),
+  promo("wedding-sheet", "이 계산기의 결제 일정을 40줄까지 넣고, 항목마다 양가 분담 방식(반반·비율·하객 비율·한쪽 전액)과 하객 수로 계산한 식대까지 한 파일에서 관리해요. 다음 결제 5건, 이번 달 낼 돈, 달마다 신랑측·신부측 몫, 누가 누구에게 얼마를 보내면 되는지가 자동으로 나와요."),
+].join("");
+
 export const wedding = [
   {
     slug: "wedding-meal", cat: "wedding", title: "결혼식 식대·축의금 계산기", short: "보증인원·식사 인원으로 식대와 축의금 손익",
     lede: "1인 식대, 최소 보증인원, 양가 하객 그룹별 초대 인원·참석률·축의금을 넣으면 청구되는 식대와 보증 미달로 더 내는 식대, 신랑측·신부측 축의금에서 식대를 뺀 금액을 계산해요. 참고용 예상치예요.",
     description: "결혼식 식대·축의금 계산기. 1인 식대·최소 보증인원·식사 비율과 신랑측·신부측 하객 그룹별 초대 인원·참석률·1인 축의금을 넣으면 예상 식사 인원, 보증인원과 비교한 식대 총액, 보증 미달 식대, 측별 식대 몫과 축의금 − 식대를 계산합니다. 2026년 식대 중간값 전국 6만·서울 8만 원 참고.",
     keys: ["결혼식 식대 계산기", "보증인원 계산", "축의금 식대 계산", "결혼식 축의금 손익", "하객 수 식대", "웨딩홀 식대 계산", "결혼식 식대 보증인원", "축의금 얼마 들어올까"],
-    form: MEAL_FORM, modules: ["wedding-ui.js"], related: ["wedding-split", "d-day", "anniversary"],
+    form: MEAL_FORM, modules: ["wedding-ui.js"], related: ["wedding-split", "wedding-payment", "d-day"],
     info: MEAL_INFO,
   },
   {
@@ -177,7 +249,15 @@ export const wedding = [
     lede: "결혼 준비 항목마다 반반·비율·하객 비율·한쪽 전액 중에서 분담 방식을 고르고 실제로 낸 쪽을 넣으면, 신랑측·신부측 부담과 누가 누구에게 얼마를 보내면 되는지 계산해요.",
     description: "결혼 비용 양가 분담 계산기. 예식장·스드메·예물·예단·신혼여행 같은 항목별로 반반·비율·하객 비율·신랑측 전액·신부측 전액 중 분담 방식과 실제로 낸 쪽을 넣으면 양가 부담 합계와 정산 금액(누가 누구에게 얼마)을 계산합니다. 원 단위까지 양가 몫의 합이 금액과 같습니다.",
     keys: ["결혼 비용 분담 계산기", "양가 분담 계산", "결혼 비용 반반", "결혼 준비 정산", "예식 비용 분담 비율", "하객 비율 분담", "결혼 비용 누가 얼마", "결혼 자금 정산"],
-    form: SPLIT_FORM, modules: ["wedding-ui.js"], related: ["wedding-meal", "d-day", "anniversary"],
+    form: SPLIT_FORM, modules: ["wedding-ui.js"], related: ["wedding-meal", "wedding-payment", "d-day"],
     info: SPLIT_INFO,
+  },
+  {
+    slug: "wedding-payment", cat: "wedding", title: "결혼 준비 결제 일정 계산기", short: "계약금·중도금·잔금 D-day와 달마다 낼 돈",
+    lede: "예식장·스드메·예물·신혼여행처럼 업체마다 다른 계약금·중도금·잔금의 금액과 날짜를 넣으면 잔금, 다음 결제와 D-day, 연체·임박, 낸 돈·남은 돈, 달마다 낼 돈을 한 번에 계산해요.",
+    description: "결혼 준비 결제 일정 계산기. 예식장·스드메·예물·신혼여행 등 업체별 총액과 계약금·중도금 금액·날짜, 잔금 날짜를 넣으면 잔금 자동 계산, 다음 결제 5건과 D-day, 연체·임박 상태, 계약 총액·낸 돈·남은 돈·예산 잔액, 달마다 낼 돈을 계산합니다. 2026년 예식장+스드메 평균 2,112만 원 참고.",
+    keys: ["결혼 준비 결제 일정", "결혼 비용 계산기", "결혼 예산 계산기", "계약금 중도금 잔금 계산", "웨딩 잔금 계산", "결혼 준비 비용 정리", "결혼식 D-day 결제", "스드메 잔금 날짜"],
+    form: PAY_FORM, modules: ["wedding-ui.js"], related: ["wedding-split", "wedding-meal", "d-day"],
+    info: PAY_INFO,
   },
 ];
