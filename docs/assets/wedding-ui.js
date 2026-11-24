@@ -1,4 +1,4 @@
-/* 날셈 결혼 준비 계산기 화면 (ES 모듈): #wmf(식대·축의금) 또는 #wsf(양가 분담) 폼을 읽어 wedding-input.js → 결혼 시트 엔진으로 계산하고 #result 에 그린다.
+/* 날셈 결혼 준비 계산기 화면 (ES 모듈): #wmf(식대·축의금), #wsf(양가 분담), #wpf(결제 일정) 폼을 읽어 wedding-input.js → 결혼 시트 엔진으로 계산하고 #result 에 그린다.
    인원·금액은 주소·localStorage·통계 이벤트에 넣지 않고 어디로도 보내지 않는다.
    통계: 결과 갱신은 N.bump 가 계산기 이름만 보낸다(calc.js "calculate"). 결혼 시트 안내 링크 클릭은 "template_click"(입력값 없음). */
 const v = new URL(import.meta.url).search; // 캐시 문자열(?v=)을 엔진 쪽에도 붙인다
@@ -165,5 +165,99 @@ if (sf && out) {
   box.addEventListener("change", (e) => { if (e.target.matches('[data-k="method"]')) syncRatio(e.target.closest(".ws-row")); });
   $("ws-example").addEventListener("click", () => { fill(W.SPLIT_EXAMPLE); go(); });
   fill(W.SPLIT_EXAMPLE);
+  go();
+}
+
+// ── 결제 일정 ───────────────────────────────────────────────
+const pf = $("wpf");
+if (pf && out) {
+  const box = $("wp-rows"), tpl = $("wp-tpl"), add = $("wp-add");
+  const pad = (x) => String(x).padStart(2, "0");
+  const now = new Date();
+  const TODAY = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const md = (iso) => { if (!iso) return ""; const [y, m, d] = iso.split("-"); return `${y}.${+m}.${+d}`; };
+  const ym = (s) => { const [y, m] = s.split("-"); return `${+m}월<small class="kp-why">${y}</small>`; };
+  const mdShort = (iso) => { const [, m, d] = iso.split("-"); return `${+m}.${+d}`; };
+  const dd = (n) => (n === "" ? "" : n === 0 ? "D-day" : n > 0 ? `D-${n}` : `D+${-n}`);
+  const badge = (st) => `<span class="wp-st" data-st="${esc(st)}">${esc(st)}</span>`;
+  let seq = 0;
+  function renumber() {
+    [...box.children].forEach((n, i) => { n.querySelector(".wp-name").textContent = `항목 ${i + 1}`; n.querySelector("[data-remove]").hidden = box.children.length === 1; });
+    add.disabled = box.children.length >= W.MAX_ROWS;
+  }
+  function addRow(vals) {
+    if (box.children.length >= W.MAX_ROWS) return null;
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    seq++;
+    node.querySelectorAll("[data-k]").forEach((el) => (el.id = `wp${seq}-${el.dataset.k}`));
+    node.querySelectorAll("label[data-for]").forEach((l) => (l.htmlFor = `wp${seq}-${l.dataset.for}`));
+    if (vals) {
+      const set = (k, val) => { const el = node.querySelector(`[data-k="${k}"]`); if (!el || val === null || val === undefined) return; if (el.type === "checkbox") el.checked = !!val; else el.value = val; };
+      set("name", vals.name); set("total", vals.total);
+      for (const k of ["dep", "mid"]) { set(`${k}-amount`, vals[k].amount); set(`${k}-date`, vals[k].date); set(`${k}-paid`, vals[k].paid); }
+      set("bal-date", vals.bal.date); set("bal-paid", vals.bal.paid);
+    }
+    box.appendChild(node);
+    renumber();
+    return node;
+  }
+  const fill = (E) => {
+    box.innerHTML = "";
+    E.rows.forEach((r) => addRow(r));
+    $("wp-wedding").value = E.wedding; $("wp-budget").value = E.budget ?? "";
+  };
+  const q = (n, k) => n.querySelector(`[data-k="${k}"]`);
+  const read = () => ({
+    today: TODAY, wedding: $("wp-wedding").value, budget: num($("wp-budget")),
+    rows: [...box.children].map((n) => ({
+      name: q(n, "name").value.trim(), total: num(q(n, "total")),
+      dep: { amount: num(q(n, "dep-amount")), date: q(n, "dep-date").value, paid: q(n, "dep-paid").checked },
+      mid: { amount: num(q(n, "mid-amount")), date: q(n, "mid-date").value, paid: q(n, "mid-paid").checked },
+      bal: { date: q(n, "bal-date").value, paid: q(n, "bal-paid").checked },
+    })),
+  });
+  // 잔금(자동) 칸: 줄마다 총액 − 계약금 − 중도금
+  const syncBal = () => [...box.children].forEach((n) => {
+    const b = (num(q(n, "total")) || 0) - (num(q(n, "dep-amount")) || 0) - (num(q(n, "mid-amount")) || 0);
+    const o = q(n, "bal-amount"); o.textContent = won(b); o.classList.toggle("wd-neg", b < 0);
+  });
+  const render = (r) => {
+    const u = r.upcoming[0];
+    const hero = u
+      ? `<div class="result-hero"><div class="k">다음 결제 · ${md(u.date)} · ${esc(u.name)}</div><div class="v accent">${won(u.amount)}<small>${dd(u.dday)} ${esc(u.status)}</small></div></div>`
+      : `<div class="result-hero"><div class="k">다음 결제</div><div class="v accent">남은 결제 없음<small>날짜가 있는 회차를 모두 냈어요</small></div></div>`;
+    const stat = (k, v, sub = "") => `<div class="stat"><div class="k">${k}</div><div class="v">${v}${sub ? `<small>${sub}</small>` : ""}</div></div>`;
+    const stats = `<div class="stats wd-stats">${r.wedding ? stat("예식", dd(r.weddingDday), md(r.wedding)) : ""}${stat("계약 총액", won(r.contractTotal), r.budgetLeft !== "" ? `예산에서 남은 돈 <span class="${r.budgetLeft < 0 ? "wd-neg" : ""}">${won(r.budgetLeft)}</span>` : "")}${stat("낸 돈", won(r.paid))}${stat("남은 돈", won(r.unpaid))}</div>`;
+    const up = r.upcoming.length
+      ? `<div class="tbl-wrap"><table class="tbl wd-tbl"><thead><tr><th>날짜</th><th>금액 · 항목</th></tr></thead><tbody>${r.upcoming.map((x) => `<tr><td class="num">${mdShort(x.date)}<small class="kp-why">${x.date.slice(0, 4)} · ${dd(x.dday)}</small></td><td><b class="wp-amt">${won(x.amount)}</b> ${badge(x.status)}<small class="kp-why">${esc(x.name)}</small></td></tr>`).join("")}</tbody></table></div>`
+      : `<p class="note">날짜가 있는 안 낸 회차가 없어요.</p>`;
+    const due = kv([
+      ["이번 달 남은 결제", won(r.thisMonthDue), "오늘부터 이번 달 말까지 안 낸 회차"],
+      ["14일 안에 낼 결제", `${r.soonCount}건`],
+      ["연체", r.overdueCount ? `<span class="wd-neg">${r.overdueCount}건 ${won(r.overdueAmount)}</span>` : "없음", "날짜가 지났는데 안 낸 회차", r.overdueCount ? "ap-sum" : ""],
+    ]);
+    const mrow = (label, m, cum) => `<tr><td>${label}</td><td class="num">${won(m.total)}<small class="kp-why">${m.unpaid === m.total ? "모두 안 냄" : m.unpaid ? `안 냄 ${won(m.unpaid)}` : "모두 냄"}${cum === null ? "" : ` · 누적 ${won(cum)}`}</small></td></tr>`;
+    const mon = r.months.length || r.before.total
+      ? `<div class="tbl-wrap"><table class="tbl wd-tbl"><thead><tr><th>달</th><th class="num">낼 돈</th></tr></thead><tbody>${r.before.total ? mrow("지난달까지", r.before, r.before.total) : ""}${r.months.map((m) => (m.total ? mrow(ym(m.month), m, m.cumulative) : "")).join("")}${r.after.total ? mrow("그 뒤", r.after, null) : ""}${r.noDate.total ? mrow("날짜 없음", r.noDate, null) : ""}</tbody></table></div>`
+      : "";
+    const lines = `<div class="tbl-wrap"><table class="tbl wd-tbl"><thead><tr><th>항목</th><th class="num">남은 돈</th></tr></thead><tbody>${r.lines.map((x) => `<tr><td>${esc(x.name)} ${badge(x.status)}${x.next ? `<small class="kp-why">다음 ${md(x.next)}</small>` : ""}</td><td class="num">${won(x.unpaid)}<small class="kp-why">총액 ${won(x.total)}</small></td></tr>`).join("")}</tbody></table></div>`;
+    const warn = [];
+    if (r.amountIssues.length) warn.push(`계약금 + 중도금이 총액보다 커요: ${r.amountIssues.join(", ")}`);
+    if (r.noDateItems.length) warn.push(`날짜가 없어 일정에서 빠진 항목이 있어요: ${r.noDateItems.join(", ")}. ${r.wedding ? "회차 날짜를 넣어 주세요." : "예식일을 넣으면 잔금은 예식일로 잡혀요."}`);
+    if (r.overdueCount) warn.push(`날짜가 지났는데 '냄' 체크가 안 된 항목이 ${r.overdueCount}개예요. 이미 냈다면 체크하세요.`);
+    out.innerHTML = hero + stats + h3("다음 결제 5건") + up + due + h3("달마다 낼 돈") + mon + h3("항목별 상태") + lines + warnBox(warn)
+      + funnel("wedding-payment", "이 일정에 양가 분담과 하객 식대까지 더해 40줄로 관리하려면")
+      + `<p class="note">${md(r.today)} 기준 참고용 계산이에요. 실제 금액과 날짜는 업체 계약서를 기준으로 하세요.</p>`;
+  };
+  const { go, schedule } = wire(pf, "wedding-payment", () => {
+    syncBal();
+    const r = W.payCalc(read());
+    if (r.error) { out.innerHTML = `<p class="note">${esc(r.error)}</p>`; return; }
+    render(r);
+  });
+  add.addEventListener("click", () => { const n = addRow(); if (n) q(n, "name").focus(); schedule(); });
+  box.addEventListener("click", (e) => { const rm = e.target.closest("[data-remove]"); if (rm && box.children.length > 1) { rm.closest(".wp-row").remove(); renumber(); schedule(); } });
+  $("wp-example").addEventListener("click", () => { fill(W.payExampleFor(TODAY)); go(); });
+  fill(W.payExampleFor(TODAY));
   go();
 }
