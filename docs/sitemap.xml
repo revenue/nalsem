@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://nalsem.suik.me/</loc><lastmod>2026-11-24</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+<url><loc>https://nalsem.suik.me/</loc><lastmod>2026-11-25</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
 <url><loc>https://nalsem.suik.me/age/</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/man-age/</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/zodiac-age/</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -37,6 +37,7 @@
 <url><loc>https://nalsem.suik.me/kepco-appliance/</loc><lastmod>2026-11-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/alba-pay/</loc><lastmod>2026-11-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/juhyu-pay/</loc><lastmod>2026-11-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+<url><loc>https://nalsem.suik.me/insurance/</loc><lastmod>2026-11-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/wedding-meal/</loc><lastmod>2026-11-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/wedding-split/</loc><lastmod>2026-11-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://nalsem.suik.me/privacy/</loc><lastmod>2026-11-21</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
