@@ -83,5 +83,10 @@ function init() {
     if (!link) return;
     if (N) N.track("template_click", { calculator: "insurance", item_id: "payroll-template-2027", placement: link.dataset.placement || "result" });
   });
+  // 제휴 묶음(쿠팡·예스24) 클릭. 상품 id와 플랫폼만 보낸다.
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-aff-link]");
+    if (a && N) N.track("affiliate_click", { calculator: "insurance", item_id: a.dataset.affId, network: a.dataset.affNet });
+  });
   run(false); // 첫 화면 예시 결과 (통계는 보내지 않음)
 }

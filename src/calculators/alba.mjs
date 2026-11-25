@@ -5,6 +5,7 @@
 // 입력값(시급·근무시간)은 주소·통계·저장소에 넣지 않는다.
 import { ARROW } from "../layout.mjs";
 import { calc, EXAMPLE } from "../../docs/assets/alba-pay-input.js";
+import { gearCard } from "./pay-gear.mjs";
 
 export const TEMPLATE = { href: "https://suikster0.gumroad.com/l/horyty", price: "9,900원", name: "2027 급여대장 엑셀" };
 const CHECKED = "2026-11-22";
@@ -122,7 +123,8 @@ const INFO = [
     `최저임금 10,700원은 확정이에요(${SRC.minwage}). 기준 확인일은 ${CHECKED}예요.`,
     `계산은 날셈의 ${TEMPLATE.name}과 같은 엔진으로 해요. 고용노동부 상담 예시 등 19개 사례로 검사했어요.`,
   ])),
-  `<div class="card bz ap-promo" id="payroll-template"><h2>${TEMPLATE.name}</h2>${P(`직원 10명까지 근무기록을 넣으면 주휴·가산·4대보험과 사장님 월 인건비를 한 번에 계산하는 엑셀 파일이에요. 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)}${P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)}${P("Gumroad에서 팔아요. 결제는 달러로 처리돼서 해외결제가 되는 카드가 필요할 수 있어요.")}</div>`,
+  `<div class="card bz ap-promo" id="payroll-template"><h2>${TEMPLATE.name}</h2>${P(`직원 10명까지 근무기록을 넣으면 주휴·가산·4대보험과 사장님 월 인건비를 한 번에 계산하는 엑셀 파일이에요. 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)}${P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)}${P("Gumroad에서 팔아요. 결제는 달러로 처리돼서 해외결제가 되는 카드가 필요할 수 있어요.")}</div>`,,
+  gearCard()
 ].join("");
 
 export const alba = [

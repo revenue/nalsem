@@ -5,6 +5,7 @@
 import { ARROW } from "../layout.mjs";
 import { insure, EXAMPLE } from "../../docs/assets/insurance-calc.js";
 import { TEMPLATE } from "./alba.mjs";
+import { gearCard } from "./pay-gear.mjs";
 
 const CHECKED = "2026-11-25";
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
@@ -93,6 +94,7 @@ const INFO = [
   ]), SRC.insure),
   card(`사장님이라면: ${TEMPLATE.name}`, P(`직원이 여러 명이면 한 사람씩 계산기를 돌리기 번거로워요. 근무기록을 넣으면 주휴·연장·야간·휴일수당과 근로자·사업주 4대보험, 사장님 월 인건비까지 한 번에 계산하는 엑셀이에요. 이 페이지와 같은 계산 방식이고, 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)
     + P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)),
+  gearCard(),
   card("이 페이지에 대해", UL([
     "<b>참고용 계산이에요. 노무·세무 자문이 아니에요.</b> 실제 고지액은 국민연금·건강보험·근로복지공단 고지서로 확인하세요.",
     "소득세·지방소득세는 빼지 않았어요. 실수령액은 여기서 소득세를 더 뺀 금액이에요.",

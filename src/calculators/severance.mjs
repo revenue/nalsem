@@ -5,6 +5,7 @@
 import { ARROW } from "../layout.mjs";
 import { severance, EXAMPLE } from "../../docs/assets/severance-calc.js";
 import { TEMPLATE } from "./alba.mjs";
+import { gearCard } from "./pay-gear.mjs";
 
 const CHECKED = "2026-11-25";
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
@@ -75,6 +76,7 @@ const INFO = [
   card(`사장님이라면: ${TEMPLATE.name}`, P(`직원이 1년을 넘기면 퇴직금이 생겨요. 급여대장 엑셀은 직원별로 매달 퇴직금 적립 예상액(월 급여의 1/12)을 사장님 월 인건비에 함께 보여 줘서, 퇴직금을 미리 모아 둘 수 있어요. 주휴·가산수당·4대보험까지 한 번에 계산하고, 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)
     + P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)
     + P(`월급별 4대보험은 <a href="/insurance/">4대보험 계산기</a>, 알바 한 달 인건비는 <a href="/alba-pay/">알바 인건비 계산기</a>에서 볼 수 있어요.`)),
+  gearCard(),
   card("이 페이지에 대해", UL([
     "<b>참고용 계산이에요. 노무 자문이 아니에요.</b> 다툼이 있으면 고용노동부(국번 없이 1350)에 물어보세요.",
     `계산은 날셈의 2027 급여대장 엑셀과 같은 엔진으로 해요. 기준 확인일은 ${CHECKED}예요.`,

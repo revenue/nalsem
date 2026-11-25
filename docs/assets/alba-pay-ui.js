@@ -104,6 +104,11 @@ function init() {
     if (!link) return;
     if (N) N.track("template_click", { calculator: "alba-pay", item_id: "payroll-template-2027", placement: link.dataset.placement || "result" });
   });
+  // 제휴 묶음(쿠팡·예스24) 클릭. 상품 id와 플랫폼만 보낸다.
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-aff-link]");
+    if (a && N) N.track("affiliate_click", { calculator: "alba-pay", item_id: a.dataset.affId, network: a.dataset.affNet });
+  });
 
   // 예시: 설명 카드의 예시와 같은 값 (alba-pay-input.js EXAMPLE)
   $("ap-example").addEventListener("click", () => {

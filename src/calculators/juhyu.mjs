@@ -5,6 +5,7 @@
 import { ARROW } from "../layout.mjs";
 import { juhyu, EXAMPLE } from "../../docs/assets/juhyu-pay-calc.js";
 import { TEMPLATE } from "./alba.mjs";
+import { gearCard } from "./pay-gear.mjs";
 
 const CHECKED = "2026-11-22";
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
@@ -69,6 +70,7 @@ const INFO = [
   card(`사장님이라면: ${TEMPLATE.name}`, P(`직원이 여러 명이면 주휴수당만으로는 부족해요. 근무기록을 넣으면 주휴·연장·야간·휴일수당과 근로자·사업주 4대보험, 사장님 월 인건비까지 한 번에 계산하는 엑셀이에요. 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)
     + P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)
     + P(`직원 한 명의 한 달 인건비는 무료 <a href="/alba-pay/">2027 알바 인건비 계산기</a>에서 볼 수 있어요.`)),
+  gearCard(),
   card("이 페이지에 대해", UL([
     "<b>참고용 계산이에요. 노무 자문이 아니에요.</b> 실제 지급은 근로계약서와 근무기록으로 다시 확인하세요.",
     "계산은 날셈의 2027 급여대장 엑셀과 같은 엔진으로 해요. 고용노동부 상담 예시 등 19개 사례로 검사했어요.",
