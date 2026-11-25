@@ -3,7 +3,7 @@
    통계: 결과 갱신은 N.bump 가 계산기 이름만 보낸다. 급여대장 안내 링크는 "template_click", 제휴 묶음은 "affiliate_click"(입력값 없음). */
 const v = new URL(import.meta.url).search; // 캐시 문자열(?v=)을 계산 모듈 쪽에도 붙인다
 const C = await import("./annual-leave-calc.js" + v);
-const TEMPLATE_URL = "https://suikster0.gumroad.com/l/horyty";
+const TEMPLATE_URL = "https://suikster0.gumroad.com/l/leave2027"; // 2027 연차관리대장 엑셀 (6,900원)
 
 const $ = (id) => document.getElementById(id);
 const form = $("alf"), out = $("result");
@@ -74,7 +74,7 @@ function init() {
       body += h3("연차 발생표") + kv(rows);
     }
     const warnHtml = warn.length ? `<div class="tx-warn" role="note"><h3>확인할 것</h3><ul>${warn.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : "";
-    const funnel = `<p class="ap-funnel">직원별 연차·주휴·4대보험을 매달 정리하려면 → <a href="${TEMPLATE_URL}" rel="noopener" data-template-link data-placement="result">2027 급여대장 엑셀(9,900원)</a></p>`;
+    const funnel = `<p class="ap-funnel">직원 30명의 연차·연차수당·사용 촉진 날짜를 한 장에서 관리하려면 → <a href="${TEMPLATE_URL}" rel="noopener" data-template-link data-item="leave-ledger-2027" data-placement="result">2027 연차관리대장 엑셀(6,900원)</a></p>`;
     const foot = `<p class="note">참고용 계산이에요. 노무 자문이 아니에요.</p>`;
     out.innerHTML = hero + body + warnHtml + funnel + foot;
   }
@@ -97,7 +97,7 @@ function init() {
   document.addEventListener("click", (e) => {
     const link = e.target.closest("[data-template-link]");
     if (!link) return;
-    if (N) N.track("template_click", { calculator: "annual-leave", item_id: "payroll-template-2027", placement: link.dataset.placement || "result" });
+    if (N) N.track("template_click", { calculator: "annual-leave", item_id: link.dataset.item || "payroll-template-2027", placement: link.dataset.placement || "result" });
   });
   // 제휴 묶음(쿠팡·예스24) 클릭. 상품 id와 플랫폼만 보낸다.
   document.addEventListener("click", (e) => {

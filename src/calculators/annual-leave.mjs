@@ -4,6 +4,7 @@
 import { ARROW } from "../layout.mjs";
 import { annualLeave, daysForYear, EXAMPLE } from "../../docs/assets/annual-leave-calc.js";
 import { TEMPLATE } from "./alba.mjs";
+const LEAVE = { href: "https://suikster0.gumroad.com/l/leave2027", bundle: "https://suikster0.gumroad.com/l/payroll-leave-2027" };
 import { gearCard } from "./pay-gear.mjs";
 
 const CHECKED = "2026-11-26";
@@ -69,8 +70,9 @@ const INFO = [
     `1주 40시간보다 적게 일하면 시간으로 줄여요. 연차 시간 = 일수 × 8시간 × (1주 근무시간 ÷ 40). 주 20시간이면 15일이 60시간, 시급 10,700원이면 ${won(exPart.pay)}이에요.`,
     "5인 미만 사업장은 연차 규정이 적용되지 않아요. 계약서나 취업규칙에 따로 정했다면 그에 따라요.",
   ]), `${SRC.art18}, ${SRC.art11}`),
-  card(`사장님이라면: ${TEMPLATE.name}`, P(`직원별 연차와 주휴·가산수당·4대보험을 매달 정리해야 한다면 급여대장 엑셀을 쓰면 편해요. 근무기록을 넣으면 수당과 4대보험, 사장님 월 인건비까지 한 번에 계산하고, 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)
-    + P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)
+  card("사장님이라면: 2027 연차관리대장 엑셀", P("직원이 여러 명이면 연차를 한 명씩 계산기로 보기 번거로워요. 연차관리대장 엑셀은 직원 30명까지 입사일만 넣으면 지금 연차, 쓴 날·남은 날, 남은 연차수당, 연차 사용 촉진 1·2차 날짜(근로기준법 제61조)를 한 장에서 보여 줘요. 이 페이지와 같은 계산 방식이고 구글시트에서도 열려요. 가격은 6,900원이에요.")
+    + P(`<a href="${LEAVE.href}" rel="noopener" data-template-link data-item="leave-ledger-2027" data-placement="promo">연차관리대장 판매 페이지 보기 ${ARROW}</a>`)
+    + P(`매달 급여·4대보험까지 함께 관리하려면 <a href="${LEAVE.bundle}" rel="noopener" data-template-link data-item="payroll-leave-bundle-2027" data-placement="promo-bundle">${TEMPLATE.name}과 묶음(13,900원)</a>이 따로 사는 것보다 2,900원 싸요.`)
     + P(`퇴사할 때 받을 돈은 <a href="/severance/">퇴직금 계산기</a>, 월급별 공제는 <a href="/insurance/">4대보험 계산기</a>에서 볼 수 있어요.`)),
   gearCard(),
   card("이 페이지에 대해", UL([

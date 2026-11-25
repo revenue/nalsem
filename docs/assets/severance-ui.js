@@ -92,7 +92,7 @@ function init() {
   document.addEventListener("click", (e) => {
     const link = e.target.closest("[data-template-link]");
     if (!link) return;
-    if (N) N.track("template_click", { calculator: "severance", item_id: "payroll-template-2027", placement: link.dataset.placement || "result" });
+    if (N) N.track("template_click", { calculator: "severance", item_id: link.dataset.item || "payroll-template-2027", placement: link.dataset.placement || "result" });
   });
   // 제휴 묶음(쿠팡·예스24) 클릭. 상품 id와 플랫폼만 보낸다.
   document.addEventListener("click", (e) => {

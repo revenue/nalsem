@@ -75,6 +75,7 @@ const INFO = [
   ]), SRC.calc),
   card(`사장님이라면: ${TEMPLATE.name}`, P(`직원이 1년을 넘기면 퇴직금이 생겨요. 급여대장 엑셀은 직원별로 매달 퇴직금 적립 예상액(월 급여의 1/12)을 사장님 월 인건비에 함께 보여 줘서, 퇴직금을 미리 모아 둘 수 있어요. 주휴·가산수당·4대보험까지 한 번에 계산하고, 구글시트에서도 열려요. 가격은 ${TEMPLATE.price}이에요.`)
     + P(`<a href="${TEMPLATE.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)
+    + P(`직원 연차와 연차수당까지 함께 관리하려면 <a href="https://suikster0.gumroad.com/l/payroll-leave-2027" rel="noopener" data-template-link data-item="payroll-leave-bundle-2027" data-placement="promo-bundle">급여대장 + 연차관리대장 묶음(13,900원)</a>도 있어요.`)
     + P(`월급별 4대보험은 <a href="/insurance/">4대보험 계산기</a>, 알바 한 달 인건비는 <a href="/alba-pay/">알바 인건비 계산기</a>에서 볼 수 있어요.`)),
   gearCard(),
   card("이 페이지에 대해", UL([
