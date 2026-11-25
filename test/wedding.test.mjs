@@ -128,3 +128,26 @@ test("결제 일정 입력 오류: 총액 없음, 기준일 없음", () => {
   assert.ok(payCalc({ ...PAY_EXAMPLE, rows: [] }).error);
   assert.ok(payCalc({ ...PAY_EXAMPLE, today: "" }).error);
 });
+
+test("제휴 링크 묶음: 페이지당 1곳, 대가 문구가 링크보다 먼저, 플랫폼 지정 문구, FAQ에 안 들어감, 가격 없음", () => {
+  for (const slug of ["wedding-meal", "wedding-split", "wedding-payment"]) {
+    const h = readFileSync(`docs/${slug}/index.html`, "utf8");
+    const boxes = h.match(/<aside class="card bz wd-aff"[\s\S]*?<\/aside>/g) || [];
+    assert.equal(boxes.length, 1, slug);
+    const box = boxes[0];
+    assert.ok(box.indexOf("수수료를 받습니다") < box.indexOf("<a "), `${slug}: 대가 문구가 첫 링크보다 앞`);
+    if (box.includes("link.coupang.com")) assert.ok(box.includes("쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."), slug);
+    if (box.includes("m=agoda")) assert.ok(box.includes("제휴마케팅이 포함된 광고로 커미션을 지급 받습니다."), slug);
+    for (const a of box.match(/<a [^>]+>/g)) {
+      assert.ok(a.includes('rel="sponsored nofollow noopener"'), a);
+      assert.ok(/href="https:\/\//.test(a), a);
+    }
+    assert.ok(!/\d[\d,]*원/.test(box.replace(/<[^>]+>/g, "")), `${slug}: 가격 표시 없음`);
+    assert.ok(!/대출|할부|카드 추천/.test(box), `${slug}: 금융 추천 없음`);
+    // 결과(#result) 바로 다음, 설명 카드보다 앞
+    assert.ok(h.indexOf('id="result"') < h.indexOf("wd-aff") && h.indexOf("wd-aff") < h.indexOf("ap-promo"), slug);
+    // FAQ 구조화 데이터에 제휴 묶음 제목이 들어가지 않는다
+    const ld = (h.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g) || []).join("");
+    assert.ok(!/찾아보기/.test(ld), `${slug}: FAQ 제외`);
+  }
+});

@@ -26,6 +26,52 @@ const actions = (exId) => `<div class="actions"><button class="btn btn-primary" 
   <p class="note tx-privacy">입력한 인원과 금액은 이 브라우저 안에서만 계산해요. 어디에도 보내거나 저장하지 않아요.</p>`;
 const promo = (id, body) => `<div class="card bz ap-promo" id="${id}"><h2>${SHEET.name}</h2>${P(body)}${P(`<a href="${SHEET.href}" rel="noopener" data-template-link data-placement="promo">판매 페이지에서 자세히 보기 ${ARROW}</a>`)}${P(`가격은 ${SHEET.price}이에요. Gumroad에서 팔고, 결제는 달러로 처리돼서 해외결제가 되는 카드가 필요할 수 있어요.`)}</div>`;
 
+// ── 제휴 링크 묶음 (페이지당 1곳, 결과 바로 아래) ─────────────
+// 근거: 본부 저장소 ops/operating-policy.md 5·6장, research/제휴플랫폼_국내_2026-11-26.md 4장 아이디어 3 (2026-11-26).
+// 쿠팡은 검색 결과 링크(상품을 고르지 않고 가격을 저장·표시하지 않는다), 신혼여행 숙소는 링크프라이스 아고다 링크(매체 suik.me, 첫 화면으로 감).
+// 대가 문구는 묶음 맨 위에 확정 표현으로 쓰고, 플랫폼 지정 문구를 그대로 붙인다. 후기형 문구·이미지·플로팅·대출·카드 할부 추천은 넣지 않는다.
+// <aside>로 감싸서 FAQ 구조화 데이터(layout.mjs faqOf)에 들어가지 않게 한다.
+const CP = (code) => `https://link.coupang.com/a/${code}`;
+// 아고다: 2026-11-26 확인 결과 도시 페이지·검색 주소로 딥링크해도 아고다 첫 화면(ko-kr)으로 간다. 그래서 도시 이름을 붙이지 않고 첫 화면 링크 1개만 쓴다.
+const AGODA_HOME = `https://click.linkprice.com/click.php?m=agoda&a=A100708213&l=9999&l_cd1=3&l_cd2=0&tu=${encodeURIComponent("https://www.agoda.com/ko-kr/")}`;
+export const AFF = {
+  "wedding-meal": {
+    title: "하객 준비물 찾아보기",
+    items: [
+      { p: "coupang", id: "gift", name: "결혼식 답례품", note: "쿠팡 검색 결과", url: CP("iYqBfpozim") },
+      { p: "coupang", id: "invitation", name: "청첩장", note: "쿠팡 검색 결과", url: CP("iYqCVytIbY") },
+      { p: "coupang", id: "guestbook", name: "웨딩 방명록", note: "쿠팡 검색 결과", url: CP("iYqFTemRAi") },
+    ],
+  },
+  "wedding-split": {
+    title: "예단·혼수 찾아보기",
+    items: [
+      { p: "coupang", id: "yedan-bedding", name: "예단 이불", note: "쿠팡 검색 결과", url: CP("iYqHBWJbUq") },
+      { p: "coupang", id: "robot-vacuum", name: "로봇청소기", note: "쿠팡 검색 결과", url: CP("iYqHmnLHLE") },
+      { p: "coupang", id: "dishwasher", name: "식기세척기", note: "쿠팡 검색 결과", url: CP("iYqF3m8z9w") },
+    ],
+  },
+  "wedding-payment": {
+    title: "신혼여행 숙소 찾아보기",
+    items: [
+      { p: "agoda", id: "agoda-home", name: "아고다에서 신혼여행 숙소 찾기", note: "아고다 첫 화면", url: AGODA_HOME },
+      { p: "coupang", id: "carrier", name: "여행용 캐리어", note: "쿠팡 검색 결과", url: CP("iYqGdRMvVQ") },
+    ],
+  },
+};
+export const AFF_DISC = {
+  base: "이 영역의 링크로 구매하거나 예약하면 날셈이 판매 수수료를 받습니다. 구매 가격은 같습니다.",
+  coupang: "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
+  agoda: "이 포스팅은 제휴마케팅이 포함된 광고로 커미션을 지급 받습니다.",
+};
+export function affBox(slug) {
+  const b = AFF[slug];
+  if (!b || !b.items.length) return "";
+  const ps = [...new Set(b.items.map((x) => x.p))];
+  const disc = [AFF_DISC.base, ...ps.map((p) => AFF_DISC[p])].join(" ");
+  return `<aside class="card bz wd-aff" aria-label="광고: ${b.title}"><p class="wd-aff-disc"><b>광고</b> ${disc}</p><h2>${b.title}</h2><ul class="wd-aff-list">${b.items.map((x) => `<li><a href="${x.url}" target="_blank" rel="sponsored nofollow noopener" data-aff="${x.p}" data-aff-item="${x.id}">${x.name}</a><small>${x.note}</small></li>`).join("")}</ul><p class="wd-aff-note">가격과 재고는 이동한 사이트에서 확인하세요. 날셈은 상품을 팔거나 추천 순위를 매기지 않습니다.</p></aside>`;
+}
+
 // ── 식대·축의금 ──────────────────────────────────────────────
 const E = MEAL_EXAMPLE;
 const cell = (l, html) => `<div class="wd-c" data-l="${l}">${html}</div>`;
@@ -58,6 +104,7 @@ const MEAL_FORM = `<form id="wmf" autocomplete="off" novalidate>
 
 const me = mealCalc(E);
 const MEAL_INFO = [
+  affBox("wedding-meal"),
   card("보증인원이 뭔가요?", UL([
     "예식장과 계약할 때 약속하는 <b>최소 식사 인원</b>이에요. 실제 식사 인원이 적어도 보증인원만큼 식대를 내요.",
     "그래서 청구되는 식사 인원은 <b>보증인원과 예상 식사 인원 중 큰 쪽</b>이에요.",
@@ -129,6 +176,7 @@ const SPLIT_FORM = `<form id="wsf" autocomplete="off" novalidate>
 const se = splitCalc(S);
 const seLine = (i) => se.lines[i];
 const SPLIT_INFO = [
+  affBox("wedding-split"),
   card("분담 방식 5가지", UL([
     "<b>반반</b>: 반씩 내요.",
     "<b>비율</b>: 신랑측 비율을 정해요. 예: 60%면 신랑측 6, 신부측 4",
@@ -202,6 +250,7 @@ const pe = payCalc(PAY_EXAMPLE);
 const md = (iso) => { const [, m, d] = iso.split("-"); return `${+m}월 ${+d}일`; };
 const dd = (n) => (n === 0 ? "D-day" : n > 0 ? `D-${n}` : `D+${-n}`);
 const PAY_INFO = [
+  affBox("wedding-payment"),
   card("계약금·중도금·잔금, 이렇게 넣어요", UL([
     "업체마다 <b>총액</b>과 <b>계약금·중도금의 금액과 날짜</b>를 넣어요. 잔금은 총액 − 계약금 − 중도금으로 자동 계산돼요.",
     "잔금 날짜를 비우면 예식일에 내는 것으로 봐요. 예식장 식대처럼 당일 정산하는 항목은 그대로 비워 두면 돼요.",
