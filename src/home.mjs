@@ -76,6 +76,13 @@ export function home(all) {
   </div>
 </section>
 
+<section class="section wrap" id="bill">
+  <div class="section-head rv"><h2>${CATS.bill.name}</h2><span class="count">${by("bill").length}개</span></div>
+  <div class="rows">
+    ${by("bill").map((c) => row(c.slug)).join("\n    ")}
+  </div>
+</section>
+
 <section class="section wrap" id="pay">
   <div class="section-head rv"><h2>${CATS.pay.name}</h2><span class="count">${by("pay").length}개</span></div>
   <div class="rows">

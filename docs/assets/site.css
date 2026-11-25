@@ -457,3 +457,7 @@ input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px va
   .wp-part input[type="date"] { font-size: 15px; padding: 0 8px; }
 }
 .wp-amt { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* 전기요금·생활비: 난방기 전기요금 */
+.form-row.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.form-row.cols-3 .field label { white-space: nowrap; font-size: 13px; }
