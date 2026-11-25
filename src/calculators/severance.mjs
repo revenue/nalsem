@@ -89,7 +89,7 @@ export const severancePay = [
     lede: "입사일, 마지막 근무일, 월급을 넣으면 1일 평균임금과 퇴직금을 계산해요. 상여금·연차수당 3/12 가산, 1년·주 15시간 조건, 달마다 다른 3개월 날짜 수까지 반영해요. 참고용이고 노무 자문이 아니에요.",
     description: "2027 퇴직금 계산기. 입사일·마지막 근무일·월급을 넣으면 퇴직일, 재직일수, 퇴직 전 3개월 임금과 날짜 수, 1일 평균임금, 퇴직금(평균임금 × 30 × 재직일수 ÷ 365)을 계산합니다. 상여금·연차수당 3/12 가산, 1년 미만·주 15시간 미만 판정, 5인 미만·알바 포함.",
     keys: ["퇴직금 계산기", "2027 퇴직금", "퇴직금 계산법", "평균임금 계산", "알바 퇴직금", "퇴직금 조건", "1년 퇴직금", "퇴직금 상여금"],
-    form: FORM, modules: ["severance-ui.js"], related: ["insurance", "alba-pay"],
+    form: FORM, modules: ["severance-ui.js"], related: ["insurance", "alba-pay", "annual-leave"],
     info: INFO,
   },
 ];

@@ -108,7 +108,7 @@ export const insurance = [
     lede: "월급을 넣으면 2027년 요율로 국민연금·건강보험·장기요양·고용보험을 근로자 몫과 사업주 몫으로 나눠 계산해요. 국민연금 5% 인상, 비과세 식대, 주 15시간 미만 알바, 산재보험까지 반영해요. 참고용이고 노무·세무 자문이 아니에요.",
     description: "2027 4대보험 계산기. 월급을 넣으면 2027년 요율(국민연금 5.0%, 건강보험 3.595%, 장기요양 13.90%, 고용보험 0.9%·정부안 1.0%)로 근로자 공제액과 사업주 부담금, 사장님 월 인건비를 계산합니다. 비과세 식대·주 15시간 미만·산재보험 반영.",
     keys: ["4대보험 계산기", "2027 4대보험 요율", "4대보험 계산", "4대보험 사업주 부담금", "2027 국민연금 요율", "월급 4대보험 공제", "4대보험 요율표", "직원 4대보험 계산"],
-    form: FORM, modules: ["insurance-ui.js"], related: ["alba-pay", "juhyu-pay", "severance"],
+    form: FORM, modules: ["insurance-ui.js"], related: ["alba-pay", "juhyu-pay", "severance", "annual-leave"],
     info: INFO,
   },
 ];
