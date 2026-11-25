@@ -26,7 +26,7 @@ test("묶음: 대가 문구가 제목 바로 다음, 모든 링크 sponsored·no
   assert.ok(!/과태료|상담|무료 진단/.test(h), "과장·상담 알선 문구 금지");
 });
 
-for (const slug of ["alba-pay", "juhyu-pay", "insurance", "severance", "annual-leave"]) {
+for (const slug of ["alba-pay", "juhyu-pay", "insurance", "severance", "annual-leave", "minimum-wage"]) {
   test(`${slug}: 묶음 1곳, 급여대장 판매 카드 아래`, () => {
     const h = readFileSync(new URL(`../docs/${slug}/index.html`, import.meta.url), "utf8");
     assert.equal(h.split('id="pay-gear"').length - 1, 1);
