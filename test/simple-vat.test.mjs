@@ -248,13 +248,21 @@ t("표기", () => {
 });
 
 // ── 5. 빌드된 페이지 (npm test 는 빌드 뒤에 실행) ──
-t("페이지: 고지 문구·구조화 데이터·사이트맵·홈 연결, 제휴 링크와 대리처럼 보이는 표현 없음", () => {
+t("페이지: 고지 문구·구조화 데이터·사이트맵·홈 연결, 제휴 대가 문구 위치, 대리처럼 보이는 표현 없음", () => {
   const h = readFileSync("docs/simple-vat/index.html", "utf8");
   assert.ok(h.includes("참고용 추정입니다. 최종 세액은 홈택스 신고서 화면에서 확인하세요."), "고지 문구");
   assert.ok(h.includes("세무 상담이나 신고 대리를 하지 않습니다"), "대리 아님 고지");
   assert.ok(h.includes('"@type":"WebApplication"') && h.includes('"@type":"FAQPage"') && h.includes('"@type":"BreadcrumbList"'), "JSON-LD");
   assert.ok(h.includes("/assets/simple-vat.js?v=") && h.includes("/assets/simple-vat-ui.js?v="), "엔진·화면 스크립트");
-  for (const bad of ["coupang", "link.coupang", "rel=\"sponsored", "신고해 드립니다", "대신 신고", "절세 전략", "세무 상담을 제공"]) assert.ok(!h.includes(bad), "금지: " + bad);
+  for (const bad of ["신고해 드립니다", "대신 신고", "절세 전략", "세무 상담을 제공", "신용카드 추천", "세무사 연결"]) assert.ok(!h.includes(bad), "금지: " + bad);
+  // 쿠팡 파트너스 묶음(2026-11-26): 대가 문구가 첫 쿠팡 링크보다 앞에 있고(머리말 + 묶음 위), 모든 쿠팡 링크는 sponsored.
+  const disc = "쿠팡 파트너스 활동의 일환으로, 구매가 일어나면 날셈이 일정액의 수수료를 받습니다";
+  const firstLink = h.indexOf("link.coupang.com");
+  assert.ok(firstLink > 0 && h.indexOf(disc) > 0 && h.indexOf(disc) < firstLink, "대가 문구가 링크보다 먼저");
+  const card = h.slice(h.indexOf("영수증·장부 정리에 쓰는 물건"));
+  assert.ok(card.indexOf(disc) < card.indexOf("link.coupang.com"), "묶음 안에서도 문구가 링크 위");
+  const links = h.match(/<a [^>]*href="https:\/\/link\.coupang\.com[^>]*>/g) || [];
+  assert.ok(links.length >= 8 && links.every((a) => a.includes('rel="sponsored nofollow noopener"')), "쿠팡 링크 sponsored");
   assert.ok(h.includes('value="switch"') && h.includes('id="sv-stock"') && h.includes("2026년 7월에 간이과세자로 바뀌었다면?"), "7월 전환자 선택지·재고납부세액 칸·설명 카드");
   assert.ok(readFileSync("docs/sitemap.xml", "utf8").includes("https://nalsem.suik.me/simple-vat/"), "사이트맵");
   assert.ok(readFileSync("docs/llms.txt", "utf8").includes("https://nalsem.suik.me/simple-vat/"), "llms.txt");

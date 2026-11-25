@@ -326,5 +326,22 @@ t("샘플 검증(2026-11-22): 독립 계산과 176개 조합 원 단위 일치�
   assert.ok(!/원로 /.test(cd.text), cd.text);
 });
 
+// 쿠팡 파트너스 묶음(2026-11-26): 맞벌이 3개 페이지는 대가 문구가 링크보다 먼저, '12월 카드' 페이지는 쇼핑 링크 없음.
+t("페이지: 제휴 묶음 대가 문구 위치와 카드 페이지 제외", () => {
+  const disc = "쿠팡 파트너스 활동의 일환으로, 구매가 일어나면 날셈이 일정액의 수수료를 받습니다";
+  for (const slug of ["dual-income", "dual-income-dependents", "dual-income-medical"]) {
+    const h = readFileSync(`docs/${slug}/index.html`, "utf8");
+    const first = h.indexOf("link.coupang.com");
+    assert.ok(first > 0 && h.indexOf(disc) > 0 && h.indexOf(disc) < first, slug + ": 대가 문구가 링크보다 먼저");
+    const card = h.slice(h.indexOf("연말정산 서류 모아 두기"));
+    assert.ok(card.indexOf(disc) >= 0 && card.indexOf(disc) < card.indexOf("link.coupang.com"), slug + ": 묶음 위 문구");
+    const links = h.match(/<a [^>]*href="https:\/\/link\.coupang\.com[^>]*>/g) || [];
+    assert.ok(links.length >= 5 && links.every((a) => a.includes('rel="sponsored nofollow noopener"')), slug + ": sponsored");
+    for (const bad of ["카드 추천", "카드 발급", "세무사 연결", "신고 대행"]) assert.ok(!h.includes(bad), slug + " 금지: " + bad);
+  }
+  const cardPage = readFileSync("docs/dual-income-card/index.html", "utf8");
+  assert.ok(!cardPage.includes("link.coupang.com"), "12월 카드 페이지에는 쇼핑 링크 없음");
+});
+
 console.log(`tax engine: ${n} passed, ${failed} failed`);
 if (failed) process.exit(1);

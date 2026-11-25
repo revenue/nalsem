@@ -65,7 +65,7 @@
       const why = x.eligible.ok ? (x.capped ? `${r.rate}%면 ${K.man(x.raw)}이지만 남은 한도까지만 받습니다.` : `${K.man(x.price)} × ${r.rate}%`) : (REASON[x.eligible.reason] || (() => ""))(x);
       const ps = (L[x.item] || []).filter((p) => p && p.url);
       const img = (p) => p.img ? `<img class="kp-thumb" src="${esc(p.img)}" alt="" width="48" height="48" decoding="async" referrerpolicy="no-referrer">` : "";
-      const link = ps.length ? `<span class="kp-buys"><small class="kp-buys-h">쿠팡에서 대상 ${esc(x.label)} 보기</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)} (${esc(p.model)})</span></a>`).join("")}</span>` : "";
+      const link = ps.length ? `<span class="kp-buys"><small class="kp-buys-h">쿠팡에서 대상 ${esc(x.label)} 보기 · 쿠팡 파트너스 링크로, 구매하면 날셈이 수수료를 받습니다</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)} (${esc(p.model)})</span></a>`).join("")}</span>` : "";
       return `<div><span class="k">${esc(x.label)}<small class="kp-why">${esc(why)}</small>${link}</span><span class="v">${x.eligible.ok ? K.wonStr(x.support) : "대상 아님"}</span></div>`;
     }).join("")}</div>`;
     const warn = [];

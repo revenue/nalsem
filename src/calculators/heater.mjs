@@ -88,10 +88,9 @@ const KIND_TABLE = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>기�
 
 const GROUP_LABEL = { mat: "전기요·전기장판", water: "온수매트", carbon: "카본매트", heater: "전기히터·온풍기", humid: "가습기" };
 const PICK_CARD = HAS_LINKS ? card("많이 사는 난방·가습 제품",
-  P(`쿠팡에서 리뷰가 많은 쿠팡 직매입 상품을 종류별로 골랐습니다(${PICKED} 확인). 전기장판·히터·가습기는 에너지효율등급 대상이 아니어서 제품마다 소비전력이 다릅니다. 사기 전에 상세페이지의 정격 소비전력을 위 계산기에 넣어 한 달 요금을 미리 보세요.`)
+  `<p class="kp-disc kp-disc-top">${DISCLOSURE}</p>` + P(`쿠팡에서 리뷰가 많은 쿠팡 직매입 상품을 종류별로 골랐습니다(${PICKED} 확인). 전기장판·히터·가습기는 에너지효율등급 대상이 아니어서 제품마다 소비전력이 다릅니다. 사기 전에 상세페이지의 정격 소비전력을 위 계산기에 넣어 한 달 요금을 미리 보세요.`)
   + `<div class="tbl-wrap"><table class="tbl kp-pick"><thead><tr><th>종류</th><th>제품 (쿠팡에서 보기)</th></tr></thead><tbody>${Object.entries(LINKS).flatMap(([id, list]) => list.filter((p) => p && p.url).map((p, i, arr) => `<tr>${i === 0 ? `<td class="kp-c" rowspan="${arr.length}">${GROUP_LABEL[id]}</td>` : ""}<td class="kp-p"><a class="kp-buy" href="${p.url}" target="_blank" rel="sponsored nofollow noopener">${p.img ? `<img class="kp-img" src="${p.img}" alt="" width="64" height="64" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ""}${p.name}</a></td></tr>`)).join("")}</tbody></table></div>`
-  + P("가격과 재고는 쿠팡에서 수시로 바뀝니다.")
-  + `<p class="kp-disc">${DISCLOSURE}</p>`) : "";
+  + P("가격과 재고는 쿠팡에서 수시로 바뀝니다.")) : "";
 
 const INFO = [
   card("전기장판을 하루 8시간 쓰면 한 달에 얼마 더 나오나?", P("300W 전기장판을 하루 8시간, 30일 쓰면 72kWh입니다. 같은 72kWh라도 <b>평소 사용량에 따라 늘어나는 요금이 다릅니다.</b> 누진제 때문에 많이 쓰는 집일수록 1kWh가 비싸집니다(12월 기준, 부가세·기금 포함).")

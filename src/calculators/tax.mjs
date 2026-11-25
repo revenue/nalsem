@@ -3,8 +3,33 @@
 // 세법 출처·확인 날짜: 본부 저장소 ventures/nalsem-dual-income/tax-rules.md (2026-11-21 대조)
 // 예시 가구의 숫자는 tax.js 로 계산한 값이다(test/tax.test.mjs 의 "설명 카드 예시" 테스트가 다시 확인한다).
 import { ARROW } from "../layout.mjs";
+import { COUPANG_DISCLOSURE, hasLinks, pickCard } from "../affiliate.mjs";
 
-const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
+// 쿠팡 파트너스 상품 묶음(2026-11-26, 본부 세션 지시 "맞벌이 연말정산 계산기에 서류 파일·세무 실무서 묶음").
+// 신용카드는 추천하지 않는다(금소법). '12월 카드' 페이지에는 넣지 않는다(카드 사용을 고르는 페이지라 오해를 피한다).
+const PICKED = "2026-11-26";
+export const PICKS = [
+  { label: "서류 파일", items: [
+    { url: "https://link.coupang.com/a/iYqS7nQlWu", name: "모던앳 아코디언 파일 13칸", img: "https://t3c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/549367908210-141a5101-9d5d-47b3-abdb-0c7c625171bf.jpg" },
+    { url: "https://link.coupang.com/a/iYqTV5ZwEm", name: "kovion 아코디언 13칸 A4 서류 파일 (2개)", img: "https://t1c.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/9431/6ab7fbd61546e8661d36eabb3294fa37768aad5f1762892c2b250652db72.png" },
+  ] },
+  { label: "영수증 스캐너", items: [
+    { url: "https://link.coupang.com/a/iYqDo4hzKC", name: "엡손 스캐너 ES-50", img: "https://thumbnail8.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2019/05/16/10/1/0a69abb5-5359-43eb-8806-98533d146118.jpg" },
+  ] },
+  { label: "연말정산·세금 책", items: [
+    { url: "https://link.coupang.com/a/iYqXFXeJ2q", name: "돈 들어오는 연말정산의 모든 것 (매일경제신문사)", img: "https://t2a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/1321/42e56139ce0f64ba2ac2bdd3b718b1d389fa50193e4ebb797e0332c9530c.jpg" },
+    { url: "https://link.coupang.com/a/iYqNbpPy3g", name: "최소한의 세금공부 (매일경제신문사)", img: "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/11/14/10/3/6cf4e952-d543-4669-a00e-5bab3dd7cc7c.jpg" },
+  ] },
+];
+const HAS_LINKS = hasLinks(PICKS);
+const LEDE_DISC = HAS_LINKS ? ` <span class="kp-disc">${COUPANG_DISCLOSURE}</span>` : "";
+const PICK_CARD = pickCard({
+  title: "연말정산 서류 모아 두기",
+  intro: `대부분의 공제 자료는 홈택스 간소화 서비스에 자동으로 모이지만, 안경·콘택트렌즈 구입비, 일부 기부금·교육비 영수증처럼 빠지는 서류는 직접 챙겨 회사에 내야 합니다. 이런 서류를 한곳에 모아 두는 데 쓰는 물건과 책을 골랐습니다(${PICKED} 확인). 책은 판에 따라 개정 전 세법이 실려 있을 수 있으니 출간 연도를 확인하세요.`,
+  groups: PICKS,
+});
+
+const card =(h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
 const P = (s) => `<p>${s}</p>`;
 const UL = (items) => `<ul class="tx-ul">${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
 const a = (href, text) => `<a href="${href}" rel="noopener">${text}</a>`;
@@ -181,27 +206,27 @@ const ASSETS = ["tax.js", "tax-ui.js"];
 export const tax = [
   {
     slug: "dual-income", cat: "tax", title: "맞벌이 연말정산 몰아주기 계산기", short: "부양가족·의료비·12월 카드를 누구에게",
-    lede: "부부 총급여와 가족을 넣으면 부양가족, 의료비, 12월 카드를 누구에게 몰아야 둘이 합쳐 세금을 가장 덜 내는지 모든 경우를 계산해 보여 줍니다. 로그인이 없고, 입력값은 브라우저 밖으로 나가지 않습니다.",
+    lede: "부부 총급여와 가족을 넣으면 부양가족, 의료비, 12월 카드를 누구에게 몰아야 둘이 합쳐 세금을 가장 덜 내는지 모든 경우를 계산해 보여 줍니다. 로그인이 없고, 입력값은 브라우저 밖으로 나가지 않습니다." + LEDE_DISC,
     description: "맞벌이 부부 연말정산 몰아주기 계산기. 부양가족·의료비·12월 카드 배분의 모든 경우를 계산해 부부 합산 세금이 가장 적은 방법과 이유를 보여 줍니다. 2026년 귀속 세법 기준.",
     keys: [...BASE_KEYS, "맞벌이 몰아주기", "부부 연말정산", "연말정산 미리보기"], related: ["dual-income-dependents", "dual-income-medical", "dual-income-card"],
     form: form("all"), assets: ASSETS,
-    info: INFO.all + EXAMPLE.all + MISTAKES.all + CHANGES_2026 + LIMITS,
+    info: INFO.all + EXAMPLE.all + MISTAKES.all + CHANGES_2026 + PICK_CARD + LIMITS,
   },
   {
     slug: "dual-income-dependents", cat: "tax", title: "맞벌이 부양가족 누구에게 올릴까", short: "자녀·부모님 기본공제를 남편? 아내?",
-    lede: "자녀와 부모님을 부부 중 누구의 기본공제로 올려야 유리한지 계산합니다. 자녀세액공제, 교육비·보험료·의료비, 카드 한도 상향처럼 함께 따라가는 공제까지 넣어 비교합니다.",
+    lede: "자녀와 부모님을 부부 중 누구의 기본공제로 올려야 유리한지 계산합니다. 자녀세액공제, 교육비·보험료·의료비, 카드 한도 상향처럼 함께 따라가는 공제까지 넣어 비교합니다." + LEDE_DISC,
     description: "맞벌이 부양가족 공제 계산기. 자녀·부모님을 남편과 아내 중 누구에게 올릴지 모든 경우를 계산하고, 자녀세액공제·교육비·카드 한도까지 따라가는 효과와 이유를 보여 줍니다.",
     keys: [...BASE_KEYS, "부양가족 공제", "자녀 공제 누구", "부모님 공제 누구", "자녀세액공제 2026"], related: ["dual-income", "dual-income-medical", "dual-income-card"],
     form: form("deps"), assets: ASSETS,
-    info: INFO.deps + EXAMPLE.deps + MISTAKES.deps + CHANGES_2026 + LIMITS,
+    info: INFO.deps + EXAMPLE.deps + MISTAKES.deps + CHANGES_2026 + PICK_CARD + LIMITS,
   },
   {
     slug: "dual-income-medical", cat: "tax", title: "맞벌이 의료비 몰아주기 계산기", short: "의료비는 누가 결제하고 누가 공제받을까",
-    lede: "부부와 가족의 의료비를 넣으면 앞으로 낼 의료비를 누가 결제하고 아이·부모님을 누가 기본공제 받아야 유리한지 계산합니다. 이미 낸 의료비는 낸 사람 것으로 고정합니다.",
+    lede: "부부와 가족의 의료비를 넣으면 앞으로 낼 의료비를 누가 결제하고 아이·부모님을 누가 기본공제 받아야 유리한지 계산합니다. 이미 낸 의료비는 낸 사람 것으로 고정합니다." + LEDE_DISC,
     description: "맞벌이 의료비 세액공제 계산기. 총급여 3% 문턱과 결정세액 0원 한계를 반영해, 배우자·자녀·부모님 의료비를 누가 결제하고 공제받아야 부부 합산 세금이 적은지 보여 줍니다.",
     keys: [...BASE_KEYS, "맞벌이 의료비 공제", "의료비 세액공제 계산", "의료비 몰아주기", "배우자 의료비 공제"], related: ["dual-income", "dual-income-dependents", "dual-income-card"],
     form: form("medical"), assets: ASSETS,
-    info: INFO.medical + MISTAKES.medical + EXAMPLE.medical + CHANGES_2026 + LIMITS,
+    info: INFO.medical + MISTAKES.medical + EXAMPLE.medical + CHANGES_2026 + PICK_CARD + LIMITS,
   },
   {
     slug: "dual-income-card", cat: "tax", title: "12월 카드 누구 걸로 쓸까", short: "연말 카드 사용, 부부 중 누구 카드로",

@@ -4,6 +4,30 @@
 // 예시의 숫자는 simple-vat.js 로 계산한 값이다(test/simple-vat.test.mjs 의 "스마트스토어 3,000만", "배달 음식점 6,000만" 테스트와 같다).
 // 세무사법: 계산과 공식 자료 안내만 한다. 상담·신고 대리·"절세 전략" 같은 표현을 쓰지 않는다.
 import { ARROW } from "../layout.mjs";
+import { COUPANG_DISCLOSURE, hasLinks, pickCard } from "../affiliate.mjs";
+
+// 쿠팡 파트너스 상품 묶음(2026-11-26, 본부 세션 지시 "세금 계산기에는 영수증 스캐너·서류 파일·세무 실무서·1인 사업자 장부 묶음").
+// 쿠팡 파트너스 상품 검색에서 브랜드 제품이나 리뷰가 많은 상품을 골랐다. 토스쇼핑 쉐어링크는 검색이 없고 판매 상위 목록에 맞는 상품이 없었다.
+const PICKED = "2026-11-26";
+export const PICKS = [
+  { label: "영수증·서류 스캐너", items: [
+    { url: "https://link.coupang.com/a/iYqDo4hzKC", name: "엡손 스캐너 ES-50", img: "https://thumbnail8.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2019/05/16/10/1/0a69abb5-5359-43eb-8806-98533d146118.jpg" },
+    { url: "https://link.coupang.com/a/iYqFwTfTWe", name: "캐논 양면 카드·문서 스캐너 R10", img: "https://t4c.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/ty2m5nn2/75cdc94d4cf6421a91c0d398e690f933.jpg" },
+  ] },
+  { label: "영수증·서류 파일", items: [
+    { url: "https://link.coupang.com/a/iYqSwHTMVE", name: "에코청운 세금철 파일 A6 (5개)", img: "https://t5c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2020/03/30/9/6/5926c04c-6b1e-4c0d-8bd2-0b3f7d21c4f0.jpg" },
+    { url: "https://link.coupang.com/a/iYqS7nQlWu", name: "모던앳 아코디언 파일 13칸", img: "https://t3c.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/549367908210-141a5101-9d5d-47b3-abdb-0c7c625171bf.jpg" },
+  ] },
+  { label: "장부", items: [
+    { url: "https://link.coupang.com/a/iYqVHSiOD6", name: "재미스쿨 간편장부 16절", img: "https://thumbnail8.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/a564/d90ccadd44245c0b4f5afbfa3ce831f2ced872e04ba86dfb53ef5ac27fe7.jpg" },
+    { url: "https://link.coupang.com/a/iYqUPJPvZk", name: "흥국장부 금전출납부 200P", img: "https://t4a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/56ae/cb633ad6b30cde33f63d8f1bee28f8fcca432d6e3307b277a9e925ca75f4.jpg" },
+  ] },
+  { label: "세금 실무서", items: [
+    { url: "https://link.coupang.com/a/iYqWit4K96", name: "한 권으로 끝내는 개인사업자 절세 공부 (길벗)", img: "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2025/02/24/12/7/afe3dca1-8e9e-4e97-895a-2beec61d5b0d.jpg" },
+    { url: "https://link.coupang.com/a/iYqWTiOTcW", name: "2026 창업·법인·개인사업자 절세의 기초와 노하우 (삼일인포마인)", img: "https://thumbnail12.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/c908/96e2b225a270cc0557be955242242c0df43d57cffab11598f0016a697d13.jpg" },
+  ] },
+];
+const HAS_LINKS = hasLinks(PICKS);
 
 export const DISCLAIMER = "참고용 추정입니다. 최종 세액은 홈택스 신고서 화면에서 확인하세요. 날셈은 세무 상담이나 신고 대리를 하지 않습니다.";
 const CHECKED = "2026-11-22";
@@ -127,18 +151,23 @@ const INFO = [
     "광업, 제조업·건설업(최종소비자 대상 제외), 도매업, 부동산매매업, 변호사·세무사 같은 전문자격사업, 전문·과학·기술서비스업과 사업지원서비스업(최종소비자 대상 제외), 복식부기의무자 등은 간이과세를 받을 수 없습니다. 사업자등록증의 과세유형이 '간이과세자'인지 먼저 보세요.",
     "사업자등록 없이 3.3%를 떼고 받는 프리랜서(인적용역)는 보통 부가세 신고 대상이 아니고 5월 종합소득세만 신고합니다.",
   ]), `${LAW.vat} 제61조·제62조, ${LAW.dec}`),
+  pickCard({
+    title: "영수증·장부 정리에 쓰는 물건",
+    intro: `1월 부가세 신고와 5월 종합소득세 신고를 준비하면서 매입 영수증과 매출 기록을 모아 두는 데 쓰는 물건을 골랐습니다(${PICKED} 확인). 신고는 홈택스에서 무료로 할 수 있고, 이 물건이 없어도 신고할 수 있습니다. 책은 판에 따라 개정 전 세법이 실려 있을 수 있으니 출간 연도를 확인하세요.`,
+    groups: PICKS,
+  }),
   card("날셈은 국세청 사이트인가요?", UL([
     "날셈은 <b>국세청 공식 사이트가 아니며</b>, 세무 상담이나 신고 대리를 하지 않습니다. 공개된 법령과 국세청 안내로 만든 계산기입니다.",
     `${DISCLAIMER} 기준 확인일 ${CHECKED}(국가법령정보센터 현행 조문).`,
     "카드 매출 공제의 1.3%·연 1,000만 원은 2026년 12월 31일 발급분까지이고, 현행법으로는 2027년 발급분부터 1%·연 500만 원입니다. 2026년 8월 정부 세제개편안에 1.2%로 하는 안이 있다고 보도됐습니다. 2026년 매출을 신고하는 2027년 1월에는 영향이 없고, 국회 통과 내용을 확인해 고칠 예정입니다.",
-    "이 페이지에는 광고 수수료를 받는 쇼핑·제휴 링크가 없습니다.",
+    HAS_LINKS ? COUPANG_DISCLOSURE : "이 페이지에는 광고 수수료를 받는 쇼핑·제휴 링크가 없습니다.",
   ])),
 ].join("");
 
 export const simpleVat = [
   {
     slug: "simple-vat", cat: "biz", title: "간이과세자 부가세 계산기 (납부면제 판정)", short: "1월 부가세 0원인지, 내야 하면 얼마인지",
-    lede: `2026년 간이과세자가 업종과 매출·매입·카드 매출을 넣으면 1월 부가세가 납부면제(4,800만 원 미만)인지, 내야 하면 대략 얼마인지 계산 과정과 함께 보여 줍니다. 2026년에 개업했거나 7월에 일반과세자에서 간이과세자로 바뀌었다면 12개월로 환산해 판정합니다. 신고 기한은 2027년 1월 25일입니다. ${DISCLAIMER}`,
+    lede: `2026년 간이과세자가 업종과 매출·매입·카드 매출을 넣으면 1월 부가세가 납부면제(4,800만 원 미만)인지, 내야 하면 대략 얼마인지 계산 과정과 함께 보여 줍니다. 2026년에 개업했거나 7월에 일반과세자에서 간이과세자로 바뀌었다면 12개월로 환산해 판정합니다. 신고 기한은 2027년 1월 25일입니다. ${DISCLAIMER}${HAS_LINKS ? ` <span class="kp-disc">${COUPANG_DISCLOSURE}</span>` : ""}`,
     description: "간이과세자 부가가치세 계산기. 2026년 매출(공급대가)·업종·매입·카드 매출·개업 시기를 넣으면 4,800만 원 납부면제 여부(신규 개업자·7월 간이과세 전환자는 12개월 환산, 전환자 재고납부세액 포함), 업종별 부가가치율로 계산한 납부세액, 매입 0.5%·카드 1.3% 공제를 보여 주고 2027년 1월 25일 홈택스 신고 순서와 5월 종합소득세 준비를 안내합니다. 2026년 귀속 기준 참고용 추정.",
     keys: ["간이과세자 부가세 계산기", "간이과세자 부가세", "간이과세자 납부면제", "간이과세자 4800만원", "간이과세자 부가세 신고", "간이과세자 업종별 부가가치율", "부가세 신고 1월", "스마트스토어 간이과세자 부가세", "간이과세자 전환 부가세", "일반과세자 간이과세자 전환", "재고납부세액"],
     form: FORM, assets: ["simple-vat.js", "simple-vat-ui.js"],

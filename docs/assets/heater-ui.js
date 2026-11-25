@@ -59,7 +59,7 @@
   function buyLinks(kindId, label) {
     const ps = (links()[GROUP[kindId]] || []).filter((p) => p && p.url);
     if (!ps.length) return "";
-    return `<span class="kp-buys"><small class="kp-buys-h">쿠팡에서 많이 사는 ${esc(label)} 보기</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)}</span></a>`).join("")}</span>`;
+    return `<span class="kp-buys"><small class="kp-buys-h">쿠팡에서 많이 사는 ${esc(label)} 보기 · 쿠팡 파트너스 링크로, 구매하면 날셈이 수수료를 받습니다</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)}</span></a>`).join("")}</span>`;
   }
 
   function render(h, r) {
