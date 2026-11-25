@@ -104,14 +104,24 @@
   function toSolar(y, m, d, leap) { const c = lunar(); if (!c.setLunarDate(y, m, d, !!leap)) return null; const s = c.getSolarCalendar(); return mk(s.year, s.month, s.day); }
   const LUNAR_MIN = 1000, LUNAR_MAX = 2050;
 
-  // 공휴일 (관공서의 공휴일에 관한 규정 + 대체공휴일 규정 2021.8~, 2023.5~ 부처님오신날·성탄절 포함)
+  // 공휴일: 관공서의 공휴일에 관한 규정 (대통령령 제36290호, 2026.4.30. 개정, 2026.5.1. 시행. 국가법령정보센터 2026-11-26 확인)
+  // - 노동절(5/1)은 2026년부터, 제헌절(7/17, 국경일)은 2026년(5/11 시행)부터 공휴일. 2025년까지는 아님.
+  // - 대체공휴일(제3조): 국경일·부처님오신날·노동절·어린이날·성탄절이 토·일과 겹치면, 설·추석 연휴가 일요일과 겹치면,
+  //   또는 이 공휴일들이 평일에 다른 공휴일과 겹치면 그다음 첫 비공휴일(토요일 제외). 신정·현충일·선거일은 대체 없음.
+  // - 임기만료 선거일(제2조 10의2): 아래 표에 확정·법정 날짜만 넣는다. 임시공휴일은 넣지 않는다.
+  const ELECTIONS = {
+    2026: [[6, 3, "전국동시지방선거"]],
+    2028: [[4, 12, "국회의원선거"]], // 공직선거법 제34조: 임기만료일(5/29) 전 50일 이후 첫 수요일
+  };
   function holidays(year) {
     const list = [];
     const push = (t, name, sub) => list.push({ date: t, name, sub: !!sub });
     push(mk(year, 1, 1), "신정");
     push(mk(year, 3, 1), "삼일절");
+    if (year >= 2026) push(mk(year, 5, 1), "노동절");
     push(mk(year, 5, 5), "어린이날");
     push(mk(year, 6, 6), "현충일");
+    if (year >= 2026) push(mk(year, 7, 17), "제헌절");
     push(mk(year, 8, 15), "광복절");
     push(mk(year, 10, 3), "개천절");
     push(mk(year, 10, 9), "한글날");
@@ -121,15 +131,20 @@
     if (seol) { push(addDays(seol, -1), "설날 연휴"); push(seol, "설날"); push(addDays(seol, 1), "설날 연휴"); }
     if (chuseok) { push(addDays(chuseok, -1), "추석 연휴"); push(chuseok, "추석"); push(addDays(chuseok, 1), "추석 연휴"); }
     if (buddha) push(buddha, "부처님오신날");
-    list.sort((a, b) => a - b || a.date - b.date);
+    (ELECTIONS[year] || []).forEach(([m, d, name]) => push(mk(year, m, d), name));
+    list.sort((a, b) => a.date - b.date);
     const has = (t) => list.some((h) => h.date.getTime() === t.getTime());
-    // 대체공휴일: 설·추석은 일요일과 겹칠 때, 나머지 지정 공휴일은 토·일과 겹칠 때 다음 첫 평일
-    const SUB_SAT = ["삼일절", "어린이날", "광복절", "개천절", "한글날", "부처님오신날", "성탄절"];
+    const SUB_SAT = ["삼일절", "노동절", "어린이날", "제헌절", "광복절", "개천절", "한글날", "부처님오신날", "성탄절"];
     const SUB_SUN = SUB_SAT.concat(["설날", "설날 연휴", "추석", "추석 연휴"]);
     const subs = [];
+    const seen = new Set();
     list.forEach((h) => {
-      const w = W(h.date);
-      const eligible = (w === 0 && SUB_SUN.includes(h.name)) || (w === 6 && SUB_SAT.includes(h.name));
+      const w = W(h.date), k = h.date.getTime();
+      const many = list.filter((x) => x.date.getTime() === k).length > 1;
+      let eligible = (w === 0 && SUB_SUN.includes(h.name)) || (w === 6 && SUB_SAT.includes(h.name));
+      // 평일에 다른 공휴일과 겹치면(제3조 제1항 제3호) 먼저 나온 것은 그날, 다음 것부터 대체 하루씩
+      if (!eligible && w > 0 && w < 6 && many && SUB_SUN.includes(h.name)) eligible = seen.has(k);
+      seen.add(k);
       if (!eligible) return;
       let t = addDays(h.date, 1);
       while (W(t) === 0 || W(t) === 6 || has(t) || subs.some((s) => s.date.getTime() === t.getTime())) t = addDays(t, 1);
