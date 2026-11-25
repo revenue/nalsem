@@ -37,6 +37,18 @@ t("공휴일 2025: 3/3 대체(삼일절 토), 추석 10/6, 개천절 10/3, 한�
   const h = hol(2025);
   for (const x of ["03-03 대체공휴일(삼일절)", "10-06 추석", "10-08 대체공휴일(추석)"]) assert.ok(h.includes(x), x + " 없음: " + h.join());
 });
+t("공휴일 2026 개정(대통령령 제36290호): 노동절·제헌절·지방선거, 2027 노동절(토)→5/3·제헌절(토)→7/19, 대체 7일", () => {
+  const h26 = hol(2026), h27 = hol(2027), h25 = hol(2025), h28 = hol(2028);
+  for (const x of ["05-01 노동절", "07-17 제헌절", "06-03 전국동시지방선거"]) assert.ok(h26.includes(x), x + " 없음: " + h26.join());
+  for (const x of ["05-03 대체공휴일(노동절)", "07-19 대체공휴일(제헌절)"]) assert.ok(h27.includes(x), x + " 없음: " + h27.join());
+  assert.equal(N.holidays(2027).filter((x) => x.sub).length, 7);
+  assert.equal(N.holidays(2027).length, 24);
+  assert.ok(!h25.some((x) => /노동절|제헌절/.test(x)), "2025년엔 노동절·제헌절 공휴일 아님");
+});
+t("공휴일 평일 겹침 대체(제3조 제1항 제3호): 2025 어린이날=부처님오신날→5/6, 2028 추석=개천절→10/5", () => {
+  assert.ok(hol(2025).includes("05-06 대체공휴일(부처님오신날)") || hol(2025).includes("05-06 대체공휴일(어린이날)"), hol(2025).join());
+  assert.ok(hol(2028).some((x) => x.startsWith("10-05 대체공휴일")), hol(2028).join());
+});
 t("간지·띠", () => {
   assert.equal(N.ganjiOf(1984).name, "갑자");
   assert.equal(N.ganjiOf(2026).name, "병오");

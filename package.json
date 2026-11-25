@@ -8,7 +8,7 @@
     "build": "node build.mjs",
     "serve": "node build.mjs && python3 -m http.server 4173 --directory docs",
     "indexnow": "node tools/indexnow.mjs",
-    "test": "node build.mjs && node test/engine.test.mjs && node test/tax.test.mjs && node test/kepco.test.mjs && node test/heater.test.mjs && node test/simple-vat.test.mjs && node --test test/alba-pay-engine.test.mjs test/alba-pay.test.mjs test/juhyu-pay.test.mjs test/insurance.test.mjs test/severance.test.mjs test/pay-gear.test.mjs test/annual-leave.test.mjs test/minimum-wage.test.mjs test/wedding.test.mjs test/sebaetdon.test.mjs && node test/site.audit.mjs"
+    "test": "node build.mjs && node test/engine.test.mjs && node test/leave-plan.test.mjs && node test/tax.test.mjs && node test/kepco.test.mjs && node test/heater.test.mjs && node test/simple-vat.test.mjs && node --test test/alba-pay-engine.test.mjs test/alba-pay.test.mjs test/juhyu-pay.test.mjs test/insurance.test.mjs test/severance.test.mjs test/pay-gear.test.mjs test/annual-leave.test.mjs test/minimum-wage.test.mjs test/wedding.test.mjs test/sebaetdon.test.mjs && node test/site.audit.mjs"
   },
   "license": "MIT"
 }

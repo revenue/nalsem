@@ -11,11 +11,12 @@ import { severancePay } from "./severance.mjs";
 import { annualLeavePay } from "./annual-leave.mjs";
 import { minimumWagePay } from "./minimum-wage.mjs";
 import { wedding } from "./wedding.mjs";
+import { holidayLeave } from "./holiday-leave.mjs";
 import { sebaetdonCalc } from "./sebaetdon.mjs";
 
 // src: 사이트맵 lastmod·dateModified를 페이지별 실제 수정일(git)로 내기 위한 원본 파일 이름
 const from = (list, src) => list.map((c) => ({ ...c, src }));
-export const calculators = [...from(age, "age.mjs"), ...from(date, "date.mjs"), ...from(tax, "tax.mjs"), ...from(simpleVat, "simple-vat.mjs"), ...from(kepco, "kepco.mjs"), ...from(heater, "heater.mjs"), ...from(alba, "alba.mjs"), ...from(juhyuPay, "juhyu.mjs"), ...from(insurance, "insurance.mjs"), ...from(severancePay, "severance.mjs"), ...from(annualLeavePay, "annual-leave.mjs"), ...from(minimumWagePay, "minimum-wage.mjs"), ...from(wedding, "wedding.mjs"), ...from(sebaetdonCalc, "sebaetdon.mjs")];
+export const calculators = [...from(age, "age.mjs"), ...from(date, "date.mjs"), ...from(holidayLeave, "holiday-leave.mjs"), ...from(tax, "tax.mjs"), ...from(simpleVat, "simple-vat.mjs"), ...from(kepco, "kepco.mjs"), ...from(heater, "heater.mjs"), ...from(alba, "alba.mjs"), ...from(juhyuPay, "juhyu.mjs"), ...from(insurance, "insurance.mjs"), ...from(severancePay, "severance.mjs"), ...from(annualLeavePay, "annual-leave.mjs"), ...from(minimumWagePay, "minimum-wage.mjs"), ...from(wedding, "wedding.mjs"), ...from(sebaetdonCalc, "sebaetdon.mjs")];
 
 // 필수 필드 점검
 for (const c of calculators) for (const k of ["slug", "title", "short", "lede", "description", "cat", "form", "info"]) if (!c[k]) throw new Error(`${c.slug || "?"}: ${k} 누락`);

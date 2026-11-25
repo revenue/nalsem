@@ -469,3 +469,9 @@ input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px va
 .wd-aff-list a { font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; word-break: keep-all; }
 .wd-aff-list small { flex: none; font-size: 12px; color: var(--muted); }
 .wd-aff-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+/* 연차 황금연휴 계산기 */
+.lp-h { font-size: 15px; font-weight: 700; margin: 18px 0 8px; }
+.lp-sub { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
+.lp-step { display: block; padding: 2px 0; }
+.lp-step small { color: var(--muted); }
+.lp-tbl td { word-break: keep-all; vertical-align: top; }
