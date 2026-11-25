@@ -1,4 +1,28 @@
 import { ymd, ARROW } from "../layout.mjs";
+import { COUPANG_DISCLOSURE, pickCard } from "../affiliate.mjs";
+
+// 쿠팡 파트너스 상품 묶음(2026-11-26, 운영 정책 11장 "날셈은 페이지마다 판매처나 제휴 링크로 잇는다"). 대가 문구는 머리말과 묶음 맨 위.
+const PICKED = "2026-11-26";
+export const MOVE_PICKS = [
+  { label: "이사 박스", items: [
+    { url: "https://link.coupang.com/a/iYv4h8Orxk", name: "코멧 두꺼운 이사박스 3T (5개입)", img: "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/3804150279642044-4b47f37f-e2bc-47a3-9534-1dee5e76fb55.jpg" },
+    { url: "https://link.coupang.com/a/iYv4S2804G", name: "박스왕 종이 이사박스 05호 (10개)", img: "https://thumbnail9.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/2377/066454312ce4dab20d3619ced76db21053ff8c786cf58b6e660291111f00.png" },
+  ] },
+  { label: "이불 압축팩", items: [
+    { url: "https://link.coupang.com/a/iYv5w3lf5g", name: "코멧 이불 압축팩 (5개입)", img: "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/997610570099452-1bf5e072-945e-44ee-882c-59cb3ebdf3fb.jpg" },
+  ] },
+];
+export const BABY_PICKS = [
+  { label: "셀프 백일상", items: [
+    { url: "https://link.coupang.com/a/iYv8hLQeUS", name: "파티블리 백일상 상차림 세트 (목련)", img: "https://thumbnail2.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/8a47/e62f0d85e9047792bf47a247e2d1a09077a38c8a350a7a2be60efda34c76.jpg" },
+    { url: "https://link.coupang.com/a/iYwamX65U4", name: "올리브파티 데이지 셀프 백일상 소품 세트", img: "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/660a/34bd99f35d697aec419edf50088072493b7483428595c3311565e3666a0e.jpg" },
+  ] },
+  { label: "성장 앨범", items: [
+    { url: "https://link.coupang.com/a/iYv8WUun6a", name: "데일앤드 성장 앨범 접착식 30매", img: "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/dd80/91d7dc4619c1196f379aaec67ae26f8e602861546b3d76e3c68650d8d475.png" },
+    { url: "https://link.coupang.com/a/iYv9w7236y", name: "미리모아 대용량 접착식 앨범 120매", img: "https://t5a.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/01eb/c5e794123d40586a231eefb1f18a48da874e37e5ee0c3eba1bc270c74da8.png" },
+  ] },
+];
+const LEDE_DISC = ` <span class="kp-disc">${COUPANG_DISCLOSURE}</span>`;
 
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
 const P = (s) => `<p>${s}</p>`;
@@ -133,11 +157,11 @@ inp.addEventListener("input",run);if(N.qs("y"))inp.value=N.qs("y");run();`,
   },
   {
     slug: "son-eomneun-nal", cat: "date", title: "손없는 날", short: "이사·개업하기 좋은 날 달력",
-    lede: "음력 끝자리가 9·0인 날, 이른바 손없는 날을 달마다 보여줍니다. 이사, 개업, 혼례 날짜를 잡을 때 참고하는 민속 달력입니다.",
+    lede: "음력 끝자리가 9·0인 날, 이른바 손없는 날을 달마다 보여줍니다. 이사, 개업, 혼례 날짜를 잡을 때 참고하는 민속 달력입니다." + LEDE_DISC,
     description: "손없는 날 달력. 이사·개업·혼례 날짜로 찾는 손없는 날(음력 9·10·19·20·29·30일)을 월별로 요일과 함께 확인하세요.",
     keys: ["손없는날", "이사날짜", "이사하기좋은날", "개업"], related: ["today-lunar", "holidays", "lunar-to-solar", "wedding-split"],
     form: `<form id="f" autocomplete="off"><div class="field"><label for="ym">달 선택</label><div class="ymd" style="grid-template-columns:1fr 1fr"><div class="unit" data-unit="년"><input id="ym-y" type="text" inputmode="numeric" maxlength="4" autocomplete="off"></div><div class="unit" data-unit="월"><input id="ym-m" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="월"></div></div></div></form>`,
-    info: card("손없는 날이란", P("'손(損)'은 날짜에 따라 방위를 옮겨 다니며 사람 일을 방해한다는 귀신을 뜻합니다. 음력 1·2일은 동쪽, 3·4일은 남쪽, 5·6일은 서쪽, 7·8일은 북쪽에 있고, 9·10일에는 하늘로 올라가 아무 방위에도 없다고 하여 이날을 손없는 날이라 합니다.") + P("과학적 근거는 없지만 이사 비용이 몰리는 날이므로 일정과 비용을 함께 고려하세요.")),
+    info: card("손없는 날이란", P("'손(損)'은 날짜에 따라 방위를 옮겨 다니며 사람 일을 방해한다는 귀신을 뜻합니다. 음력 1·2일은 동쪽, 3·4일은 남쪽, 5·6일은 서쪽, 7·8일은 북쪽에 있고, 9·10일에는 하늘로 올라가 아무 방위에도 없다고 하여 이날을 손없는 날이라 합니다.") + P("과학적 근거는 없지만 이사 비용이 몰리는 날이므로 일정과 비용을 함께 고려하세요.")) + pickCard({ title: "이사 짐 싸기 준비물", intro: `손없는 날로 이사 날짜를 잡았다면 짐 싸기에 쓰는 박스와 압축팩을 미리 준비해 두세요. 쿠팡에서 리뷰가 많은 상품을 골랐습니다(${PICKED} 확인). 포장 이사라면 업체가 박스를 가져오는지 먼저 확인하세요.`, groups: MOVE_PICKS }),
     script: pre + `const yi=$("ym-y"),mi=$("ym-m");yi.value=TY;mi.value=N.M(T);
 function run(){const y=parseInt(yi.value,10),m=parseInt(mi.value,10);if(!(y>=N.LUNAR_MIN&&y<=N.LUNAR_MAX&&m>=1&&m<=12)){out.hidden=true;return;}const n=N.daysInMonth(y,m);const rows=[];for(let d=1;d<=n;d++){const t=N.mk(y,m,d),L=N.toLunar(t);if(!L||!N.isSonEomneun(L.day))continue;const w=N.W(t);rows.push(\`<tr class="\${t.getTime()===T.getTime()?"hl":""}"><td>\${m}월 \${d}일</td><td>\${N.WEEK[w]}\${w===0||w===6?' <span class="tag neutral">주말</span>':""}</td><td>\${L.leap?"윤":""}\${L.month}.\${L.day}</td><td>\${L.gapja.day}</td></tr>\`);}
 out.innerHTML=\`<div class="result-hero"><div class="k">\${y}년 \${m}월</div><div class="v">\${rows.length}<small>일이 손없는 날</small></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>양력</th><th>요일</th><th>음력</th><th>일진</th></tr></thead><tbody>\${rows.join("")}</tbody></table></div>\`;out.hidden=false;N.setQS({y,m});}
@@ -145,11 +169,11 @@ out.innerHTML=\`<div class="result-hero"><div class="k">\${y}년 \${m}월</div><
   },
   {
     slug: "baby-100", cat: "date", title: "아기 100일 계산기", short: "백일·돌·생후 개월 수",
-    lede: "아기 생년월일을 넣으면 백일, 200일, 첫돌, 두돌 날짜와 오늘 생후 며칠·몇 개월인지 계산합니다.",
+    lede: "아기 생년월일을 넣으면 백일, 200일, 첫돌, 두돌 날짜와 오늘 생후 며칠·몇 개월인지 계산합니다." + LEDE_DISC,
     description: "아기 백일 계산기. 생년월일로 백일(100일), 첫돌, 두돌 날짜와 생후 일수·개월수·주수를 확인하세요.",
     keys: ["백일", "100일", "돌", "첫돌", "생후개월", "아기"], related: ["anniversary", "man-age", "age"],
     form: `<form id="f" autocomplete="off">${ymd("b", "아기 생년월일")}${btns()}</form>`,
-    info: card("백일 세는 법", P("태어난 날을 1일로 세어 100일째 되는 날이 백일입니다. 즉 생일에서 99일 뒤입니다. 돌은 태어난 다음 해 같은 날(만 1세 생일)입니다.") + P("영유아 건강검진 시기는 생후 개월 수 기준이므로 '생후 개월'을 참고하세요.")),
+    info: card("백일 세는 법", P("태어난 날을 1일로 세어 100일째 되는 날이 백일입니다. 즉 생일에서 99일 뒤입니다. 돌은 태어난 다음 해 같은 날(만 1세 생일)입니다.") + P("영유아 건강검진 시기는 생후 개월 수 기준이므로 '생후 개월'을 참고하세요.")) + pickCard({ title: "셀프 백일상과 성장 앨범", intro: `백일을 집에서 차리는 '셀프 백일상' 소품 세트와 사진을 모아 두는 앨범을 골랐습니다(${PICKED} 확인). 대여 대신 사는 소품이라 반납이 없고, 세트마다 구성이 달라 상세페이지에서 구성품을 확인하세요.`, groups: BABY_PICKS }),
     script: pre + `const f=$("b"),get=N.ymdInputs(f);
 function run(){const b=get();if(!b){out.hidden=true;return;}if(b>T){N.showErr(f,"오늘 이전 날짜를 입력해 주세요");out.hidden=true;return;}N.showErr(f,"");const a=N.ages(b,T),days=a.full.days+1;const rows=[["백일 (100일째)",N.addDays(b,99)],["200일",N.addDays(b,199)],["첫돌 (만 1세)",N.addMonths(b,12)],["500일",N.addDays(b,499)],["두돌 (만 2세)",N.addMonths(b,24)],["1000일",N.addDays(b,999)],["세돌 (만 3세)",N.addMonths(b,36)]];
 out.innerHTML=\`<div class="result-hero"><div class="k">오늘 생후</div><div class="v accent">\${days}<small>일째</small></div></div><div class="stats cols-3"><div class="stat"><div class="k">생후 개월</div><div class="v">\${a.full.y*12+a.full.m}<small>개월 \${a.full.d}일</small></div></div><div class="stat"><div class="k">생후 주</div><div class="v">\${Math.floor(a.full.days/7)}<small>주 \${a.full.days%7}일</small></div></div><div class="stat"><div class="k">만나이</div><div class="v">\${a.man}<small>세</small></div></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>기념일</th><th>날짜</th><th>남은 날</th></tr></thead><tbody>\${rows.map(([k,d])=>{const n=N.diffDays(T,d);return \`<tr class="\${n>=0&&n<=14?"hl":""}"><td>\${k}</td><td>\${N.fmt(d)}</td><td>\${n===0?"오늘":n>0?"D-"+n:"지남"}</td></tr>\`;}).join("")}</tbody></table></div>\`;N.bump(out);N.setQS({d:N.iso(b)});}

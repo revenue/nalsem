@@ -10,6 +10,8 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const won = (el) => { if (!el) return 0; const v = parseFloat(String(el.value).replace(/[^0-9.]/g, "")); return isFinite(v) && v > 0 ? Math.round(v * 10000) : 0; };
   const links = () => window.KEPCO_LINKS || {};
+  // 품목별 시즌 안내 (미세먼지 계절관리제 7차 2025-12~2026-03 기준, 8차 계획 미발표 2026-11-26)
+  const SEASON = { purifier: "정부는 해마다 12월~이듬해 3월을 미세먼지 계절관리제 기간으로 운영합니다. 겨울 미세먼지 대비와 지원금을 함께 챙기려면 지금이 좋습니다." };
 
   // ── 제품 행 ──
   const box = $("kp-rows"), tpl = $("kp-tpl"), add = $("kp-add");
@@ -65,7 +67,8 @@
       const why = x.eligible.ok ? (x.capped ? `${r.rate}%면 ${K.man(x.raw)}이지만 남은 한도까지만 받습니다.` : `${K.man(x.price)} × ${r.rate}%`) : (REASON[x.eligible.reason] || (() => ""))(x);
       const ps = (L[x.item] || []).filter((p) => p && p.url);
       const img = (p) => p.img ? `<img class="kp-thumb" src="${esc(p.img)}" alt="" width="48" height="48" decoding="async" referrerpolicy="no-referrer">` : "";
-      const link = ps.length ? `<span class="kp-buys"><small class="kp-buys-h">쿠팡에서 대상 ${esc(x.label)} 보기 · 쿠팡 파트너스 링크로, 구매하면 날셈이 수수료를 받습니다</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)} (${esc(p.model)})</span></a>`).join("")}</span>` : "";
+      const season = SEASON[x.item] ? `<small class="kp-buys-h">${esc(SEASON[x.item])}</small>` : "";
+      const link = ps.length ? `<span class="kp-buys">${season}<small class="kp-buys-h">쿠팡에서 대상 ${esc(x.label)} 보기 · 쿠팡 파트너스 링크로, 구매하면 날셈이 수수료를 받습니다</small>${ps.map((p) => `<a class="kp-buy kp-buy-row" href="${esc(p.url)}" target="_blank" rel="sponsored nofollow noopener">${img(p)}<span>${esc(p.name)} (${esc(p.model)})</span></a>`).join("")}</span>` : "";
       return `<div><span class="k">${esc(x.label)}<small class="kp-why">${esc(why)}</small>${link}</span><span class="v">${x.eligible.ok ? K.wonStr(x.support) : "대상 아님"}</span></div>`;
     }).join("")}</div>`;
     const warn = [];
