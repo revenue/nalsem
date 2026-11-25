@@ -343,5 +343,19 @@ t("페이지: 제휴 묶음 대가 문구 위치와 카드 페이지 제외", ()
   assert.ok(!cardPage.includes("link.coupang.com"), "12월 카드 페이지에는 쇼핑 링크 없음");
 });
 
+// 생활 계산기 쿠팡 파트너스 묶음(2026-11-26): 손없는 날·아기 100일·입학 연도. 대가 문구가 첫 링크보다 먼저, 링크는 sponsored.
+t("페이지: 생활 계산기 제휴 묶음 대가 문구 위치", () => {
+  const disc = "쿠팡 파트너스 활동의 일환으로, 구매가 일어나면 날셈이 일정액의 수수료를 받습니다";
+  for (const [slug, title, min] of [["son-eomneun-nal", "이사 짐 싸기 준비물", 3], ["baby-100", "셀프 백일상과 성장 앨범", 4], ["school", "초등학교 입학 준비물", 3]]) {
+    const h = readFileSync(`docs/${slug}/index.html`, "utf8");
+    const first = h.indexOf("link.coupang.com");
+    assert.ok(first > 0 && h.indexOf(disc) > 0 && h.indexOf(disc) < first, slug + ": 대가 문구가 링크보다 먼저");
+    const card = h.slice(h.indexOf(title));
+    assert.ok(card.indexOf(disc) >= 0 && card.indexOf(disc) < card.indexOf("link.coupang.com"), slug + ": 묶음 위 문구");
+    const links = h.match(/<a [^>]*href="https:\/\/link\.coupang\.com[^>]*>/g) || [];
+    assert.ok(links.length >= min && links.every((a) => a.includes('rel="sponsored nofollow noopener"')), slug + ": sponsored");
+  }
+});
+
 console.log(`tax engine: ${n} passed, ${failed} failed`);
 if (failed) process.exit(1);

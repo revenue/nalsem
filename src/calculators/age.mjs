@@ -1,4 +1,18 @@
 import { ymd, yearField, ARROW } from "../layout.mjs";
+import { COUPANG_DISCLOSURE, pickCard } from "../affiliate.mjs";
+
+// 쿠팡 파트너스 상품 묶음(2026-11-26, 운영 정책 11장 "날셈은 페이지마다 판매처나 제휴 링크로 잇는다"). 대가 문구는 머리말과 묶음 맨 위.
+const PICKED = "2026-11-26";
+export const SCHOOL_PICKS = [
+  { label: "초등 책가방", items: [
+    { url: "https://link.coupang.com/a/iYv6aqAghg", name: "빅토리아앤프렌즈 리플렉션 콤비 경량 책가방", img: "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2026/10/12/16/9/3f3231cd-e980-4add-bce7-a4fb2090c7ce.jpg" },
+    { url: "https://link.coupang.com/a/iYv6MqQu0O", name: "블랙야크 키즈 홀로그램 초등 책가방 세트", img: "https://thumbnail6.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/f047/405bcf81bdc22ab7565ae6c3239ac2f054161dd329f8695773cf2d938754.PNG" },
+  ] },
+  { label: "이름 스티커", items: [
+    { url: "https://link.coupang.com/a/iYv7m9UEsm", name: "네임에이드 방수 네임스티커 패키지 9종", img: "https://thumbnail15.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/bc83/5010345dec680b4fe99e235d48f99e59c7907b7bfc8b3f8ddfbcf068285a.jpg" },
+  ] },
+];
+const LEDE_DISC = ` <span class="kp-disc">${COUPANG_DISCLOSURE}</span>`;
 
 const card = (h2, body, src = "") => `<div class="card bz"><h2>${h2}</h2>${body}${src ? `<p class="src">출처: ${src}</p>` : ""}</div>`;
 const P = (s) => `<p>${s}</p>`;
@@ -159,11 +173,11 @@ inp.addEventListener("input",run);$("f").addEventListener("submit",e=>{e.prevent
   },
   {
     slug: "school", cat: "age", title: "학교 입학·졸업 년도 계산기", short: "초·중·고·대학 입학과 졸업 연도",
-    lede: "출생연도를 넣으면 초등학교부터 대학교까지 입학·졸업 연도를 계산합니다. 2009년 이후 취학 기준(1월생 조기입학 폐지)입니다.",
+    lede: "출생연도를 넣으면 초등학교부터 대학교까지 입학·졸업 연도를 계산합니다. 2009년 이후 취학 기준(1월생 조기입학 폐지)입니다." + LEDE_DISC,
     description: "입학 졸업 년도 계산기. 출생연도로 초등학교·중학교·고등학교·대학교 입학 연도와 졸업 연도, 학번을 확인하세요.",
     keys: ["입학년도", "졸업년도", "학번", "취학"], related: ["student-age", "suneung", "age"],
     form: `<form id="f" autocomplete="off">${yearField("y", "출생연도")}<div class="field"><label>학제 기준</label><div class="seg" id="mode"><button type="button" data-v="normal" aria-pressed="true">정상 취학</button><button type="button" data-v="early" aria-pressed="false">1년 빠름</button><button type="button" data-v="late" aria-pressed="false">1년 늦음</button></div><p class="help">재수·휴학·유급은 반영하지 않습니다.</p></div></form>`,
-    info: card("취학 기준", P("초·중등교육법에 따라 만 6세가 되는 날이 속한 해의 다음 해 3월 1일에 초등학교에 입학합니다. 즉 출생연도 + 7년입니다.") + P("2008년 이전에는 3월 1일~다음 해 2월 말 출생을 한 학년으로 묶어 1·2월생이 한 해 먼저 입학했습니다(이른바 빠른 년생). 그 경우 '1년 빠름'을 고르세요."), '<a href="https://www.law.go.kr/법령/초·중등교육법" rel="noopener">초·중등교육법 제13조</a>'),
+    info: card("취학 기준", P("초·중등교육법에 따라 만 6세가 되는 날이 속한 해의 다음 해 3월 1일에 초등학교에 입학합니다. 즉 출생연도 + 7년입니다.") + P("2008년 이전에는 3월 1일~다음 해 2월 말 출생을 한 학년으로 묶어 1·2월생이 한 해 먼저 입학했습니다(이른바 빠른 년생). 그 경우 '1년 빠름'을 고르세요."), '<a href="https://www.law.go.kr/법령/초·중등교육법" rel="noopener">초·중등교육법 제13조</a>') + pickCard({ title: "초등학교 입학 준비물", intro: `2027년 3월에 초등학교에 들어가는 아이는 2020년생입니다. 입학 전 많이 사는 책가방과 이름 스티커를 골랐습니다(${PICKED} 확인). 책가방은 학교마다 권장 크기·무게 안내가 있을 수 있으니 입학 안내문을 먼저 보세요.`, groups: SCHOOL_PICKS }),
     script: pre + `const inp=$("y-y");let off=0;const seg=$("mode");seg.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));off=b.dataset.v==="early"?-1:b.dataset.v==="late"?1:0;run();});
 function run(){const y=parseInt(inp.value,10);if(!(y>1900&&y<2100)){out.hidden=true;return;}const s=N.school(y+off);const rows=[["초등학교",s.elemIn,s.elemOut],["중학교",s.midIn,s.midOut],["고등학교",s.highIn,s.highOut],["대학교 (4년제)",s.univIn,s.univOut]];
 out.innerHTML=\`<div class="result-hero"><div class="k">\${y}년생</div><div class="v">\${String(s.univIn).slice(2)}학번<small>대학 \${s.univIn}년 입학</small></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>학교</th><th>입학</th><th>졸업</th><th>상태</th></tr></thead><tbody>\${rows.map(([n,i,o])=>\`<tr><td>\${n}</td><td>\${i}년 3월</td><td>\${o}년 2월</td><td>\${TY<i?"입학 전":TY<o||(TY===o&&N.M(T)<3)?"재학 중":"졸업"}</td></tr>\`).join("")}</tbody></table></div><p class="note">수능은 고3 해 11월, 즉 \${s.highOut-1}년 11월(\${s.highOut}학년도 수능)입니다.</p>\`;N.bump(out);N.setQS({y});}
