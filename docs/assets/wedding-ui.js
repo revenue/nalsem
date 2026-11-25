@@ -30,6 +30,9 @@ function wire(form, calcName, run) {
   document.addEventListener("click", (e) => {
     const link = e.target.closest("[data-template-link]");
     if (link && N) N.track("template_click", { calculator: calcName, item_id: "wedding-sheet-2027", placement: link.dataset.placement || "result" });
+    // 제휴 링크(쿠팡·아고다) 클릭: 플랫폼과 항목 이름만 보낸다.
+    const aff = e.target.closest("[data-aff]");
+    if (aff && N) N.track("affiliate_click", { calculator: calcName, partner: aff.dataset.aff, item_id: aff.dataset.affItem || "" });
   });
   return { go, schedule };
 }
