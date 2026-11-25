@@ -28,12 +28,12 @@ const promo = (id, body) => `<div class="card bz ap-promo" id="${id}"><h2>${SHEE
 
 // ── 제휴 링크 묶음 (페이지당 1곳, 결과 바로 아래) ─────────────
 // 근거: 본부 저장소 ops/operating-policy.md 5·6장, research/제휴플랫폼_국내_2026-11-26.md 4장 아이디어 3 (2026-11-26).
-// 쿠팡은 검색 결과 링크(상품을 고르지 않고 가격을 저장·표시하지 않는다), 신혼여행 숙소는 링크프라이스 아고다 링크(매체 suik.me, 첫 화면으로 감).
+// 쿠팡은 검색 결과 링크(상품을 고르지 않고 가격을 저장·표시하지 않는다), 신혼여행 숙소는 링크프라이스 아고다 링크(매체 날셈 nalsem.suik.me, 2026-11-26 승인, 첫 화면으로 감).
 // 대가 문구는 묶음 맨 위에 확정 표현으로 쓰고, 플랫폼 지정 문구를 그대로 붙인다. 후기형 문구·이미지·플로팅·대출·카드 할부 추천은 넣지 않는다.
 // <aside>로 감싸서 FAQ 구조화 데이터(layout.mjs faqOf)에 들어가지 않게 한다.
 const CP = (code) => `https://link.coupang.com/a/${code}`;
 // 아고다: 2026-11-26 확인 결과 도시 페이지·검색 주소로 딥링크해도 아고다 첫 화면(ko-kr)으로 간다. 그래서 도시 이름을 붙이지 않고 첫 화면 링크 1개만 쓴다.
-const AGODA_HOME = `https://click.linkprice.com/click.php?m=agoda&a=A100708213&l=9999&l_cd1=3&l_cd2=0&tu=${encodeURIComponent("https://www.agoda.com/ko-kr/")}`;
+const AGODA_HOME = `https://click.linkprice.com/click.php?m=agoda&a=A100710565&l=9999&l_cd1=3&l_cd2=0&tu=${encodeURIComponent("https://www.agoda.com/ko-kr/")}`;
 export const AFF = {
   "wedding-meal": {
     title: "하객 준비물 찾아보기",
